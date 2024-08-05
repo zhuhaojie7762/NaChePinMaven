@@ -1,0 +1,175 @@
+<%layout("../layout/header_layout.html"){%>
+<title>员工账号管理</title>
+<style>
+    .sui-modal.fade.in {top: 51%;}
+    .add-text {width: 690px;padding: 3px 8px;}
+    .add-text label{margin:0;padding:0;font-size: 11px;}
+    .btn-primary {background-color: #ec7f15;border: 1px solid #ec7f15;}
+    .btn-primary:hover, .btn-primary:focus {background-color: #ed8e2f;border: 1px solid #ed8e2f;}
+    .sui-form input[type="button"], .sui-form input[type="submit"] {background-color: #c2c2c2 !important;border: 1px solid #c2c2c2 !important;}
+    .sui-form input[type="button"]:hover, .sui-form input[type="submit"]:focus{opacity: .6;}
+    .sui-modal .modal-header {border:0;padding: 15px 0 0 10px;}
+    .w200 {width: 160px !important;}
+    .sui-form.form-horizontal .control-label {width: 66px;}
+    .modal-body .query-zone{padding-top: 20px;height: 446px;}
+    .sui-table tr td:first-child,.sui-table tr td:nth-child(6),.sui-table th:first-child,.sui-table th:nth-child(6){text-align: center;}
+    .sui-table th:last-child, .sui-table tr td:last-child{padding-left:15px;}
+    .modal-body .query-zone{height: 486px;}
+    .btn-save{margin-left:16px;}
+</style>
+<script type="text/javascript">
+    $(function () {
+        Pagination.init();
+        $("input.btn-reset").click(function () {
+            Common.reset("form.query-form");
+        });
+
+        $(".btn-edit").unbind("click").bind("click", function () {
+            $this = $(this);
+            Common.post("/admin/user/edit", {id: $(this).attr("data-id")}, function (json) {
+                $("#J_user_edit_modal").find(".modal-body").html(json.data);
+                Common.ajaxForm($("#J_user_edit_modal").find("form.save-form"), "", function (json) {
+                    if (json.code == Common.SUCC) {
+                        Msg.success(json.message, function () {
+                            if (json.data) {
+                                Common.go(json.data);
+                            } else {
+                                Common.refresh();
+                            }
+                        });
+                    } else {
+                        Msg.danger(json.message);
+                    }
+                });
+                $("#J_user_edit_modal").find(".btn-save").unbind("click").bind("click", function () {
+                    $("#J_user_edit_modal").find("form.save-form").submit();
+                });
+                $this.siblings(".btn-edit-sel").trigger("click");
+            });
+        });
+
+//        $('.sui-modal .modal-header .modal-title').html("添加员工");
+        Common.ajaxForm($("#J_user_add_modal").find("form.save-form"), "", function (json) {
+            if (json.code == Common.SUCC) {
+                Msg.success(json.message, function () {
+                    if (json.data) {
+                        Common.go(json.data);
+                    } else {
+                        Common.refresh();
+                    }
+                });
+            } else {
+                Msg.danger(json.message);
+            }
+        });
+        $("#J_user_add_modal").find(".btn-save").unbind("click").bind("click", function () {
+            $("#J_user_add_modal").find("form.save-form").submit();
+        });
+
+    });
+</script>
+<%}%>
+<%layout("../layout/body_layout.html"){%>
+<div class="query-zone" style="height: 78px;">
+    <form class="sui-form form-horizontal query-form" id="query-form">
+        <input type="hidden" name="perSize" value="${page.perSize!10}">
+
+        <div class="sui-row">
+            <div class="span3 w200">
+                <div class="input-prepend">
+                    <span class="add-on">名称</span>
+                    <input id="prependedInput2" type="text" name="name" value="${parameter.name!''}"
+                           placeholder="名称"
+                           class="input-fat h18 w100">
+                </div>
+            </div>
+            <div class="span2">
+            <div class="input-prepend">
+                    <span class="add-on">
+                        状态
+                    </span>
+                    <span class="sui-dropdown dropdown-bordered select">
+                        <span class="dropdown-inner">
+                            <a role="button" href="javascript:void(0);" data-toggle="dropdown"
+                               class="dropdown-toggle h22">
+                                <input value="${params.state!}" name="state" type="hidden">
+                                <i class="caret"></i>
+                                <span>
+                                    ${decode(parameter.state, 'normal', '在职', 'leave', '离职',
+                                    '请选择')}
+                                </span>
+                            </a>
+                            <ul role="menu" aria-labelledby="drop4" class="sui-dropdown-menu">
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="">请选择</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="normal">在职</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="leave">离职</a>
+                                </li>
+                            </ul>
+                        </span>
+                    </span>
+            </div>
+        </div>
+        </div>
+        <div class="sui-row">
+            <button class="sui-btn btn-primary">查询</button>
+            <input type="button" class="sui-btn btn-primary btn-reset" value="重置"/>
+
+            <div class="sui-btn-group">
+                <#auth name='add' >
+                    <a class="sui-btn btn-primary" data-toggle="modal"
+                       data-width="800px"
+                       data-height="550px"
+                       data-title="添加员工"
+                       data-target="#J_user_add_modal">添加员工</a>
+                </#auth>
+            </div>
+        </div>
+    </form>
+</div>
+<table class="sui-table table-bordered">
+    <thead>
+    <tr>
+        <th width="80">编号</th>
+        <th width="120">名称</th>
+        <th width="120">帐号</th>
+        <th width="120">联系方式</th>
+        <th width="120">紧急联系方式</th>
+        <th width="60">状态</th>
+        <th>操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    <%for(item in pager.data!){%>
+    <tr>
+        <td>${item.code!}</td>
+        <td>${item.name!}</td>
+        <td>${item.username}</td>
+        <td>${item.phone!}</td>
+        <td>${item.emergencyPhone!}</td>
+        <td>${item.state.value!}</td>
+        <td>
+            <#auth name="edit">
+                <a class="hidden btn-edit-sel" data-toggle="modal"
+                   data-width="large"
+                   data-title="编辑员工"
+                   data-target="#J_user_edit_modal"></a>
+                <a data-id="${item.id}" class="sui-btn btn-small btn-edit">编辑</a>
+            </#auth>
+        </td>
+    </tr>
+    <%}elsefor{%>
+    <tr>
+        <td colspan="7" class="zanWuShuju"><p>没有数据</p></td>
+    </tr>
+    <%}%>
+    </tbody>
+</table>
+<#page val="${pager.page!}" size="large" params="${parameter.map!}"/>
+<%include("../modal/user_add_modal.html"){}%>
+<%include("../modal/user_edit_modal.html"){}%>
+<%}%>

@@ -1,0 +1,421 @@
+<%layout("/web/layout/header_layout.html"){%>
+<link rel="stylesheet" type="text/css" href="/static/css/admin.css?v=${v}">
+<script src="/static/js/web/zixie.js"></script>
+<%}%>
+<%layout("/web/layout/body_layout.html"){%>
+<style>
+    .sui-form{line-height: 30px;}
+    .add_xuanfclass{margin-top:66px;cursor: pointer;}
+    .zx_grzxUser{margin: 28px 44px 0 35px;}
+</style>
+<div class="zx_type">
+    <div class="zx_arrow"></div>
+    选择货品分类
+</div>
+<p class="zx_grzxUser"><span class="indTitleTao"></span>选择货品分类</p>
+<form class="sui-form form-horizontal query-form" id="query-form">
+    <input type="hidden" name="goodid" value="${goodid!}">
+    <div class="zx_fabugoods" >
+        <!--分类选择 start-->
+        <div id="CategoryTitle">
+            <ul id="TitleContent">
+                <li>选择一级分类</li>
+                <li>选择二级分类</li>
+                <li>选择三级分类</li>
+            </ul>
+        </div>
+        <div id="CategorySelector">
+            <ul id="Category_rootclass" class="Blank">
+            </ul>
+            <ul id="Category_secondclass" class="Blank">
+            </ul>
+            <ul id="Category_thirdclass" class="Blank">
+            </ul>
+        </div>
+        <div class="add_xianshi">
+            <span>你当前选择的类目：</span>
+            <span id="one_class"></span><span class="add_jiangeshuang" id="jiange1"></span><span id="two_class"></span><span class="add_jiangeshuang" id="jiange2"></span><span id="three_class"></span>
+        </div>
+        <div class="add_xuanfclass" >已选择好分类，现在分布货品</div>
+        <script language="javascript" type="text/javascript" id="commonjs">
+            Array.prototype.S = String.fromCharCode(2);
+            Array.prototype.in_array = function(e)
+            {
+                var re = new RegExp(this.S+e+this.S);
+                return re.test(this.S+this.join(this.S)+this.S);
+            }
+            function DataContent()
+            {
+                this.Parent;  // Parent Tags
+                this.ParentID;
+                this.Children;  // Children Tags
+                this.ChildrenID;
+            }
+            function DataServer()
+            {
+                this.mList = new Array();
+                this.ListCount = function(){return this.mList.length;}
+                this.GetListObj = function(n)
+                {
+                    if (n<this.ListCount()) return this.mList[n];
+                    return null;
+                }
+                this.Add = function(sParent,sParentID,sChildren,sChildrenID)
+                {
+                    obj = new DataContent();
+                    obj.Parent  = sParent;
+                    obj.ParentID  = sParentID;
+                    obj.Children = sChildren;
+                    obj.ChildrenID = sChildrenID;
+                    this.mList[this.ListCount()] = obj;
+                }
+            }
+            function getTriggerNode(e) {
+                return (document.all)?event.srcElement:e.target;
+            }
+            function getObject(objID)
+            {
+                return document.getElementById(objID);
+            }
+            function CreateList(objName,objData,objSelected)
+            {
+                var listBox = getObject(objName[0]);
+                if(!listBox) return;
+                var strOutput = "";
+                var liClass = "";
+                var id = 0;
+                var op_txt = new Array();
+                var op_val = new Array();
+                var sub_val = new Array();
+                if (objSelected[0])
+                {
+                    for(i=0;i<objData.ListCount();i++)
+                        if(objData.GetListObj(i).ParentID==objSelected[0])
+                        {
+                            id = i;
+                            break;
+                        }
+                    if(i==objData.ListCount()){
+                        listBox.innerHTML="";
+                        listBox.className="Blank";
+                        return false;
+                    }
+                }
+                if(objName[1])
+                    for(i=0;i<objName[1].ListCount();sub_val.push(objName[1].GetListObj(i++).ParentID));
+                tmpobj = objData.GetListObj(id);
+                if (tmpobj.Children.length==0)
+                {
+                    for(i=0;i<objData.ListCount();op_txt.push(objData.GetListObj(i).Parent),op_val.push(objData.GetListObj(i++).ParentID));
+                }
+                else
+                {
+                    op_txt = tmpobj.Children;
+                    op_val = tmpobj.ChildrenID;
+                }
+                for(i=0;i<op_txt.length;i++)
+                {
+                    if(sub_val.in_array(op_val[i]))
+                        liClass = "IsParent";
+                    if(op_val[i] == objSelected[1]){
+                        liClass += " Selected";
+                    }
+                    strOutput += '<li id="'+objName[0]+'__'+op_val[i]+'" class="'+liClass+'">'+op_txt[i]+'</li>';
+                    liClass = '';
+                }
+                listBox.innerHTML = strOutput;
+
+                var liCurr = $("#" + objName[0] + " li.Selected");
+
+                if (liCurr.length > 0) {
+                    changeCategoryStyle(objName[0], liCurr[0]);
+
+                    if (objName[0] == rootclass) {
+                        $("#one_class").html($(liCurr[0]).text());
+                        $("#jiange1").html(">");
+                    }
+
+                    if (objName[0] == secondclass) {
+                        $("#two_class").html($(liCurr[0]).text());
+                        $("#jiange2").html(">");
+                    }
+
+                    if (objName[0] == thirdclass) {
+                        $("#three_class").html($(liCurr[0]).text());
+                    }
+                }
+
+                strOutput = "";
+                listBox.className="";
+            }
+            function changeCategoryStyle(ulID,liCurr){
+                if(lastSelectItem[ulID]){
+                    lastSelectItem[ulID].className=lastSelectItem[ulID].className.replace("Selected","").replace(/\s+$/,"");
+                }
+
+                if (liCurr.className.indexOf("Selected") < 0) {
+                    liCurr.className += " Selected";
+                }
+
+                lastSelectItem[ulID] = liCurr;
+            }
+            function changeCategory(evnt)
+            {
+                var obj = getTriggerNode(evnt);
+                var obj2 = obj;
+                if(obj2.nodeName=="DIV") return (0);
+                if(obj.nodeName != "LI")
+                    obj = obj.parentNode;
+                while(obj2.nodeName != "UL")
+                    obj2 = obj2.parentNode;
+                if(obj.nodeName != "LI") return;
+                changeCategoryStyle(obj2.id,obj);
+                var parentID = (obj.id).split("__")[1];
+
+                var names = [];
+                var ids = [];
+                switch(obj2.id)
+                {
+                    case rootclass:
+                        //二级分类列表
+                        Common.ajax("/admin/goods/subclass", {id:parentID}, function(json) {
+                            if (json.code == Common.SUCC) {
+                                for (var i = 0; i < json.data.length; i++) {
+                                    names[i] = json.data[i].name;
+                                    ids[i] = json.data[i].id;
+                                }
+
+                            } else {
+                                Msg.danger("服务异常");
+                            }
+                        });
+
+                        secondclassData = new DataServer();
+
+                        secondclassData.Add("",parentID,names,ids);
+                        CreateList([secondclass],secondclassData,[parentID,0]);
+
+                        $("#Category_thirdclass li").remove();
+
+                        $("#Category_secondclass li").click(function(){
+                            var Uarry=$("#Category_secondclass li");//获取所有的li元素
+                            var count=$(this).index();//获取li的下标
+                            var Tresult=Uarry.eq(count).text();
+                            $("#two_class").html(Tresult);
+                            $("#jiange2").html(">");
+
+                            $("#three_class").html("");
+
+                        });
+
+                        break;
+                    case secondclass:
+                        //三级级分类列表
+                        Common.ajax("/admin/goods/subclass", {id:parentID}, function(json) {
+                            if (json.code == Common.SUCC) {
+                                for (var i = 0; i < json.data.length; i++) {
+                                    names[i] = json.data[i].name;
+                                    ids[i] = json.data[i].id;
+                                }
+
+                            } else {
+                                Msg.danger("服务异常");
+                            }
+                        });
+
+                        thirdclassData = new DataServer();
+
+                        thirdclassData.Add("",parentID,names,ids);
+                        CreateList([thirdclass],thirdclassData,[parentID,0]);
+
+                        $("#Category_thirdclass li").click(function(){
+                            var Uarry=$("#Category_thirdclass li");//获取所有的li元素
+                            var count=$(this).index();//获取li的下标
+                            var Tresult=Uarry.eq(count).text();
+                            $("#three_class").html(Tresult);
+                        });
+                        break;
+                }
+            }
+
+            var cselect = "CategorySelector";
+
+            var rootclass = "Category_rootclass";
+            var secondclass = "Category_secondclass";
+            var thirdclass = "Category_thirdclass";
+
+            var lastSelectItem = {};
+
+
+            //初始化 三级分类Id
+            var classid = "${parameter.classid!}";
+
+            var pid = "";
+
+            var rootid = 0;
+
+            if (null != classid && classid != "") {
+
+                //三级分类
+                Common.ajax("/admin/goods/classes/get", {id:classid}, function(json) {
+                    if (json.code == Common.SUCC) {
+                        pid = json.data.pid;
+                    } else {
+                        Msg.danger("服务异常");
+                    }
+                });
+
+                var names = [];
+                var ids = [];
+
+                //三级级分类列表
+                Common.ajax("/admin/goods/subclass", {id:pid}, function(json) {
+
+                    names = [];
+                    ids = [];
+
+                    if (json.code == Common.SUCC) {
+                        for (var i = 0; i < json.data.length; i++) {
+                            names[i] = json.data[i].name;
+                            ids[i] = json.data[i].id;
+                        }
+
+                    } else {
+                        Msg.danger("服务异常");
+                    }
+                });
+
+                var thirdclassData = new DataServer();
+
+                thirdclassData.Add("", pid, names, ids);
+                CreateList([thirdclass],thirdclassData,[pid,classid]);
+
+                $("#Category_thirdclass li").click(function(){
+                    var Uarry=$("#Category_thirdclass li");//获取所有的li元素
+                    var count=$(this).index();//获取li的下标
+                    var Tresult=Uarry.eq(count).text();
+                    $("#three_class").html(Tresult);
+                });
+
+                var secondId = pid;
+
+                //二级分类
+                Common.ajax("/admin/goods/classes/get", {id:pid}, function(json) {
+                    if (json.code == Common.SUCC) {
+                        pid = json.data.pid;
+                    } else {
+                        Msg.danger("服务异常");
+                    }
+                });
+
+                //二级级分类列表
+                Common.ajax("/admin/goods/subclass", {id:pid}, function(json) {
+
+                    names = [];
+                    ids = [];
+
+                    if (json.code == Common.SUCC) {
+                        for (var i = 0; i < json.data.length; i++) {
+                            names[i] = json.data[i].name;
+                            ids[i] = json.data[i].id;
+                        }
+
+                    } else {
+                        Msg.danger("服务异常");
+                    }
+                });
+
+                var secondclassData = new DataServer();
+                secondclassData.Add("",pid,names,ids);
+                CreateList([secondclass],secondclassData,[pid,secondId]);
+
+                $("#Category_secondclass li").click(function(){
+                    var Uarry=$("#Category_secondclass li");//获取所有的li元素
+                    var count=$(this).index();//获取li的下标
+                    var Tresult=Uarry.eq(count).text();
+                    $("#two_class").html(Tresult);
+                    $("#jiange2").html(">");
+
+                    $("#three_class").html("");
+
+                });
+
+                rootid = pid;
+            }
+
+
+            var rootclassData = new DataServer();
+
+            //初始化一级分类
+            Common.ajax("/admin/goods/rootclass", null, function(json) {
+                if (json.code == Common.SUCC) {
+                    for (var i = 0; i < json.data.length; i++) {
+                        rootclassData.Add(json.data[i].name, json.data[i].id,[],[]);
+                    }
+                } else {
+                    Msg.danger("服务异常");
+                }
+            });
+
+            //var secondclassData = new DataServer();
+            //secondclassData.Add("",1,["汽车内饰用品","汽车保养用品"],[1,2]);
+
+            //var thirdclassData = new DataServer();
+            //thirdclassData.Add("",1,["坐垫/座套","脚垫/后备箱","方向盘套","头枕腰靠","香水","空气净化","车内饰品","车身装饰","车衣","功能小件","安全座椅"],[1,2,3,4,5,6,7,8,9,10,11]);
+            //thirdclassData.Add("",2,["油漆","保养机油"],[1,2]);
+
+            CreateList([rootclass],rootclassData,[0,rootid]);
+            getObject(cselect).onclick = changeCategory;
+
+
+            /*选择一级类目值*/
+            $("#Category_rootclass li").click(function(){
+                var Uarry=$("#Category_rootclass li");//获取所有的li元素
+                var count=$(this).index();//获取li的下标
+                var Tresult=Uarry.eq(count).text();
+                $("#one_class").html(Tresult);
+                $("#jiange1").html(">");
+
+                //清空
+                $("#two_class").html("");
+                $("#jiange2").html("");
+                $("#three_class").html("");
+
+            });
+
+            $(".add_xuanfclass").click(function(){
+                var array=$("li.Selected");//获取所有的li元素
+                if (array.length != 3) {
+                    Msg.danger("请选择分类");
+                    return;
+                }
+
+                var classid;
+
+                for (var i = 0; i < array.length; i++) {
+
+                    if ((array[i].id).split("__")[0] == 'Category_thirdclass') {
+                        classid = (array[i].id).split("__")[1];
+                    }
+                }
+
+                if (classid == null) {
+                    Msg.danger("请选择三级分类");
+                    return;
+                }
+
+                if (classid != null) {
+                    var goodid = $("input[name=goodid]").val();
+                    if (goodid != null && goodid != '') {
+                        Common.go("/admin/goods/edit?id=" + goodid + "&classid=" + classid);
+                    } else {
+                        Common.go("/member/newGoods/add/v2?classid=" + classid);
+                    }
+                }
+            });
+        </script>
+        <!--分类选择 end-->
+    </div>
+</form>
+<%}%>
+</html>

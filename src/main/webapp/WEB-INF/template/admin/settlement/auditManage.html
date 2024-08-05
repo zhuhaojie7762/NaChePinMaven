@@ -1,0 +1,93 @@
+<%layout("../layout/header_layout.html"){%>
+<title>审核中的账单</title>
+<%}%>
+<script>
+    $(function() {
+        $(".btn-query").click(function() {
+            $("#query-form").submit();
+        });
+
+        $(".btn-reset").click(function() {
+            Common.go("/admin/settlement/check/goAuditManage");
+        });
+    });
+</script>
+<%layout("../layout/body_layout.html"){%>
+<div id="toDay_Con" class="query-zone" style="min-height: 40px;">
+<form id="query-form" class="sui-form form-horizontal query-form">
+    <div class="sui-row">
+        <div class="span2">
+            <div class="input-prepend">
+                <span class="add-on">账单名称 </span>
+                <input class="input h22" type="text" value="${parameter.code!}" name="code" />
+            </div>
+        </div>
+        <div class="span2">
+            <div class="input-prepend">
+                <span class="add-on"> 账单生成时间 </span>
+                <input class="input-date h22" type="text" value="${parameter.startTime!}" data-date-timepicker="true" data-toggle="datepicker" name="startTime" />
+                <span class="add-on2">-</span>
+                <input class="input-date h22" type="text" value="${parameter.endTime!}" data-date-timepicker="true" data-toggle="datepicker" name="endTime" />
+            </div>
+        </div>
+    </div>
+    <div class="sui-row">
+        <input class="sui-btn btn-primary btn-query" type="button" value="查询" />
+        <input class="sui-btn btn-primary btn-reset" type="button" value="重置" />
+    </div>
+</form>
+</div>
+<table class="sui-table table-bordered" id="yueJieTab">
+    <thead>
+    <tr>
+        <th width="116">账单生成时间</th>
+        <th>账单名称</th>
+        <th>当前处理人</th>
+        <th>上一处理人</th>
+        <th>下一处理人</th>
+        <th width="106">操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    <%for(list in lists){%>
+    <tr>
+        <td>${list.created!, 'yyyy-MM-dd HH:mm:ss'}</td>
+        <td>${list.code!}</td>
+
+        <%if(list.status == 'wait_check_first'){%>
+            <td>${list.status.name!}</td>
+            <td>运营专员</td>
+            <td>财务主管</td>
+        <%}else if(list.status == 'wait_check_second'){%>
+            <td>${list.status.name!}</td>
+            <td>运营主管</td>
+            <td>总经理审核</td>
+        <%}else if(list.status == 'wait_check_thirdly'){%>
+            <td>${list.status.name!}</td>
+            <td>财务主管</td>
+            <td>财务结算</td>
+        <%}%>
+
+        <td>
+            <a href="/admin/settlement/order/detail?code=${list.code!}" target="_blank">查看</a>
+            <%for(sign in signs){%>
+                <%if(sign == 8 && list.status.val == 20){%>
+                    <a href="/admin/settlement/check/goChecking?code=${list.code!}&checkId=${list.status.val!}" target="_blank">处理</a>
+                <%}%>
+                <%if(sign == 9 && list.status.val == 40){%>
+                    <a href="/admin/settlement/check/goChecking?code=${list.code!}&checkId=${list.status.val!}" target="_blank">处理</a>
+                <%}%>
+                <%if(sign == 10 && list.status.val == 60){%>
+                    <a href="/admin/settlement/check/goChecking?code=${list.code!}&checkId=${list.status.val!}" target="_blank">处理</a>
+                <%}%>
+            <%}%>
+        </td>
+    </tr>
+    <%}elsefor{%>
+    <tr>
+        <td colspan="6" class="zanWuShuju"><p>没有数据</p></td>
+    </tr>
+    <%}%>
+    </tbody>
+</table>
+<%}%>

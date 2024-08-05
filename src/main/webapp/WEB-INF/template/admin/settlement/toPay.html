@@ -1,0 +1,209 @@
+<%layout("../layout/header_layout.html"){%>
+<title>已结算账单</title>
+<style>
+    #yueJieTab a{padding-right: 15px;}
+</style>
+<script type="text/javascript">
+    $(function () {
+
+        /**
+         * 选择/取消 全部
+         */
+        $("input[name=ckAll]").click(function () {
+            var checkFlag = $(this).prop("checked");
+            $("input[name=items]:checkbox").prop("checked", checkFlag);
+        });
+
+        /**
+         *  选择/取消 单个
+         */
+        $("input[name=items]:checkbox").click(function () {
+            if ($("input[name=items]:checkbox:checked").length == $("input[name=items]:checkbox").length) {
+                $("input[name=ckAll]:checkbox").prop("checked", 'true');
+            } else {
+                $("input[name=ckAll]:checkbox").removeAttr("checked");
+            }
+        });
+
+        /**
+         * 重置
+         */
+        $("input.btn-reset").click(function () {
+            $("input[name=supplierName]").val("");
+            $("input[name=settlementMoney]").val("");
+            $("form.query-form").submit();
+        });
+
+        /**
+         * 确认退款
+         */
+        $(".btn-paid").unbind("click").bind("click", function() {
+            if(!confirm("确认已付款？")){
+                return;
+            }
+            var code = $(this).attr("data-code");
+            Common.post("/admin/settlement/pay/confirmPay", {codes:code}, function (json) {
+                if (json.code == Common.SUCC) {
+                    Msg.success(json.message);
+                    Common.refresh();
+                } else {
+                    Msg.danger(json.message);
+                }
+            });
+        });
+
+        /**
+         * 收支平衡
+         */
+        $(".btn-confirm").unbind("click").bind("click", function() {
+            if(!confirm("确认收支平衡？")){
+                return;
+            }
+            var code = $(this).attr("data-code");
+            Common.post("/admin/settlement/pay/confirmPay", {codes:code}, function (json) {
+                if (json.code == Common.SUCC) {
+                    Msg.success(json.message);
+                    Common.refresh();
+                } else {
+                    Msg.danger(json.message);
+                }
+            });
+        });
+
+        /**
+         * 导出批量付款的EXCEL
+         */
+        $(".btn-batchPay").unbind("click").bind("click", function() {
+            if(!confirm("确定导出批量付款的EXCEL？")){
+                return;
+            }
+            var code = $("input[name=code]").val();
+            Common.downLoadFile({url:"/admin/settlement/pay/batchPay",
+                data:{code:code}});
+        });
+
+        /**
+         * 已付款批量确认
+         */
+        $(".btn-batchPaid").unbind("click").bind("click", function() {
+            if(!confirm("确定已批量付款？")){
+                return;
+            }
+            if($("input[name=items]:checkbox:checked").length == 0){
+                Msg.danger("选择需要批量确认的已付款订单");
+                return;
+            }
+            var codes = new Array();
+            $("input[name=items]:checkbox:checked").each(function (i, item) {
+                codes.push($(item).val());
+            });
+            Common.post("/admin/settlement/pay/confirmPay", {codes:codes.join(",")},
+                    function(json){
+                        if (json.code == Common.SUCC) {
+                            Msg.success(json.message);
+                            Common.refresh();
+                        }else{
+                            Msg.danger(json.message);
+                        }}
+            );
+        });
+    });
+</script>
+<%}%>
+<%layout("../layout/body_layout.html"){%>
+<div class="query-zone" id="searchL">
+    <form class="sui-form form-horizontal query-form" id="query-form">
+        <input type="hidden" name="code" value="${parameter.code}">
+        <div class="sui-row" id="jiesuanFangs">
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        供货商名称
+                    </span>
+                    <input type="text" class="input h22" name="supplierName" value="${parameter.supplierName!}"/>
+                </div>
+            </div>
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        应结算金额&nbsp;&nbsp;&nbsp;
+                    </span>
+                    <input type="text" class="input h22" name="settlementMoney" value="${parameter.settlementMoney!}" onkeyup="if(isNaN(value))execCommand('undo')" onafterpaste="if(isNaN(value))execCommand('undo')"/>
+                </div>
+            </div>
+        </div>
+        <div class="sui-row" style="margin:15px 0 0 2px;">
+            <button class="sui-btn btn-primary">查询</button>
+            <input type="button" class="sui-btn btn-primary btn-reset" value="重置"/>
+            <input type="button" class="sui-btn btn-primary btn-batchPay" value="导出批量付款用EXCEL"/>&nbsp;
+            <input type="button" class="sui-btn btn-primary btn-batchPaid" value="已付款批量确认"/>
+
+            <!--<input type="button" class="sui-btn btn-primary" value="导出供货商账单明细"/>&nbsp;-->
+            <!--<input type="button" class="sui-btn btn-primary" value="导出结算汇总"/>-->
+        </div>
+    </form>
+</div>
+<table class="sui-table table-bordered" id="yueJieTab">
+    <thead>
+    <tr>
+        <th width="70"><input type="checkbox" name="ckAll" value="" id="ckAll">&nbsp;<label for="ckAll">全选/反选</label></th>
+        <th width="80">上次结算日期</th>
+        <th width="80">本次结算日期</th>
+        <th width="120">供货商名称</th>
+        <th width="70">需结算金额</th>
+        <th width="56">退款金额</th>
+        <th width="70">应结算金额</th>
+        <th width="80">收款信息</th>
+        <th width="50">结算状态</th>
+        <th width="50">结算方式</th>
+        <th width="126">操作</th>
+        <th>备注</th>
+    </tr>
+    </thead>
+    <tbody>
+    <%
+        var sumSaleMoney = 0;
+        var sumBackMoney = 0;
+    %>
+    <%for(item in data){%>
+    <tr>
+        <td><input type="checkbox" name="items" value="${item.code}" /></td>
+        <td>${dts.d2d(item.startTime)}</td>
+        <td>${dts.d2d(item.endTime)}</td>
+        <td>${item.supplierCompany}</td>
+        <td>${nums.yuan(item.saleMoney)}</td>
+        <td>${nums.yuan(item.backMoney)}</td>
+        <td>${nums.yuan(item.saleMoney - item.backMoney)}</td>
+        <td>${item.alipayName}&nbsp;&nbsp;&nbsp;${item.alipayCode}</td>
+        <td>${item.status.name}</td>
+        <td>${item.settlementMethod.name}</td>
+        <td>
+            <a href="/admin/settlement/pay/detail?code=${item.code}">明细</a>
+            <%if(item.status != 'finish'){%>
+            <a href="javascript:void(0);" class="wuborderBtn btn-paid" data-code="${item.code}" >已付款确认</a>
+            <%}%>
+        </td>
+        <td>${item.remark}</td>
+        <%
+            sumSaleMoney = sumSaleMoney + item.saleMoney;
+            sumBackMoney = sumBackMoney + item.backMoney;
+        %>
+    </tr>
+    <%}elsefor{%>
+    <tr>
+        <td colspan="12" class="zanWuShuju"><p>没有数据</p></td>
+    </tr>
+    <%}%>
+    </tbody>
+    <tfoot id="yunyingftoot">
+    <tr>
+        <td colspan="12">
+            <span>销售总金额：<strong>${nums.yuan(sumSaleMoney)}</strong>元</span>
+            <span>退款总金额：<strong>${nums.yuan(sumBackMoney)}</strong>元</span>
+            <span>应结算总金额：<strong>${nums.yuan(sumSaleMoney - sumBackMoney)}</strong>元</span>
+        </td>
+    </tr>
+    </tfoot>
+</table>
+</div>
+<%}%>

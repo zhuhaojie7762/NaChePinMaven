@@ -1,0 +1,191 @@
+<%layout("../layout/header_layout.html"){%>
+<title>导出到EXCEL订单</title>
+<script src="/static/js/web/hd_zixie.js?v=${v}"></script>
+<%}%>
+<%layout("../layout/body_layout.html"){%>
+<script type="text/javascript">
+    $(function(){
+        // 全选 or 全不选
+        $("#CheckedAll").click(function(){
+            var checked = $(this).prop("checked");
+            $("input[name=items]").prop("checked", checked);
+        });
+        // 导出excel
+        $(".btn-export").click(function() {
+            var params = new Array();
+            if ($("input[name=items]:checkbox:checked").length > 0) {
+                var codes = new Array();
+                $("input[name=items]:checkbox:checked").each(function (i, item) {
+                   codes.push($(item).val());
+                });
+                params.push("codes=" + codes.join(","));
+            } else {
+                Msg.danger("亲，请先选择要导出的订单！");
+                return;
+            }
+            window.open("/admin/deliver/print/exportToExcel?" + params.join("&"), "_blank");
+        });
+
+        $(".btn-excel").click(function(){
+            codes="";
+            $("input:checkbox").each(function(){
+                if($(this).is(':checked')){
+                    codes += $(this).val() + ";";
+                }
+            });
+            if(codes == ""){
+                Msg.danger("请选择需打印的发货单");
+                return;
+            }
+            window.open("/admin/deliver/print/exportToExcel?codes=" + codes);
+        });
+
+        // remark save
+        Common.ajaxForm($("form[name=remarkForm]"), $("form[name=remarkForm]").action, function(json){
+            if (json.code == Common.SUCC) {
+                Msg.success(json.message, function() {
+                   if (json.data) {
+                       Common.go(json.data);
+                   } else {
+                       Common.refresh();
+                   }
+                });
+            } else {
+                Msg.danger(json.message);
+            }
+        });
+    });
+</script>
+<!--<style>
+    .drjhInfo:after{content: "拣货单001";}
+</style>-->
+<ul class="sui-breadcrumb">
+    <li><a href="/admin/picklist/picking">当日拣货中</a></li>
+    <li class="active">导出到EXCEL订单</li>
+</ul>
+<div class="query-zone" id="confirm_Con">
+    <form class="sui-form form-horizontal query-form" id="query-form">
+        <input type="hidden" name="pickCode" value="${pickCode!}" />
+        <div class="sui-row">
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        快递公司：
+                    </span>
+                    <span class="sui-dropdown dropdown-bordered select h22">
+                        <span class="dropdown-inner">
+                            <a id="select" role="button" href="javascript:void(0);" data-toggle="dropdown" class="dropdown-toggle">
+                                <input type="hidden" name="expressId" data-rules="required" value="${expressInfo.id!0}" />
+                                <i class="caret"></i>
+                                <span>${expressInfo.name!'请选择'}</span>
+                            </a>
+                            <ul role="menu" aria-labelledby="drop12" class="sui-dropdown-menu">
+                                <li role="presentation"><a role="menuitem" tabindex="" href="javascript:void(0);" value="0" >请选择</a></li>
+                                <%for(express in expressLists){%>
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="${express.id!}">${express.name!}</a></li>
+                                <%}%>
+                            </ul>
+                        </span>
+                    </span>
+                </div>
+            </div>
+            <div class="span2">
+                <button class="sui-btn btn-primary" title="查询">查询</button>
+                <input type="button" class="sui-btn btn-primary btn-reset" onclick="location.href='/admin/picklist/picking/pickOrder?pickCode=${pickCode!}'" value="重置" title="重置"/>
+            </div>
+        </div>
+    </form>
+</div>
+<div class="benCi_dingDan">
+    <p>本次拣货的订单（拣货单 ${pickCode!}）</p>
+</div>
+<!--新布局 start-->
+<table class="sui-table table-bordered" id="weiwancheng_Tab">
+    <thead>
+    <th><input type="checkbox" id="CheckedAll">&nbsp;&nbsp;&nbsp;&nbsp;商品详情</th>
+    <th width="60">单价</th>
+    <th width="60">数量</th>
+    <th width="60">状态</th>
+    <th width="60">优惠</th>
+    <th width="80">实付款</th>
+    <th width="80">操作</th>
+    </thead>
+    <tbody>
+    <%for(trade in trades){%>
+    <tr>
+        <td colspan="7" class="tr_bgys">
+            <span class="tab_span01"><input type="checkbox" name="items" value="${trade.code!}"></span>
+            <span class="tab_span02">${trade.code!}</span>
+            <span class="tab_span03">${dts.d2s(trade.created)}</span>
+            <span class="tab_span03">${trade.sendOrder.expressName}</span>
+        </td>
+    </tr>
+    <div class="ty_gyClear"></div>
+        <%for(order in trade.orders){%>
+        <tr>
+            <td class="orderList">
+                <div class="tab_span01"></div>
+                <div class="tab_span02">${order.code!}</div>
+                <div class="hd_ghsDiv">
+                    <p>${order.sellerCompany!}</p>
+                    <p>${order.brand!}</p>
+                </div>
+                <div class="wshop_goods"><img src="${img_url.getS(order.headImg!)}" /></div>
+                <div class="xiangQing">
+                    <span class="shop_xgTitle">${order.goodsName!}</span>
+                    <br />
+                    <span class="tongYong_gg">${order.specPropValue!}</span>
+                    <br />
+                    <span class="tongYong_bh">编号：${order.goodsCode!}&nbsp;&nbsp;货号：${order.goodsItemNo!}</span>
+                </div>
+            </td>
+            <td>${nums.yuan(order.price)}</td>
+            <td>${order.quantity!}</td>
+            <td>${order.status.name!}</td>
+            <%if(orderLP.first){%>
+                <td rowspan="${orderLP.size}" class="wei_yhjuan">
+                    <%if(!isEmpty(trade.coupon.couponTemplate.money!)){%>
+                    ${trade.coupon.couponTemplate.useType.value!}${nums.yuan(trade.coupon.couponTemplate.money!)}元
+                    <%}%>
+                    <%if(trade.packSubsidy > 0){%>
+                    打包优惠${nums.yuan(trade.packSubsidy)}元
+                    <%}%>
+                    <%if(trade.couponId == 0 && trade.packSubsidy == 0){%>
+                    无
+                    <%}%>
+                </td>
+                <td rowspan="${orderLP.size}">
+                    <span style="font-size: 14px;display: block;">${nums.yuan(trade.payment)}元</span>
+                    <span style="display: block;font-size: 12px;">( 含运费${nums.yuan(trade.postFee)}元 )</span>
+                </td>
+                <td rowspan="${orderLP.size}" class="hd_jddwei">
+                    <form name="remarkForm" method="post" action="/admin/picklist/picking/remarkSave">
+                    <span class="beiZhu_wai" title="备注">
+                    <span class="sui-btn btn-small beiZhu_wai">备注</span>
+                        <!-- 备注框 start -->
+                        <p class="header_la">
+                            <input type="hidden" name="tradeCode" value="${trade.code!}" />
+                            <span><textarea name="remark" class="beiZhuQuYu" rows="6" placeholder="请填写备注内容（50字以内）。">${trade.remark!}</textarea></span>
+                            <button class="sui-btn btn-small dingbot">确定</button>
+                        </p>
+                        <!-- 备注框 end -->
+                    </span>
+                    </form>
+                    <a href="/admin/picklist/peiOrder/detail?code=${trade.code}" class="sui-btn btn-small">查看详情</a>
+                    <a href="/admin/deliver/print/exportToExcel?codes=${trade.code!}" class="sui-btn btn-small" style="clear:both;margin-bottom: 36px;">导出到EXCEL</a>
+                </td>
+            <%}%>
+        </tr>
+        <%}%>
+    <%}elsefor{%>
+    <tr>
+        <td colspan="7" class="zanWuShuju"><p>没有数据</p></td>
+    </tr>
+    <%}%>
+    </tbody>
+</table>
+<div class="hdMore_btns hd_botomDiv">
+    <input type="button" class="sui-btn btn-primary btn-export" value="导出到EXCEL"/>&nbsp;&nbsp;
+    <a href="/admin/picklist/picking/kuaiDiOrder?pickCode=${pickCode!}" class="sui-btn btn-primary btn-piliang">完成快递面单打印</a>
+</div>
+<%}%>

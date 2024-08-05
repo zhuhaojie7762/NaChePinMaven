@@ -1,0 +1,124 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="carlist_content-Type" carlist_content="text/html; charset=utf-8" />
+    <meta name="viewport" carlist_content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>供货商中心--对账单</title>
+    <link href="/static/images/web/ncp_logo.ico" rel="icon" type="image/x-icon"/>
+    <link href="/static/images/web/ncp_logo.ico" rel="shortcut icon" type="image/x-icon"/>
+    <link rel="stylesheet" type="text/css" href="/static/css/web/common.css?v=${v}">
+    <link rel="stylesheet" type="text/css" href="/static/css/web/sui.min.css?v=${v}">
+    <link rel="stylesheet" type="text/css" href="/static/css/web/style.css?v=${v}">
+    <!--city start-->
+    <link rel="stylesheet" type="text/css" href="/static/css/web/city.css?v=${v}">
+    <!--city end-->
+    <script type="text/javascript" src="/static/js/web/jquery-1.9.1.min.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/web/zixie.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/web/baidu.js?v=${v}"></script>
+    <script type="text/javascript" src="http://g.alicdn.com/sj/lib/jquery/dist/jquery.min.js?v=${v}"></script>
+    <script type="text/javascript" src="http://g.alicdn.com/sj/dpl/1.5.1/js/sui.min.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/common.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/jquery.form.js?v=${v}"></script>
+    <link rel="stylesheet" type="text/css" href="/static/css/msg_box.css?v=${v}">
+    <script type="text/javascript" src="/static/js/MsgBox.js?v=${v}"></script>
+</head>
+<div class="zheZhaoCengCon"></div>
+<%layout("../../layout/body_layout.html"){%>
+<div class="zx_type">
+    <div class="zx_arrow"></div>
+    本期对账单
+</div>
+<p class="zx_grzxUser"><span class="indTitleTao"></span>本期对账单</p>
+<table class="sui-table table-bordered" id="dingdanmingxi">
+    <thead>
+    <tr>
+        <th colspan="11" class="zx_zhangdanColor">${supplier.supplierCompany} 供货商 ( ${dts.d2d(startTime)} ~ ${dts.d2d(endTime)} ) 订单明细</th>
+    </tr>
+    <tr>
+        <th width="70">总订单编号</th>
+        <th width="70">订单编号</th>
+        <th width="70">下单时间</th>
+        <th width="70">商品货号</th>
+        <th width="80">商品单价</th>
+        <th width="80">商品数量</th>
+        <th width="80">商品总金额</th>
+    </tr>
+    </thead>
+    <tbody>
+    <%var sumSales = 0;%>
+    <%for(item in sales){%>
+    <tr>
+        <td>${item.tradeCode!}</td>
+        <td>${item.code!}</td>
+        <td>${dts.d2s(item.payTime)}</td>
+        <td>${item.goodsItemNo!}</td>
+        <td>${nums.yuan(item.price)}</td>
+        <td>${item.quantity!}</td>
+        <td>${nums.yuan(item.money)}</td>
+    </tr>
+    <%sumSales = sumSales + item.money;%>
+    <%}%>
+    </tbody>
+    <tfoot>
+    <tr>
+        <td colspan="11">合计：<strong>${nums.yuan(sumSales)}</strong>元</td>
+    </tr>
+    </tfoot>
+</table>
+<table class="sui-table table-bordered" id="dingdanmingxi02">
+    <thead>
+    <tr>
+        <th colspan="7" class="zx_zhangdanColor">${supplier.supplierCompany} 供货商 ( ${dts.d2d(startTime)} ~ ${dts.d2d(endTime)} ) 结算表</th>
+    </tr>
+    <tr>
+        <th>订单编号</th>
+        <th>支付时间</th>
+        <th>退货申请时间</th>
+        <th>同意申请时间</th>
+        <th>退款原因</th>
+        <th>订单状态</th>
+        <th>退款金额</th>
+    </tr>
+    </thead>
+    <tbody>
+    <%var sumBack = 0;%>
+    <%for(item in backs){%>
+    <tr>
+        <td>${item.code}</td>
+        <td>${dts.d2s(item.payTime)}</td>
+        <td>${dts.d2s(item.applyRefundTime)}</td>
+        <td>${dts.d2s(item.refundConfirmTime)}</td>
+        <td>${item.refundReason}</td>
+        <td>${item.status.name}</td>
+        <td>${nums.yuan(item.money)}</td>
+    </tr>
+    <%sumBack = sumBack + item.money;%>
+    <%}%>
+    <tfoot>
+    <tr>
+        <td colspan="11">合计：<strong>${nums.yuan(sumBack)}</strong>元</td>
+    </tr>
+    </tfoot>
+    </tbody>
+</table>
+<table class="sui-table table-bordered" id="dingdanmingxi03">
+    <thead>
+    <tr>
+        <th colspan="8" class="zx_zhangdanColor">本期结算金额</th>
+    </tr>
+    <tr class="zx_youbor">
+        <th>本期需结算金额</th>
+        <th>本期退款金额</th>
+        <th>实际应结算金额</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td>${nums.yuan(sumSales)}</td>
+        <td>${nums.yuan(sumBack)}</td>
+        <td>${nums.yuan(sumSales - sumBack)}</td>
+    </tr>
+    </tbody>
+</table>
+<%}%>
+</html>

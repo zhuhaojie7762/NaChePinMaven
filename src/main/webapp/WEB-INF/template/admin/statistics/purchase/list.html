@@ -1,0 +1,187 @@
+<%layout("../../layout/header_layout.html"){%>
+<title>进货商统计</title>
+<script type="text/javascript">
+    $(function(){
+        //重置
+        $("input.btn-reset").click(function () {
+            Common.reset("form.query-form");
+        });
+
+        //查询
+        $("input.btn-query").click(function(){
+            if($("input[name=startTime]").val() == "" || $("input[name=endTime]").val() == ""){
+                Msg.warning("请输入下单时间");
+                return;
+            }
+            $("form.query-form").submit();
+        });
+
+        //当日，最近1周，最近1个月
+        dateFunc.init($("#btn-today"),"today", $("input[name=startTime]"), $("input[name=endTime]"));
+        dateFunc.init($("#btn-lastWeek"),"lastWeek", $("input[name=startTime]"), $("input[name=endTime]"));
+        dateFunc.init($("#btn-lastMonth"),"lastMonth", $("input[name=startTime]"), $("input[name=endTime]"));
+
+        //导出当前结果
+        $("input.btn-export").click(function(){
+            var params = new Array();
+            $($("form.query-form").serializeArray()).each(function (i, item) {
+                params.push(item.name + "=" + item.value);
+            });
+            window.open("/admin/statistics/purchase/exportNow?" + params.join("&"), "_blank");
+        });
+
+        //导出近30天+7天数据
+        $("input.btn-export30").click(function(){
+            var params = new Array();
+            $($("form.query-form").serializeArray()).each(function (i, item) {
+                params.push(item.name + "=" + item.value);
+            });
+            window.open("/admin/statistics/purchase/export30?" + params.join("&"), "_blank");
+        });
+    });
+</script>
+<%}%>
+<%layout("../../layout/body_layout.html"){%>
+<div class="query-zone" >
+    <form class="sui-form form-horizontal query-form" id="query-form">
+        <div class="sui-row">
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">进货商账号</span>
+                    <input type="text" class="input h22" name="purchaseCode" value="${parameter.purchaseCode!}" />
+                </div>
+            </div>
+<!--            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">订单状态</span>
+                    <span class="sui-dropdown dropdown-bordered select h22">
+                        <span class="dropdown-inner">
+                            <a role="button" data-toggle="dropdown" href="#" class="dropdown-toggle">
+                                <input value="${parameter.status!}" name="status" type="hidden" />
+                                <i class="caret"></i>
+                                <span>
+                                    ${parameter.status!'请选择'}
+                                </span>
+                            </a>
+                            <ul role="menu" aria-labelledby="drop12" class="sui-dropdown-menu">
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" >请选择</a></li>
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="交易中">交易中</a></li>
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="已退款">已退款</a></li>
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="交易关闭">交易关闭</a></li>
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="交易完成">交易完成</a></li>
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="所有">所有</a></li>
+                            </ul>
+                        </span>
+                    </span>
+                </div>
+            </div>-->
+            <div class="span4">
+                <div class="input-prepend">
+                    <span class="add-on">进货商名称</span>
+                    <input type="text" class="input h22" name="purchaseName" value="${parameter.purchaseName!}" />
+                </div>
+            </div>
+            <div class="span4">
+                <div class="input-prepend">
+                    <span class="add-on">商品总金额</span>
+                    <input type="text" class="input h22" name="minMoney" value="${parameter.minMoney!}" />
+                    <span class="add-on2">-</span>
+                    <input type="text" class="input h22" name="maxMoney" value="${parameter.maxMoney!}" />
+                </div>
+            </div>
+        </div>
+        <div class="sui-row" style="clear:both;">
+            <div class="span4">
+                <div class="input-prepend input-inner">
+                    <span class="add-on">&nbsp;下单时间</span>
+                    <input type="text" class="input-date h22" name="startTime" data-toggle="datepicker" placeholder="时间范围起始"  value="${parameter.startTime!}">
+                    <span class="add-on2">-</span>
+                    <input type="text" class="input-date h22" name="endTime" data-toggle="datepicker" placeholder="时间范围结束" value="${parameter.endTime!}">
+                </div>
+            </div>
+            <div class="span4">
+                <div class="input-prepend">
+                    <span class="add-on" id="more_times">
+                        <span class="zhongKuoHao">【</span>
+                        <a href="javascript:void(0);" class="btn-today" id="btn-today"><span>当日</span></a>
+                        <a href="javascript:void(0);" class="btn-week" id="btn-lastWeek"><span class="more_duanJianGe">最近1周</span></a>
+                        <a href="javascript:void(0);" class="btn-month" id="btn-lastMonth"><span class="more_duanJianGe">最近1个月</span></a>
+                        <span class="zhongKuoHao">】</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="sui-row" >
+            <input type="button" class="sui-btn btn-primary btn-query" value="查询"/>
+            <input type="button" class="sui-btn btn-primary btn-reset" value="重置"/>
+            <input type="button" class="sui-btn btn-primary btn-export30" value="导出近30天+7天数据"/>
+            <input type="button" class="sui-btn btn-primary btn-export" value="导出当前数据"/>
+        </div>
+    </form>
+</div>
+<div class="ncpTable_Con">
+    <p class="addjuzhong">（${parameter.startTime!} ~ ${parameter.endTime!}）订单汇总统计</p>
+</div>
+<table class="sui-table table-bordered" id="jinhuostj_tab">
+    <thead>
+    <tr>
+        <th width="100">进货商账号</th>
+        <th width="100">进货商名称</th>
+        <th width="80">空包商品数</th>
+        <th width="80">实物商品数</th>
+        <th width="70">总商品数</th>
+        <th width="80">空包订单数</th>
+        <th width="80">实物订单数</th>
+        <th width="70">总订单数</th>
+        <th width="90">空包商品总金额</th>
+        <th width="90">实物商品总金额</th>
+        <th width="90">实物商品平均价格</th>
+        <th width="90">商品总金额</th>
+        <th width="90">运费总金额</th>
+        <th width="90">优惠券总金额</th>
+        <th width="90">打包袋总金额</th>
+        <th width="90">打包袋优惠总金额</th>
+        <th width="70">历史总交易额</th>
+        <th width="80">历史所有订单平均价格</th>
+        <th width="80" >退款退货总金额</th>
+        <th width="80">第一次采购时间</th>
+        <th width="80">最后一次采购时间</th>
+        <th width="120">详情明细</th>
+    </tr>
+    </thead>
+    <tbody>
+    <%for(item in statistics){%>
+    <tr>
+        <td>${item.buyerUsername}</td>
+        <td>${item.buyerName}</td>
+        <td>${item.nullGoodsCnt}</td>
+        <td>${item.realGoodsCnt}</td>
+        <td>${item.totalGoodsCnt}</td>
+        <td>${item.nullOrderCnt}</td>
+        <td>${item.realOrderCnt}</td>
+        <td>${item.totalOrderCnt}</td>
+        <td>${item.nullGoodsMoney / 100}</td>
+        <td>${item.realGoodsMoney / 100}</td>
+        <td>${item.realGoodsAvgPrice / 100}</td>
+        <td>${item.totalGoodsMoney / 100}</td>
+        <td>${item.postFee / 100}</td>
+        <td>${item.couponMoney / 100}</td>
+        <td>${item.packFee / 100}</td>
+        <td>${item.packSubsidy / 100}</td>
+        <td>${item.historyTotalMoney / 100}</td>
+        <td>${item.historyAvgPrice / 100}</td>
+        <td>${item.refundMoney / 100}</td>
+        <td>${dts.d2d(item.firstPurchaseTime)}</td>
+        <td>${dts.d2d(item.lastPurchaseTime)}</td>
+        <td>
+            <a href="/admin/statistics/purchase/detail?id=${item.buyerId}&startTime=${parameter.startTime!}&endTime=${parameter.endTime!}" class="sui-btn btn-small" target="_blank" title="明细统计">明细统计</a>
+        </td>
+    </tr>
+    <%}elsefor{%>
+    <tr>
+        <td colspan="19" class="zanWuShuju"><p>没有数据</p></td>
+    </tr>
+    <%}%>
+    </tbody>
+</table>
+<%}%>

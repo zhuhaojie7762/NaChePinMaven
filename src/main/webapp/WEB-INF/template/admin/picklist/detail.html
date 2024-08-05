@@ -1,0 +1,301 @@
+<%layout("../layout/header_layout.html"){%>
+<title>拣货单详情</title>
+<script type="text/javascript">
+    $(function () {
+        $(".btn-close").unbind("click").bind("click", function () {
+            Common.backHistory();
+        });
+    });
+</script>
+<style>
+    .baseInfo:after {
+        content: "订单详情";
+    }
+
+    .buyInfo:after {
+        content: "物流信息";
+    }
+    .lcTuInfo:after{
+        content: "订单状态";
+    }
+    .hPInfo:after{content: "货品信息";}
+</style>
+<%}%>
+<%layout("../layout/body_layout.html"){%>
+<!--订单详情 start-->
+<div class="info-group lcTuInfo" id="dingDanZT">
+    <div class="ncp_ddzt_zt01">
+        <div class="ncp_ddztRight">
+            <img src="/static/images/web/ttu_3.png" alt="订单状态">
+            <span class="xiadanTime01">${order.created!, "yyyy-MM-dd"}</span>
+            <span class="xiadanU_02">${order.payTime!, "yyyy-MM-dd"}</span>
+            <span class="xiadanU_03">${order.payTime!, "yyyy-MM-dd"}</span>
+        </div>
+    </div>
+</div>
+<form class="sui-form form-horizontal detail-form" novalidate="novalidate" method="POST">
+    <div class="info-group baseInfo" id="xq_xiangX" >
+        <div class="xq_pai01">
+            <div class="control-group" >
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">总订单编号：</span>
+                        <span class="add-text h18">
+                            ${trade.code!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="xq_pai02">
+            <div class="control-group" >
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">供货商账号：</span>
+                        <span class="add-text h18">
+                            ${seller.username!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="xq_pai02">
+            <div class="control-group" >
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">买家名称：</span>
+                        <span class="add-text h18">
+                            ${buyer.name!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="ncp_clear"></div>
+        <div class="xq_pai01">
+            <div class="control-group" >
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">子订单编号：</span>
+                        <span class="add-text h18">
+                            ${order.code}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="xq_pai02">
+            <div class="control-group" >
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">供货商名称：</span>
+                        <span class="add-text h18">
+                            ${seller.name!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="xq_pai02">
+            <div class="control-group" >
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">买家邮编：</span>
+                        <span class="add-text h18">
+                            ${buyer.postCode!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="ncp_clear"></div>
+        <div class="xq_pai01">
+            <div class="control-group" >
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">优惠信息：</span>
+                        <span class="add-text h18">
+                            5元优惠券已抵
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="xq_pai02">
+            <div class="control-group" >
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">供货商电话：</span>
+                        <span class="add-text h18">
+                            ${seller.phone!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="xq_pai02">
+            <div class="control-group" >
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">买家电话：</span>
+                        <span class="add-text h18">
+                           ${buyer.phone!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="ncp_clear"></div>
+        <div class="xq_pai01">
+            <div class="control-group" >
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">总运费(元)：</span>
+                        <span class="add-text h18">
+                           ${nums.yuan(trade.postFee)}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="xq_pai02">
+            <div class="control-group" >
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">供货商地址：</span>
+                        <textarea rows="2">${seller.pickAddress}</textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="xq_pai02">
+            <div class="control-group" >
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">买家地址：</span>
+                        <textarea rows="2">${buyer.address}</textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="info-group hPInfo" id="hddd_xq">
+        <table class="sui-table table-bordered">
+            <thead>
+            <th width="240">货品详情</th>
+            <th>规格属性</th>
+            <th width="90">单价</th>
+            <th width="90">数量</th>
+            <th width="130">货品总价(元)</th>
+            <th width="90">是否特殊商品</th>
+            <th width="60">状态</th>
+            </thead>
+            <tbody>
+            <tr>
+                <td>
+                    <img src="${img_url.getS(order.headImg!)}" width="70" style="float:left;" />
+                    <p style="float: left;width: 160px;;">${order.goodsName}</p>
+                </td>
+                <td>
+                    <span>${order.SpecPropValue}</span>
+                </td>
+                <td>${nums.yuan(order.price)}</td>
+                <td>${order.quantity}</td>
+                <td>${nums.yuan(order.money)}</td>
+                <td>${order.isSpecial?'是':'否'}</td>
+                <td>${order.status.name}</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="info-group buyInfo" id="wuLiuxx">
+        <div class="control-group">
+            <div class="xq_botom">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">收货人信息：</span>
+                    <span class="add-text h18">
+                        ${sendOrder.buyerName}
+                    </span>
+                    </div>
+                </div>
+            </div>
+            <div class="xq_botom">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">拣货人：</span>
+                    <span class="add-text h18">
+                       无
+                    </span>
+                    </div>
+                </div>
+            </div>
+            <div class="xq_botom">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">拣货完成时间：</span>
+                    <span class="add-text h18">
+                       无
+                    </span>
+                    </div>
+                </div>
+            </div>
+            <div class="xq_botom">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">发货人：</span>
+                    <span class="add-text h18">
+                        无
+                    </span>
+                    </div>
+                </div>
+            </div>
+            <div class="xq_botom">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">发货完成时间：</span>
+                    <span class="add-text h18">
+                         无
+                    </span>
+                    </div>
+                </div>
+            </div>
+            <div class="xq_botom">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">物流公司：</span>
+                    <span class="add-text h18">
+                        ${trade.expressName}
+                    </span>
+                    </div>
+                </div>
+            </div>
+            <div class="xq_botom">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">物流单号：</span>
+                    <span class="add-text h18">
+                       无
+                    </span>
+                    </div>
+                </div>
+            </div>
+            <div class="xq_botom">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">物流跟踪：</span>
+                    <span class="add-text h18">
+                       无
+                    </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <input type="button" class="sui-btn btn-primary btn-close" value="关闭"/>
+</form>
+<%include("../common/dialog.html"){}%>
+<%}%>
+

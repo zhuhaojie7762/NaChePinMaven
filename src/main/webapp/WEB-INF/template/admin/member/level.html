@@ -1,0 +1,47 @@
+<%layout("../layout/header_layout.html"){%>
+<title>会员设置</title>
+
+<%}%>
+<%layout("../layout/body_layout.html"){%>
+<div class="huanyingBg">
+    <p>
+        <span class="pingtai_title">平台当前会员:</span><span class="huiyuan_hongse">${totalCount}</span><span class="putongYs">位</span>
+        <span class="pintai_mess"><a href="/admin/member/manage">管理查看</a></span>
+    </p>
+</div>
+<div class="ncpTable_Con">
+    <p>
+        <span class="huiyuan_jiegu">当前会员结构</span>
+        <span class="huiyuan_quanyi"><a href="/admin/member/level/edit" title="修改"><button class="sui-btn btn-primary">修改</button></a></span>
+    </p>
+</div>
+<table class="sui-table table-bordered" id="huiyuanTab">
+    <thead>
+    <tr>
+        <th width="120">会员等级</th>
+        <th width="380">会员等级条件</th>
+        <th>人数</th>
+    </tr>
+    </thead>
+    <tbody>
+    <%for(item in memberLevels!){%>
+    <tr>
+        <td>${item.name!}</td>
+        <td>
+            采购总额<strong>${nums.yuan(item.totalMoney)}</strong>元
+            <em>${item.andOr!true ? '且' : '或'}</em>
+            采购单数<strong>${item.totalQuantity}</strong>个
+        </td>
+        <td>${item.memberCount!}</td>
+<!--        <td>${item.info!}</td>-->
+    </tr>
+    <%}elsefor{%>
+    <tr>
+        <td colspan="3" class="member_noData">
+            <p>没有数据</p>
+        </td>
+    </tr>
+    <%}%>
+    </tbody>
+</table>
+<%}%>

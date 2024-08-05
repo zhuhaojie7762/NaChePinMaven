@@ -1,0 +1,26 @@
+body{
+    min-width: 1500px;
+}
+
+[class*="span"] {
+    width: auto;
+}
+audio, canvas, img, svg, video {
+    max-width: 100%;
+    vertical-align: middle;
+}
+
+/* 图片样式 start */
+.img-thumbnail {
+    display: inline-block;
+    max-width: 100%;
+    height: auto;
+    padding: 4px;
+    line-height: 1.53846154;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    -webkit-transition: all .2s ease-in-out;
+    transition: all .2s ease-in-out;
+}
+/* 图片样式 end */

@@ -1,0 +1,54 @@
+<style>
+    #con.sui-navbar,#con .navbar-inner{min-width: 1200px;}
+    .sui-navbar .sui-nav {display: block;float: left;left: 0;margin: 3px 10px 0 0;position: relative;}
+    .sui-layout {margin-top: 6px;position: relative;}
+    .sui-navbar .sui-nav > li > a.active:active,.sui-navbar .sui-nav > li > a.active:hover{color: #ef7700;}
+    .hyTitleY{padding:3px 18px 0 6px;font-size: 16px;}
+</style>
+<div id="con" class="sui-navbar">
+    <div class="navbar-inner">
+        <a href="/admin" class="sui-brand">
+            <img src="/static/images/web/ncp_logo.ico" width="26"/><span class="hyTitleY">纳车品管理后台</span>
+        </a>
+        <ul class="sui-nav">
+            <%for(menu in session.topMenus!){%>
+            <%if(isNotEmpty(menu.children)){%>
+            <li class="sui-dropdown">
+                <a href="javascript:Admin.menuClick(${menu.id});" class="active">&nbsp;${menu.name!}</a>
+            </li>
+            <%}%>
+            <%}%>
+        </ul>
+        <ul class="sui-nav pull-right">
+            <li><a href="#"><img src="/static/images/web/gonghuoshang.png" width="17" />&nbsp;${session.curUser.name!}</a></li>
+            <li><a href="#" data-toggle="modal" data-width="small" data-target="#J_password_edit_modal"><img
+                    src="/static/images/web/editUser.png" width="20"/>&nbsp;修改密码</a></li>
+            <!--<li><a href="#">消息</a></li>-->
+            <li><a href="/admin/logout"><img src="/static/images/web/exitIcon.png" width="17" />&nbsp;退出</a></li>
+        </ul>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        Common.ajaxForm($("#J_password_edit_modal").find("form.setting-password"), "", function (json) {
+            if (json.code == Common.SUCC) {
+                Msg.success(json.message, function () {
+                    if (json.data) {
+                        Common.go(json.data);
+                    } else {
+                        Common.refresh();
+                    }
+                });
+            } else {
+                Msg.danger(json.message);
+            }
+        });
+
+        $("#J_password_edit_modal").find(".btn-settingPwd").unbind("click").bind("click", function () {
+            $("#J_password_edit_modal").find("form.setting-password").submit();
+        });
+    });
+</script>
+
+<%include("../modal/password_edit_modal.html"){}%>

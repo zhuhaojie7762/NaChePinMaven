@@ -1,0 +1,905 @@
+<%layout("/web/layout/header_layout2.html"){%>
+<link rel="stylesheet" type="text/css" href="static/css/web/zx_index.css">
+<!--图片轮播 start-->
+<script src="static/js/zuixin/jquery-1.4.2.min.js"></script>
+<script src="static/js/zuixin/koala.min.1.5.js"/>
+<!--图片轮播 end-->
+<%}%>
+<%layout("/web/layout/body_layout2.html"){%>
+<script>
+    $(document).ready(function(){
+        $("#zx_rbar .zx_con ul li.zx_weixin a").mouseover(function(){
+            $(".zx_weixinCon").css("display","block");
+        });
+        $("#zx_rbar .zx_con ul li.zx_weixin a").mouseout(function(){
+            $(".zx_weixinCon").css("display","none");
+        });
+        /*分类楼层显示与隐藏*/
+        $(window).scroll(function(){
+            height = $(window).scrollTop();
+            if(height > 560){
+                $('#nav').fadeIn(600);
+            }else{
+                $('#nav').fadeOut(300);
+            };
+        });
+        /*返回顶部*/
+        $(".zx_fantop").click(function()
+        {
+            $("html, body").animate({
+                "scroll-top":0
+            },"fast");
+        });
+        /*切换*/
+        $("#towzuodian .zx_til span").click(function(){
+            $(this).addClass("hover").siblings().removeClass("hover");
+            $("#zx_qiehuan ul").eq($("#towzuodian .zx_til span").index(this)).fadeIn(500).siblings().hide(100);
+        });
+
+        $("#threejiaodian .zx_til span").click(function(){
+            $(this).addClass("hover").siblings().removeClass("hover");
+            $("#zx_twoconter ul").eq($("#threejiaodian .zx_til span").index(this)).fadeIn(500).siblings().hide(100);
+        });
+        /*品牌指向*/
+        $(".zx_remaituiJ li").hover(function(){
+            $(this).find(".zx_pinhover").show().animate({
+                opacity:'1'
+            });
+        },function(){
+            $(this).find(".zx_pinhover").hide().animate({
+                opacity:'0'
+            });
+        });
+    });
+</script>
+<div class="zx_lanren">
+    <div class="zx_syright">
+        <div class="zx_rightTop">
+            <%if(isEmpty(session.curCustomer)){%>
+            <p class="add_tophello">您好，欢迎来到纳车品！</p>
+            <ul>
+                <a href="/login.html"><li class="login" title="登录">登录</li></a>
+                <a href="/register.html"><li title="注册">注册</li></a>
+            </ul>
+            <%}else{%>
+            <p class="zx_sayhello">您好，欢迎来到纳车品！</p>
+            <%}%>
+        </div>
+        <div class="zx_conterZ">
+            <p><span class="title">纳车品快讯</span><a href="${ctx}/notice/noticeList.html"><span class="more">更多 > </span></a></p>
+            <ul>
+                <%for(notice in notices.data){%>
+                <%if(strutil.length(notice.title) <= 13){%>
+                <li><a href="${ctx}/notice/${notice.id!}.html">[ ${notice.type.value} ] ${notice.title!}</a></li>
+                <%}else{%>
+                <li><a href="${ctx}/notice/${notice.id!}.html">[ ${notice.type.value} ] ${strutil.subStringTo (notice.title, 0, 13)}...</a></li>
+                <%}%>
+                <%}%>
+            </ul>
+        </div>
+        <div class="zx_bottom">
+            <p>平台入驻流程</p>
+            <a href="${ctx}/member/index.html" title="点击申请" target="_blank"><div>&nbsp;</div></a>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="${ctx}/static/js/jquery.kinMaxShow-1.0.min.js"></script>
+<script type="text/javascript">
+    $(function(){
+        $("#kinMaxShow").kinMaxShow({
+            height:380,
+            button:{
+                showIndex:false,
+                normal:{background:'url(${ctx}/static/images/button.png) no-repeat -14px 0',marginRight:'8px',border:'0',right:'50%',bottom:'20px'},
+                focus:{background:'url(${ctx}/static/images/button.png) no-repeat 0 0',border:'0'}
+            },
+            callback:function(index,action){
+                switch(index){
+                    case 0 :
+                        if(action=='fadeIn'){
+                            $(this).find('.sub_4_1').animate({ opacity: 1 }, 'slow');
+                            $(this).find('.sub_4_2').animate({top:'100px'},360)
+                        }else{
+                            $(this).find('.sub_4_1').animate({ opacity: 0.1 }, 'slow')
+                            $(this).find('.sub_4_2').animate({top:'-360px'},360)
+                        };
+                        break;
+                    case 1 :
+                        if(action=='fadeIn'){
+                            $(this).find('.sub_3_1').animate({right:'200px'},300)
+                            $(this).find('.sub_3_2').animate({top:'76px'},420)
+                            $(this).find('.sub_3_3').animate({left:'216px'},420)
+                        }else{
+                            $(this).find('.sub_3_1').animate({right:'-980px'},300)
+                            $(this).find('.sub_3_2').animate({top:'-460px'},420)
+                            $(this).find('.sub_3_3').animate({left:'-660px'},420)
+                        };
+                        break;
+                    case 2 :
+                        if(action=='fadeIn'){
+                            $(this).find('.sub_1_1').animate({bottom:'-86px'},360)
+                            $(this).find('.sub_1_2').animate({top:'30px'},420)
+                            $(this).find('.sub_1_3').animate({left:'105px'},420)
+                        }else{
+                            $(this).find('.sub_1_1').animate({bottom:'-380px'},360)
+                            $(this).find('.sub_1_2').animate({top:'-360px'},420)
+                            $(this).find('.sub_1_3').animate({left:'-660px'},420)
+                        };
+                        break;
+                    case 3 :
+                        if(action=='fadeIn'){
+                            $(this).find('.sub_2_1').animate({top:'69px'},300)
+                            $(this).find('.sub_2_2').animate({bottom:'60px'},320)
+                        }else{
+                            $(this).find('.sub_2_1').animate({top:'-400px'},300)
+                            $(this).find('.sub_2_2').animate({bottom:'-320px'},300)
+                        };
+                        break;
+                }
+            }
+        });
+    });
+</script>
+<div id="kinMaxShow">
+    <%for(banner in homeBanner){%>
+    <div onclick="window.open('${banner.url!}');" class="add_shouxingY">
+        <img src="${img_url.fullPath(banner.image!)}" />
+    </div>
+    <%}%>
+</div>
+<!--Banner end-->
+<!--楼层滚动 start-->
+<ul id="nav">
+    <li><a href="#onedayNew">每日<br />上新</a></li>
+    <li><a href="#towzuodian">坐垫<br />座套</a>
+    <li><a href="#threejiaodian">脚垫<br />后备<br />箱垫</a>
+    <li><a href="#zx_fangxpT">方向<br />盘套</a>
+    <li><a href="#zx_gongnxJ">功能<br />小件</a>
+    <li><a href="#zx_zhishu">汽车<br />指数</a>
+</ul>
+<div id="container">
+    <div id="onedayNew" class="zx_onedayNew">
+        <p class="title">每日上新</p>
+        <ul>
+            <%for(goods in oneDayGoods){%>
+            <li>
+                <a href="${ctx}/goods/${goods.code!}.html" target="_blank">
+                    <img src="${img_url.getL(goods.headImgUrl1)}" />
+                    <p><em>${goods.brand!}</em> ${goods.name!}</p>
+                    <p><span class="price">￥${goods.wholesalePrice/100, "#0.00"}</span></p>
+                </a>
+            </li>
+            <%}%>
+        </ul>
+    </div>
+    <div id="towzuodian">
+        <div class="zx_main">
+            <div class="zx_til">
+                <p>
+                    <div class="zx_bor">1F 坐垫 / 座套</div>
+                    <span class="float_l zx_feilei01 hover" title="坐垫">坐垫</span>
+                    <span class="float_l zx_feilei02" title="座套">座套</span>
+                    <div class="zx_more"><a href="/goods/class/22.html" title="更多好货" target="_blank">更多好货 >></a></div>
+                </p>
+            </div>
+            <div class="ty_gyClear"></div>
+            <%for(banner in leftBanner){%>
+                <%if(banner.type == "cushion"){%>
+                <div class="zx_twolef">
+                    <a href="${banner.url!}" target="_blank">
+                        <img src="${img_url.fullPath(banner.image!)}" />
+                    </a>
+                </div>
+                <%}%>
+            <%}%>
+            <div class="zx_twoconter" id="zx_qiehuan">
+                <ul id="zx_onezt01">
+                    <%for(goods in zuoDian){%>
+                    <li>
+                        <a href="${ctx}/goods/${goods.code!}.html" target="_blank">
+                            <img src="${img_url.getL(goods.headImgUrl1)}" />
+                            <p class="zx_lititle"><em>${goods.brand!}</em> ${goods.name!}</p>
+                            <p><span class="price">￥${goods.wholesalePrice/100, "#0.00"}</span></p>
+                        </a>
+                    </li>
+                    <%}%>
+                </ul>
+                <ul id="zx_onezt02">
+                    <%for(goods in zuoTao){%>
+                    <li>
+                        <a href="${ctx}/goods/${goods.code!}.html" target="_blank">
+                            <img src="${img_url.getL(goods.headImgUrl1)}" />
+                            <p class="zx_lititle"><em>${goods.brand!}</em> ${goods.name!}</p>
+                            <p><span class="price">￥${goods.wholesalePrice/100, "#0.00"}</span></p>
+                        </a>
+                    </li>
+                    <%}%>
+                </ul>
+            </div>
+            <div class="zx_tworight">
+                <p>热销排行</p>
+                <!--图片轮播 start-->
+                <div id="fsD1" class="focus">
+                    <div id="D1pic1" class="fPic">
+                        <div class="fcon">
+                            <ul>
+                                <%for(goods in hotZuoDian){%>
+                                <%var i = goodsLP.index;%>
+                                <%if(i%4 != 0){%>
+                                <li>
+                                    <a href="${ctx}/goods/${goods.code!}.html" target="_blank">
+                                        <img src="${img_url.getL(goods.headImgUrl1)}" />
+                                        <dl>
+                                            <dt>${goods.brand!}</dt>
+                                            <dd>${goods.name!}</dd>
+                                            <dd class="price">￥${goods.wholesalePrice/100, "#0.00"}</dd>
+                                        </dl>
+                                    </a>
+                                </li>
+                                <%}else{%>
+                                <li>
+                                    <a href="${ctx}/goods/${goods.code!}.html" target="_blank">
+                                        <img src="${img_url.getL(goods.headImgUrl1)}" />
+                                        <dl>
+                                            <dt>${goods.brand!}</dt>
+                                            <dd>${goods.name!}</dd>
+                                            <dd class="price">￥${goods.wholesalePrice/100, "#0.00"}</dd>
+                                        </dl>
+                                    </a>
+                                </li>
+                                <%}%>
+                                <%if(i != 12){%>
+                                <%if(i%4 == 0){%>
+                            </ul></div><div class="fcon"><ul>
+                        <%}%>
+                        <%}else{%>
+                    </ul></div>
+                        <%}%>
+                        <%}%>
+                    </div>
+                    <div class="fbg">
+                        <div class="D1fBt" id="D1fBt">
+                            <a href="javascript:void(0)" hidefocus="true" target="_self" class=""><i>1</i></a>
+                            <a href="javascript:void(0)" hidefocus="true" target="_self" class=""><i>2</i></a>
+                            <a href="javascript:void(0)" hidefocus="true" target="_self" class="current"><i>3</i></a>
+                        </div>
+                    </div>
+                </div>
+                <script type="text/javascript">
+                    Qfast.add('widgets', { path: "static/js/zuixin/terminator2.2.min.js", type: "js", requires: ['fx'] });
+                    Qfast(false, 'widgets', function () {
+                        K.tabs({
+                            id: 'fsD1',
+                            conId: "D1pic1",
+                            tabId:"D1fBt",
+                            tabTn:"a",
+                            conCn: '.fcon',
+                            effect: 'fade',
+                            eType: 'click',
+                            pageBt:true,
+                            bns: ['.prev', '.next'],
+                            interval: 3000
+                        })
+                    })
+                </script>
+                <!--图片轮播 end-->
+            </div>
+        </div>
+        <div class="ty_gyClear"></div>
+        <div class="zx_huanyipiOne">
+            <div class="zx_remai">
+                热卖推荐
+            </div>
+            <div class="zx_remaituiJ">
+                <ul>
+                    <%for(brand in brandZuoDian){%>
+                    <li>
+                        <a href="${ctx}/brand/brandDetail.html?brandId=${brand.id!}" target="_blank" title="${brand.name!}">
+                            <div class="jianbiaofont">
+                                <p class="new_bigFont">${brand.name!}</p>
+                            </div>
+                            <div class="zx_pinhover">${brand.name!}</div>
+                        </a>
+                    </li>
+                    <%}%>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div id="threejiaodian">
+        <div class="zx_main">
+            <div class="zx_til">
+                <p>
+                    <div class="zx_bor">2F 脚垫 / 后备箱垫</div>
+                    <span class="float_l zx_feilei01 hover" title="脚垫">脚垫</span>
+                    <span class="float_l zx_feilei02" title="后备箱垫">后备箱垫</span>
+                    <div class="zx_more"><a href="${ctx}/goods/class/23.html" title="更多好货" target="_blank">更多好货 >></a></div>
+                </p>
+            </div>
+            <div class="ty_gyClear"></div>
+            <%for(banner in leftBanner){%>
+                <%if(banner.type == "floorMat"){%>
+                <div class="zx_twolef">
+                    <a href="${banner.url!}" target="_blank">
+                        <img src="${img_url.fullPath(banner.image!)}" />
+                    </a>
+                </div>
+                <%}%>
+            <%}%>
+            <div class="zx_twoconter" id="zx_twoconter">
+                <ul id="zx_three01">
+                    <%for(goods in jiaoDian){%>
+                    <li>
+                        <a href="${ctx}/goods/${goods.code!}.html" target="_blank">
+                            <img src="${img_url.getL(goods.headImgUrl1)}" />
+                            <p class="zx_lititle"><em>${goods.brand!}</em> ${goods.name!}</p>
+                            <p><span class="price">￥${goods.wholesalePrice/100, "#0.00"}</span></p>
+                        </a>
+                    </li>
+                    <%}%>
+                </ul>
+                <ul id="zx_three02">
+                    <%for(goods in houBXD){%>
+                    <li>
+                        <a href="${ctx}/goods/${goods.code!}.html" target="_blank">
+                            <img src="${img_url.getL(goods.headImgUrl1)}" />
+                            <p class="zx_lititle"><em>${goods.brand!}</em> ${goods.name!}</p>
+                            <p><span class="price">￥${goods.wholesalePrice/100, "#0.00"}</span></p>
+                        </a>
+                    </li>
+                    <%}%>
+                </ul>
+            </div>
+            <div class="zx_tworight">
+                <p>热销排行</p>
+                <!--图片轮播 start-->
+                <div id="fsD2" class="focus">
+                    <div id="D1pic2" class="fPic">
+                        <div class="fcon">
+                            <ul>
+                                <%for(goods in hotCheDian){%>
+                                <%var i = goodsLP.index;%>
+                                <%if(i%4 != 0){%>
+                                <li>
+                                    <a href="${ctx}/goods/${goods.code!}.html" target="_blank">
+                                        <img src="${img_url.getL(goods.headImgUrl1)}" />
+                                        <dl>
+                                            <dt>${goods.brand!}</dt>
+                                            <dd>${goods.name!}</dd>
+                                            <dd class="price">￥${goods.wholesalePrice/100, "#0.00"}</dd>
+                                        </dl>
+                                    </a>
+                                </li>
+                                <%}else{%>
+                                <li>
+                                    <a href="${ctx}/goods/${goods.code!}.html" target="_blank">
+                                        <img src="${img_url.getL(goods.headImgUrl1)}" />
+                                        <dl>
+                                            <dt>${goods.brand!}</dt>
+                                            <dd>${goods.name!}</dd>
+                                            <dd class="price">￥${goods.wholesalePrice/100, "#0.00"}</dd>
+                                        </dl>
+                                    </a>
+                                </li>
+                                <%}%>
+                                <%if(i != 12){%>
+                                <%if(i%4 == 0){%>
+                            </ul></div><div class="fcon"><ul>
+                        <%}%>
+                        <%}else{%>
+                    </ul></div>
+                        <%}%>
+                        <%}%>
+                    </div>
+                    <div class="fbg">
+                        <div class="D1fBt" id="D1fBt2">
+                            <a href="javascript:void(0)" hidefocus="true" target="_self" class=""><i>1</i></a>
+                            <a href="javascript:void(0)" hidefocus="true" target="_self" class=""><i>2</i></a>
+                            <a href="javascript:void(0)" hidefocus="true" target="_self" class="current"><i>3</i></a>
+                        </div>
+                    </div>
+                </div>
+                <script type="text/javascript">
+                    Qfast.add('widgets', { path: "static/js/zuixin/terminator2.2.min.js", type: "js", requires: ['fx'] });
+                    Qfast(false, 'widgets', function () {
+                        K.tabs({
+                            id: 'fsD2',
+                            conId: "D1pic2",
+                            tabId:"D1fBt2",
+                            tabTn:"a",
+                            conCn: '.fcon',
+                            effect: 'fade',
+                            eType: 'click',
+                            pageBt:true,
+                            bns: ['.prev', '.next'],
+                            interval: 3000
+                        })
+                    })
+                </script>
+                <!--图片轮播 end-->
+            </div>
+        </div>
+        <div class="ty_gyClear"></div>
+        <div class="zx_huanyipiOne">
+            <div class="zx_remai">
+                热卖推荐
+            </div>
+            <div class="zx_remaituiJ">
+                <ul>
+                    <%for(brand in brandCheDian){%>
+                    <li>
+                        <a href="${ctx}/brand/brandDetail.html?brandId=${brand.id!}" target="_blank" title="${brand.name!}">
+                            <div class="jianbiaofont">
+                                <p class="new_bigFont">${brand.name!}</p>
+                            </div>
+                            <div class="zx_pinhover">${brand.name!}</div>
+                        </a>
+                    </li>
+                    <%}%>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div id="zx_fangxpT">
+        <div class="zx_main">
+            <div class="zx_til">
+                <p>
+                    <span class="zx_bor">3F 方向盘套</span>
+                    <span class="zx_more"><a href="${ctx}/goods/class/24.html" title="更多好货" target="_blank">更多好货 >></a></span>
+                </p>
+            </div>
+            <div class="ty_gyClear"></div>
+            <%for(banner in leftBanner){%>
+                <%if(banner.type == "wheelCover"){%>
+                <div class="zx_twolef">
+                    <a href="${banner.url!}" target="_blank">
+                        <img src="${img_url.fullPath(banner.image!)}" />
+                    </a>
+                </div>
+                <%}%>
+            <%}%>
+            <div class="zx_twoconter">
+                <ul>
+                    <%for(goods in fangXP){%>
+                    <li>
+                        <a href="${ctx}/goods/${goods.code!}.html" target="_blank">
+                            <img src="${img_url.getL(goods.headImgUrl1)}" />
+                            <p class="zx_lititle"><em>${goods.brand!}</em> ${goods.name!}</p>
+                            <p><span class="price">￥${goods.wholesalePrice/100, "#0.00"}</span></p>
+                        </a>
+                    </li>
+                    <%}%>
+                </ul>
+            </div>
+            <div class="zx_tworight">
+                <p>热销排行</p>
+                <!--图片轮播 start-->
+                <div id="fsD3" class="focus">
+                    <div id="D1pic3" class="fPic">
+                        <div class="fcon">
+                            <ul>
+                                <%for(goods in hotFandXP){%>
+                                <%var i = goodsLP.index;%>
+                                <%if(i%4 != 0){%>
+                                <li>
+                                    <a href="${ctx}/goods/${goods.code!}.html" target="_blank">
+                                        <img src="${img_url.getL(goods.headImgUrl1)}" />
+                                        <dl>
+                                            <dt>${goods.brand!}</dt>
+                                            <dd>${goods.name!}</dd>
+                                            <dd class="price">￥${goods.wholesalePrice/100, "#0.00"}</dd>
+                                        </dl>
+                                    </a>
+                                </li>
+                                <%}else{%>
+                                <li>
+                                    <a href="${ctx}/goods/${goods.code!}.html" target="_blank">
+                                        <img src="${img_url.getL(goods.headImgUrl1)}" />
+                                        <dl>
+                                            <dt>${goods.brand!}</dt>
+                                            <dd>${goods.name!}</dd>
+                                            <dd class="price">￥${goods.wholesalePrice/100, "#0.00"}</dd>
+                                        </dl>
+                                    </a>
+                                </li>
+                                <%}%>
+                                <%if(i != 12){%>
+                                <%if(i%4 == 0){%>
+                            </ul></div><div class="fcon"><ul>
+                        <%}%>
+                        <%}else{%>
+                    </ul></div>
+                        <%}%>
+                        <%}%>
+                    </div>
+                    <div class="fbg">
+                        <div class="D1fBt" id="D1fBt3">
+                            <a href="javascript:void(0)" hidefocus="true" target="_self" class=""><i>1</i></a>
+                            <a href="javascript:void(0)" hidefocus="true" target="_self" class=""><i>2</i></a>
+                            <a href="javascript:void(0)" hidefocus="true" target="_self" class="current"><i>3</i></a>
+                        </div>
+                    </div>
+                </div>
+                <script type="text/javascript">
+                    Qfast.add('widgets', { path: "static/js/zuixin/terminator2.2.min.js", type: "js", requires: ['fx'] });
+                    Qfast(false, 'widgets', function () {
+                        K.tabs({
+                            id: 'fsD3',
+                            conId: "D1pic3",
+                            tabId:"D1fBt3",
+                            tabTn:"a",
+                            conCn: '.fcon',
+                            effect: 'fade',
+                            eType: 'click',
+                            pageBt:true,
+                            bns: ['.prev', '.next'],
+                            interval: 3000
+                        })
+                    })
+                </script>
+                <!--图片轮播 end-->
+            </div>
+        </div>
+        <div class="ty_gyClear"></div>
+        <div class="zx_huanyipiOne">
+            <div class="zx_remai">
+                热卖推荐
+            </div>
+            <div class="zx_remaituiJ">
+                <ul>
+                    <%for(brand in brandFanXP){%>
+                    <li>
+                        <a href="${ctx}/brand/brandDetail.html?brandId=${brand.id!}" target="_blank" title="${brand.name!}">
+                            <div class="jianbiaofont">
+                                <p class="new_bigFont">${brand.name!}</p>
+                            </div>
+                            <div class="zx_pinhover">${brand.name!}</div>
+                        </a>
+                    </li>
+                    <%}%>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div id="zx_gongnxJ">
+        <div class="zx_main">
+            <div class="zx_til">
+                <p>
+                    <span class="zx_bor">4F 功能小件</span>
+                    <span class="zx_more"><a href="${ctx}/goods/class/28.html" title="更多好货" target="_blank">更多好货 >></a></span>
+                </p>
+            </div>
+            <div class="ty_gyClear"></div>
+            <%for(banner in leftBanner){%>
+                <%if(banner.type == "carTrim"){%>
+                <div class="zx_twolef">
+                    <a href="${banner.url!}" target="_blank">
+                        <img src="${img_url.fullPath(banner.image!)}" />
+                    </a>
+                </div>
+                <%}%>
+            <%}%>
+            <div class="zx_twoconter">
+                <ul>
+                    <%for(goods in small){%>
+                    <li>
+                        <a href="${ctx}/goods/${goods.code!}.html" target="_blank">
+                            <img src="${img_url.getL(goods.headImgUrl1)}" />
+                            <p class="zx_lititle"><em>${goods.brand!}</em> ${goods.name!}</p>
+                            <p><span class="price">￥${goods.wholesalePrice/100, "#0.00"}</span></p>
+                        </a>
+                    </li>
+                    <%}%>
+                </ul>
+            </div>
+            <div class="zx_tworight">
+                <p>热销排行</p>
+                <!--图片轮播 start-->
+                <div id="fsD4" class="focus">
+                    <div id="D1pic4" class="fPic">
+                        <div class="fcon">
+                            <ul>
+                                <%for(goods in hotSmall){%>
+                                <%var i = goodsLP.index;%>
+                                <%if(i%4 != 0){%>
+                                <li>
+                                    <a href="${ctx}/goods/${goods.code!}.html" target="_blank">
+                                        <img src="${img_url.getL(goods.headImgUrl1)}" />
+                                        <dl>
+                                            <dt>${goods.brand!}</dt>
+                                            <dd>${goods.name!}</dd>
+                                            <dd class="price">￥${goods.wholesalePrice/100, "#0.00"}</dd>
+                                        </dl>
+                                    </a>
+                                </li>
+                                <%}else{%>
+                                <li>
+                                    <a href="${ctx}/goods/${goods.code!}.html" target="_blank">
+                                        <img src="${img_url.getL(goods.headImgUrl1)}" />
+                                        <dl>
+                                            <dt>${goods.brand!}</dt>
+                                            <dd>${goods.name!}</dd>
+                                            <dd class="price">￥${goods.wholesalePrice/100, "#0.00"}</dd>
+                                        </dl>
+                                    </a>
+                                </li>
+                                <%}%>
+                                <%if(i != 12){%>
+                                <%if(i%4 == 0){%>
+                            </ul></div><div class="fcon"><ul>
+                        <%}%>
+                        <%}else{%>
+                    </ul></div>
+                        <%}%>
+                        <%}%>
+                    </div>
+                    <div class="fbg">
+                        <div class="D1fBt" id="D1fBt4">
+                            <a href="javascript:void(0)" hidefocus="true" target="_self" class=""><i>1</i></a>
+                            <a href="javascript:void(0)" hidefocus="true" target="_self" class=""><i>2</i></a>
+                            <a href="javascript:void(0)" hidefocus="true" target="_self" class="current"><i>3</i></a>
+                        </div>
+                    </div>
+                </div>
+                <script type="text/javascript">
+                    Qfast.add('widgets', { path: "static/js/zuixin/terminator2.2.min.js", type: "js", requires: ['fx'] });
+                    Qfast(false, 'widgets', function () {
+                        K.tabs({
+                            id: 'fsD4',
+                            conId: "D1pic4",
+                            tabId:"D1fBt4",
+                            tabTn:"a",
+                            conCn: '.fcon',
+                            effect: 'fade',
+                            eType: 'click',
+                            pageBt:true,
+                            bns: ['.prev', '.next'],
+                            interval: 3000
+                        })
+                    })
+                </script>
+                <!--图片轮播 end-->
+            </div>
+        </div>
+        <div class="ty_gyClear"></div>
+        <div class="zx_huanyipiOne">
+            <div class="zx_remai">
+                热卖推荐
+            </div>
+            <div class="zx_remaituiJ">
+                <ul>
+                    <%for(brand in brandSmall){%>
+                    <li>
+                        <a href="${ctx}/brand/brandDetail.html?brandId=${brand.id!}" target="_blank" title="${brand.name!}">
+                            <div class="jianbiaofont">
+                                <p class="new_bigFont">${brand.name!}</p>
+                            </div>
+                            <div class="zx_pinhover">${brand.name!}</div>
+                        </a>
+                    </li>
+                    <%}%>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div id="zx_zhishu" style="clear:both;">
+        <div class="tt_carZS" style="background: #fff;padding-bottom: 15px;">
+            <dl class="tt_carZhishu ncp_JuTopZS" style="background: #fff;">
+                <div title="汽车用品指数" class="gaiDong_title">汽车用品指数<span><a href="http://www.jhdindex.com/" class="float_r" target="_blank" title="更多">更多</a></span></div>
+                <dd class="tt_qufen">
+                    <ul>
+                        <li>
+                            <dl>
+                                <dt>
+                                    <span class="tt_cZScity">坐垫</span>
+                                    <span class="tt_cZStime">2017年2月</span>
+                                </dt>
+                                <dd>
+                                    <span class="tt_puJuan">涨跌值</span>
+                                    <span class="tt_puJuanZS03">-1.12</span>
+                                </dd>
+                                <dd>
+                                    <span class="tt_puJuan02">涨跌幅</span>
+                                    <span class="tt_puJuanZS03">-1.36%</span>
+                                </dd>
+                            </dl>
+                        </li>
+                        <li>
+                            <dl>
+                                <dt>
+                                    <span class="tt_cZScity">脚垫</span>
+                                    <span class="tt_cZStime">2017年2月</span>
+                                </dt>
+                                <dd>
+                                    <span class="tt_puJuan">涨跌值</span>
+                                    <!--<span class="tt_puJuanZS">0.92</span>-->
+                                    <span class="tt_puJuanZS03">-4.61</span>
+                                </dd>
+                                <dd>
+                                    <span class="tt_puJuan02">涨跌幅</span>
+                                    <!--<span class="tt_puJuanZS02">1.00%</span>-->
+                                    <span class="tt_puJuanZS03">-5.28%</span>
+                                </dd>
+                            </dl>
+                        </li>
+                        <li>
+                            <dl>
+                                <dt>
+                                    <span class="tt_cZScity">方向盘套</span>
+                                    <span class="tt_cZStime">2017年2月</span>
+                                </dt>
+                                <dd>
+                                    <span class="tt_puJuan">涨跌值</span>
+                                    <span class="tt_puJuanZS03">-1.52</span>
+                                </dd>
+                                <dd>
+                                    <span class="tt_puJuan02">涨跌幅</span>
+                                    <span class="tt_puJuanZS03">-1.69%</span>
+                                </dd>
+                            </dl>
+                        </li>
+                        <img style="margin:6px 0 0 7px;" src="${ctx}/static/images/zuixin/tup.png" />
+                    </ul>
+                </dd>
+            </dl>
+        </div>
+    </div>
+</div>
+<script>
+    (function($, window, document, undefined){
+        var OnePageNav = function(elem, options){
+            this.elem = elem;
+            this.$elem = $(elem);
+            this.options = options;
+            this.metadata = this.$elem.data('plugin-options');
+            this.$win = $(window);
+            this.sections = {};
+            this.didScroll = false;
+            this.$doc = $(document);
+            this.docHeight = this.$doc.height();
+        };
+        OnePageNav.prototype = {
+            defaults: {
+                navItems: 'a',
+                currentClass: 'current',
+                changeHash: false,
+                easing: 'swing',
+                filter: '',
+                scrollSpeed: 750,
+                scrollThreshold: 0.5,
+                begin: false,
+                end: false,
+                scrollChange: false
+            },
+
+            init: function() {
+                this.config = $.extend({}, this.defaults, this.options, this.metadata);
+                this.$nav = this.$elem.find(this.config.navItems);
+                if(this.config.filter !== '') {
+                    this.$nav = this.$nav.filter(this.config.filter);
+                }
+                  //this.$nav.on('click.onePageNav', $.proxy(this.handleClick, this));
+              
+                this.getPositions();
+                this.bindInterval();
+                this.$win.on('resize.onePageNav', $.proxy(this.getPositions, this));
+                return this;
+            },
+            adjustNav: function(self, $parent) {
+                self.$elem.find('.' + self.config.currentClass).removeClass(self.config.currentClass);
+                $parent.addClass(self.config.currentClass);
+            },
+            bindInterval: function() {
+                var self = this;
+                var docHeight;
+                self.$win.on('scroll.onePageNav', function() {
+                    self.didScroll = true;
+                });
+                self.t = setInterval(function() {
+                    docHeight = self.$doc.height();
+                    if(self.didScroll) {
+                        self.didScroll = false;
+                        self.scrollChange();
+                    }
+                    if(docHeight !== self.docHeight) {
+                        self.docHeight = docHeight;
+                        self.getPositions();
+                    }
+                }, 250);
+            },
+            getHash: function($link) {
+                return $link.attr('href').split('#')[1];
+            },
+            getPositions: function() {
+                var self = this;
+                var linkHref;
+                var topPos;
+                var $target;
+                self.$nav.each(function() {
+                    linkHref = self.getHash($(this));
+                    $target = $('#' + linkHref);
+
+                    if($target.length) {
+                        topPos = $target.offset().top;
+                        self.sections[linkHref] = Math.round(topPos);
+                    }
+                });
+            },
+            getSection: function(windowPos) {
+                var returnValue = null;
+                var windowHeight = Math.round(this.$win.height() * this.config.scrollThreshold);
+                for(var section in this.sections) {
+                    if((this.sections[section] - windowHeight) < windowPos) {
+                        returnValue = section;
+                    }
+                }
+                return returnValue;
+            },
+            handleClick: function(e) {
+                var self = this;
+                var $link = $(e.currentTarget);
+                var $parent = $link.parent();
+                var newLoc = '#' + self.getHash($link);
+                if(!$parent.hasClass(self.config.currentClass)) {
+                    if(self.config.begin) {
+                        self.config.begin();
+                    }
+                    self.adjustNav(self, $parent);
+                    self.unbindInterval();
+                    self.scrollTo(newLoc, function() {
+                        if(self.config.changeHash) {
+                            window.location.hash = newLoc;
+                        }
+                        self.bindInterval();
+                        if(self.config.end) {
+                            self.config.end();
+                        }
+                    });
+                }
+                e.preventDefault();
+            },
+            scrollChange: function() {
+                var windowTop = this.$win.scrollTop();
+                var position = this.getSection(windowTop);
+                var $parent;
+                if(position !== null) {
+                    $parent = this.$elem.find('a[href$="#' + position + '"]').parent();
+                    if(!$parent.hasClass(this.config.currentClass)) {
+                        this.adjustNav(this, $parent);
+                        if(this.config.scrollChange) {
+                            this.config.scrollChange($parent);
+                        }
+                    }
+                }
+            },
+            scrollTo: function(target, callback) {
+                var offset = $(target).offset().top;
+                $('html, body').animate({
+                    scrollTop: offset
+                }, this.config.scrollSpeed, this.config.easing, callback);
+            },
+            unbindInterval: function() {
+                clearInterval(this.t);
+                this.$win.unbind('scroll.onePageNav');
+            }
+        };
+        OnePageNav.defaults = OnePageNav.prototype.defaults;
+        $.fn.onePageNav = function(options) {
+            return this.each(function() {
+                new OnePageNav(this, options).init();
+            });
+        };
+    })( jQuery, window , document );
+    $(function(){
+        $('#nav').onePageNav();
+    });
+</script>
+<!--楼层滚动 end-->
+<!--查询条件 start-->
+<div class="ty_gyClear"></div>
+<div class="zx_fuwuCon">
+    <div class="zx_fuwuMain">
+        <img src="${ctx}/static/images/zuixin/zx_fuwu.png" />
+    </div>
+</div>
+<%}%>

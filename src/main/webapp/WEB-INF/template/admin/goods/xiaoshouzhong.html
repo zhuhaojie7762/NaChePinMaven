@@ -1,0 +1,474 @@
+<%layout("../layout/header_layout.html"){%>
+<title>销售中的货品</title>
+<script type="text/javascript" src="/static/js/common.js?v=${v}"></script>
+<script type="text/javascript" src="/static/js/jquery.form.js?v=${v}"></script>
+<script type="text/javascript">
+
+function setOffline(obj) {
+	if(confirm('确定要下架吗？')){
+		var ids = $(obj).data("id") + ",";
+		
+		Common.post("/admin/goods/setoffline", {ids: ids.substr(0, ids.length -1)}, function (json) {
+	    	if (json.code == Common.SUCC) {
+	    		Common.refresh();
+	        } else {
+	        	
+	        }
+	    });
+	}
+}
+
+
+function edit(obj) {
+	var id = $(obj).data("id");
+	Common.go("/admin/goods/edit?id=" + id);
+}
+
+function del(obj) {
+	if(confirm('确定要删除吗？')){
+		var ids = $(obj).data("id") + ",";
+
+		Common.post("/admin/goods/del", {ids: ids.substr(0, ids.length -1)}, function (json) {
+	    	if (json.code == Common.SUCC) {
+	    		Common.refresh();
+	        } else {
+	        	
+	        }
+	    });
+	}
+}
+
+function showAllLi(obj) {
+	$(obj).next().children().each(function(){
+		$(this).show();
+	});
+}
+
+function changeli(event, obj) {
+	var realkey = String.fromCharCode(event.which); 
+	if ((realkey >= 'a' && realkey <= 'z') || (realkey >= 'A' && realkey <= 'Z')) {
+		$(obj).next().children().each(function(){
+			var a = $(this).children().first();
+			if ($(a).data('pinyin') == realkey.toUpperCase()) {
+				$(this).show();
+			} else {
+				$(this).hide();
+			}
+		});
+	}
+}
+
+$(function () {
+	
+	Pagination.init();
+	
+	$(".btn-reset").click(function(){
+		
+		//$("#query-form").trigger("reset");
+		
+		$("input[name='name']").val('');
+		$("input[name='itemNo']").val('');
+		
+		
+		$("#thirdclassid").html('请选择');
+		$("input[name='thirdclassid']").val('');
+		$("input[name='thirdclassname']").val('');
+		$("#thirdclass").html('<li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" >请选择</a></li>');
+		
+		$("#secondclassid").html('请选择');
+		$("input[name='secondclassid']").val('');
+		$("input[name='secondclassname']").val('');
+		$("#secondclass").html('<li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" >请选择</a></li>');
+		
+		$("#firstclassid").html('请选择');
+		$("input[name='firstclassid']").val('');
+		$("input[name='firstclassname']").val('');
+		
+		$("#brandname").html('请选择');
+		$("input[name='brandid']").val('');
+		$("input[name='brand']").val('');
+		
+		$("input[name='minsellcnt']").val('');
+		$("input[name='maxsellcnt']").val('');
+		
+		$("input[name='minprice']").val('');
+		$("input[name='maxprice']").val('');
+		
+		$("#submittypename").html('请选择');
+		$("input[name='submittype']").val('');
+	});
+	
+	$("#batchOffline").click(function(){ 
+		
+		var arrChk = $("input[name='id']:checked");
+    	
+    	if (arrChk.length < 1)
+    	{
+    		Msg.danger("请选择要下架的商品");
+    		return;
+    	}
+    	
+    	if(confirm('确定要下架吗？')){
+    		var ids = "";
+        	
+            $(arrChk).each(function(){
+            	ids += this.value + ",";
+            });
+    		
+    		Common.post("/admin/goods/setoffline", {ids: ids.substr(0, ids.length -1)}, function (json) {
+            	if (json.code == Common.SUCC) {
+            		Common.refresh();
+                } else {
+                	
+                }
+            });
+    	}
+		
+	});
+	
+	$("#batchDel").click(function(){ 
+		
+		var arrChk = $("input[name='id']:checked");
+    	
+    	if (arrChk.length < 1)
+    	{
+    		Msg.danger("请选择要删除的商品");
+    		return;
+    	}
+    	
+    	if(confirm('确定要删除吗？')){
+    		var ids = "";
+        	
+            $(arrChk).each(function(){
+            	ids += this.value + ",";
+            });
+    		
+            Common.post("/admin/goods/del", {ids: ids.substr(0, ids.length -1)}, function (json) {
+            	if (json.code == Common.SUCC) {
+            		Common.refresh();
+                } else {
+                	
+                }
+            });
+    	}
+		
+	});
+	
+	$("#all").change(function(){ 
+		var is_checked = $(this).prop("checked"); 
+		$("input[name='id']").prop("checked",is_checked); 
+	}); 
+	
+	$("#brand li a").click(function(){
+		var brand = $(this).attr("title");
+		$("input[name='brand']").val(brand);
+	});
+	
+	$("#secondclass li a").click(function(){
+		var secondclassid = $(this).attr("value");
+		var secondclassname = $(this).attr("title");
+		$("input[name='secondclassname']").val(secondclassname);
+		
+		Common.ajax("/admin/goods/subclass", {id:secondclassid}, function(json) {
+			
+			var li = '<li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" >请选择</a></li>';
+			
+    		if (json.code == Common.SUCC) {
+    			for (var i = 0; i < json.data.length; i++) {
+    				li += '<li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="' + json.data[i].id + '" title="' + json.data[i].name + '">' + json.data[i].name + '</a></li>'
+    			}
+    			
+    			$("#thirdclass").html(li);
+    			$("#thirdclassid").html('请选择');
+    			$("input[name='thirdclassid']").val('');
+    			$("input[name='thirdclassname']").val('');
+    			
+    			
+    			$("#thirdclass li a").click(function(){
+    				var thirdclassid = $(this).attr("value");
+    				var thirdclassname = $(this).attr("title");
+    				$("input[name='thirdclassname']").val(thirdclassname);
+    			});
+    			
+    		} else {
+    			Msg.danger("服务异常");
+    		}
+    	});
+	});
+	
+	$("#thirdclass li a").click(function(){
+		var thirdclassid = $(this).attr("value");
+		var thirdclassname = $(this).attr("title");
+		$("input[name='thirdclassname']").val(thirdclassname);
+	});
+	
+	$("#firstclass li a").click(function(){
+		var firstclassid = $(this).attr("value");
+		var firstclassname = $(this).attr("title");
+		$("input[name='firstclassname']").val(firstclassname);
+		
+		Common.ajax("/admin/goods/subclass", {id:firstclassid}, function(json) {
+			
+			var li = '<li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" >请选择</a></li>';
+			
+    		if (json.code == Common.SUCC) {
+    			for (var i = 0; i < json.data.length; i++) {
+    				li += '<li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="' + json.data[i].id + '" title="' + json.data[i].name + '">' + json.data[i].name + '</a></li>'
+    			}
+    			
+    			$("#secondclass").html(li);
+    			
+    			$("#secondclassid").html('请选择');
+    			$("input[name='secondclassid']").val('');
+    			$("input[name='secondclassname']").val('');
+    			
+    			
+    			$("#thirdclassid").html('请选择');
+    			$("input[name='thirdclassid']").val('');
+    			$("input[name='thirdclassname']").val('');
+    			
+    			$("#secondclass li a").click(function(){
+    				var secondclassid = $(this).attr("value");
+    				var secondclassname = $(this).attr("title");
+    				$("input[name='secondclassname']").val(secondclassname);
+    				
+    				Common.ajax("/admin/goods/subclass", {id:secondclassid}, function(json) {
+    					
+    					var li = '<li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" >请选择</a></li>';
+    					
+    		    		if (json.code == Common.SUCC) {
+    		    			for (var i = 0; i < json.data.length; i++) {
+    		    				li += '<li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="' + json.data[i].id + '" title="' + json.data[i].name + '">' + json.data[i].name + '</a></li>'
+    		    			}
+    		    			
+    		    			$("#thirdclass").html(li);
+    		    			$("#thirdclassid").html('请选择');
+    		    			$("input[name='thirdclassid']").val('');
+    		    			$("input[name='thirdclassname']").val('');
+    		    			
+    		    			
+    		    			$("#thirdclass li a").click(function(){
+    		    				var thirdclassid = $(this).attr("value");
+    		    				var thirdclassname = $(this).attr("title");
+    		    				$("input[name='thirdclassname']").val(thirdclassname);
+    		    			});
+    		    			
+    		    		} else {
+    		    			Msg.danger("服务异常");
+    		    		}
+    		    	});
+    			});
+    			
+    		} else {
+    			Msg.danger("服务异常");
+    		}
+    	});
+	});
+	
+	$("#query-form").validate();
+	
+})
+</script>
+<%}%>
+<%layout("../layout/body_layout.html"){%>
+<div class="query-zone" id="confirm_Con">
+    <form class="sui-form form-horizontal query-form" id="query-form">
+    	<input type="hidden" name="perSize" value="${page.perSize!10}">
+    	<input type="hidden" name="firstclassname" value="${parameter.firstclassname}">
+    	<input type="hidden" name="secondclassname" value="${parameter.secondclassname}">
+    	<input type="hidden" name="thirdclassname" value="${parameter.thirdclassname}">
+    	<input type="hidden" name="brand" value="${parameter.brand}">
+        <div class="sui-row">
+            <div class="span4">
+                <div class="input-prepend">
+                    <span class="add-on">货品名称</span>
+                    <input type="text" class="input h22" name="name" value="${parameter.name!}" />
+                </div>
+            </div>
+            <div class="span4">
+                <div class="input-prepend">
+                    <span class="add-on">一级分类</span>
+                    <span class="sui-dropdown dropdown-bordered select h22">
+                        <span class="dropdown-inner">
+                        	<input type="hidden" name="firstclassid" value="${parameter.firstclassid}" />
+                            <a role="button" data-toggle="dropdown" href="#" class="dropdown-toggle">
+                                <i class="caret"></i>
+                                <span id="firstclassid">${parameter.firstclassname!'请选择' == '' ? '请选择' : parameter.firstclassname!'请选择'}</span>
+                            </a>
+                            <ul id="firstclass" role="menu" aria-labelledby="drop12" class="sui-dropdown-menu">
+                            	<li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" >请选择</a></li>
+                            	<%for(class in firstclasslist!){%>
+		                        <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="${class.id}" title="${class.name}">${class.name}</a></li>
+		                        <%}%>
+                            </ul>
+                        </span>
+                    </span>
+                </div>
+            </div>
+            <div class="span4">
+                <div class="input-prepend">
+                    <span class="add-on">二级分类</span>
+                    <span class="sui-dropdown dropdown-bordered select h22">
+                        <span class="dropdown-inner">
+                        	<input type="hidden" name="secondclassid" value="${parameter.secondclassid}" />
+                            <a role="button" data-toggle="dropdown" href="#" class="dropdown-toggle">
+                                <i class="caret"></i>
+                                <span id="secondclassid">${parameter.secondclassname!'请选择' == '' ? '请选择' : parameter.secondclassname!'请选择'}</span>
+                            </a>
+                            <ul id="secondclass" role="menu" aria-labelledby="drop12" class="sui-dropdown-menu">
+                            	<li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" >请选择</a></li>
+                            	<%for(class in secondclasslist!){%>
+		                        <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="${class.id}" title="${class.name}">${class.name}</a></li>
+		                        <%}%>
+                            </ul>
+                        </span>
+                    </span>
+                </div>
+            </div>
+            <div class="span4">
+                <div class="input-prepend">
+                    <span class="add-on">三级分类</span>
+                    <span class="sui-dropdown dropdown-bordered select h22">
+                        <span class="dropdown-inner">
+                        	<input type="hidden" name="thirdclassid" value="${parameter.thirdclassid}" />
+                            <a role="button" data-toggle="dropdown" href="#" class="dropdown-toggle">
+                                <i class="caret"></i>
+                                <span id="thirdclassid">${parameter.thirdclassname!'请选择' == '' ? '请选择' : parameter.thirdclassname!'请选择'}</span>
+                            </a>
+                            <ul id="thirdclass" role="menu" aria-labelledby="drop12" class="sui-dropdown-menu">
+                            	<li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" >请选择</a></li>
+                            	<%for(class in thirdclasslist!){%>
+		                        <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="${class.id}" title="${class.name}">${class.name}</a></li>
+		                        <%}%>
+                            </ul>
+                        </span>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="sui-row">
+            <div class="span4">
+                <div class="input-prepend">
+                    <span class="add-on add_onleft">单价</span>
+                    <input type="text" class="input h22 w50" name="minprice" value="${parameter.minprice}" placeholder="" data-rules="number" title="价格"/>
+                    <span class="add-on2">-</span>
+                    <input type="text" class="input h22 w50" name="maxprice" value="${parameter.maxprice}" placeholder="" data-rules="number" title="价格"/>
+                </div>
+            </div>
+            <div class="span4">
+                <div class="input-prepend">
+                    <span class="add-on add_onleft">品牌</span>
+                    <span class="sui-dropdown dropdown-bordered select h22">
+                        <span class="dropdown-inner">
+                        	<input type="hidden" name="brandid" value="" />
+                            <a role="button" data-toggle="dropdown" href="#" class="dropdown-toggle" onKeyPress="changeli(event, this);" onclick="showAllLi(this);">
+                                <i class="caret"></i>
+                                <span id="brandname" >${parameter.brand!'请选择' == '' ? '请选择' : parameter.brand!'请选择'}</span>
+                            </a>
+                            <ul id="brand" role="menu" aria-labelledby="drop12" class="sui-dropdown-menu">
+                            	<li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" >请选择</a></li>
+                                <%for(brand in brands!){%>
+        						<li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="${brand.id}" title="${brand.name}" data-pinyin="${brand.pinyin}">${brand.name}</a></li>
+        						<%}%>
+                            </ul>
+                        </span>
+                    </span>
+                </div>
+            </div>
+            <div class="span4">
+                <div class="input-prepend">
+                    <span class="add-on add_onleft">提交方</span>
+                    <span class="sui-dropdown dropdown-bordered select h22">
+                        <span class="dropdown-inner">
+                        	<input type="hidden" name="submittype" value="${parameter.submittype}" />
+                            <a role="button" data-toggle="dropdown" href="#" class="dropdown-toggle">
+                                <i class="caret"></i>
+                                <span id="submittype" >${parameter.submittype!'' == '' ? '请选择' : (parameter.submittype == '0' ? '供货商' : '后台')}</span>
+                            </a>
+                            <ul role="menu" aria-labelledby="drop12" class="sui-dropdown-menu">
+                            	<li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" >请选择</a></li>
+        						<li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="0">供货商</a></li>
+        						<li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="1">后台</a></li>
+                            </ul>
+                        </span>
+                    </span>
+                </div>
+            </div>
+            <div class="span4">
+                <div class="input-prepend">
+                    <span class="add-on">货品货号</span>
+                    <input type="text" class="input h22" name="itemNo" value="${parameter.itemNo}" />
+                </div>
+            </div>
+        </div>
+        <div class="sui-row">
+            <div class="span4">
+                <div class="input-prepend">
+                    <span class="add-on">&nbsp;&nbsp;&nbsp;总销量</span>
+                    <input type="text" class="input h22 w50" name="minsellcnt" value="${parameter.minsellcnt}" placeholder="" data-rules="number" title="销量"/>
+                    <span class="add-on2">-</span>
+                    <input type="text" class="input h22 w50" name="maxsellcnt" value="${parameter.maxsellcnt}" placeholder="" data-rules="number" title="销量"/>
+                </div>
+            </div>
+            <div class="span4 add_onleft02" >
+                <div class="input-prepend">
+                	<span class="add-on">&nbsp;&nbsp;&nbsp;</span>
+                    <button type="submit" class="sui-btn btn-primary">查询</button>
+                    <input type="button" class="sui-btn btn-primary btn-reset" value="重置"/>
+                </div>
+            </div>
+        </div>
+        <div class="add_clear"></div>
+    </form>
+</div>
+<div class="add_fenleiCon">
+    <span class="piliangshanBtn" title="批量删除" id="batchDel" >批量删除</span>
+    <span class="chongxishjiaBtn" title="批量下架" id="batchOffline">批量下架</span>
+</div>
+<table class="sui-table table-bordered" id="add_yxjiatab">
+    <thead>
+    <th width="80"><label><input type="checkbox" id="all" /> 全选/反选</label></th>
+    <th>品牌</th>
+    <th>供货商名称</th>
+    <th>供货商公司名称</th>
+    <th>提交方</th>
+    <th>货品详情</th>
+    <th>单价</th>
+    <th>库存</th>
+    <th>总销量</th>
+    <th>发布时间</th>
+    <th width="180">操作</th>
+    </thead>
+    <tbody>
+    <%for(item in pager.data!){%>
+    <tr>
+        <td><input type="checkbox" name="id" value="${item.id!}"></td>
+        <td>${item.brand!}</td>
+        <td>${item.customerName!}</td>
+        <td>${item.supplierCompany!}</td>
+        <td>${item.submittype.name!}</td>
+        <td>
+            <img src="http://storage.nachepin.com/${item.headImgUrl1}!198" style="float:left;" />
+            <div style="float:left;line-height: 60px;"><a href="/goods/${item.code!}.html" target="_blank">${item.name!}</a></div>
+        </td>
+        <td><#yuan value='${item.retailPrice!}' /></td>
+        <td>${item.stock!}</td>
+        <td>${item.sellcnt!}</td>
+        <td>${item.created!}</td>
+        <td class="hdMore_btns">
+            <span class="sui-btn btn-small chakan" title="下架" id="offline" data-id="${item.id!}" onclick="setOffline(this);">下架</span>
+            <span class="sui-btn btn-small upbtn" title="编辑" id="edit" data-id="${item.id!}" onclick="edit(this);">编辑</span>
+            <span class="sui-btn btn-small upbtn" title="删除" id="del" data-id="${item.id!}" onclick="del(this);">删除</span>
+        </td>
+    </tr>
+    <%}elsefor{%>
+    <tr>
+        <td colspan="12" class="zanWuShuju"><p>没有数据</p></td>
+    </tr>
+    <%}%>
+    </tbody>
+</table>
+<#page val="${pager.page!}" size="large" params="${parameter.map!}"/>
+<%}%>
+</body>
+</html>

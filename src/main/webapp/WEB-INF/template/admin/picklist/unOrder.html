@@ -1,0 +1,201 @@
+<%layout("../layout/header_layout.html"){%>
+<title>未完成配货单的订单汇总</title>
+<script src="/static/js/web/hd_zixie.js?v=${v}"></script>
+<script type="text/javascript">
+    $(function () {
+        Pagination.init();
+        $("input.btn-reset").click(function () {
+            Common.reset("form.query-form");
+        });
+
+        /**
+         * 修改快递单号
+         */
+        Common.ajaxForm($("form[name=expressForm]"), null, null);
+
+        /**
+         * 发货
+         */
+        $(".btn-sendGoods").click(function () {
+            if (!confirm("确认发货吗？")) {
+                return;
+            }
+            Common.post2({
+                url: "/admin/picklist/picking/deliverGoods",
+                param: { tradeCode : $(this).attr("data-code"), pickCode : $(this).attr("data-pick") },
+                success: function (result) {
+                    if (result.code == Common.SUCC) {
+                        Msg.success(result.message);
+                    }else{
+                        Msg.danger(result.message);
+                        return false;
+                    }
+                    setTimeout(function () {
+                        if ($("input[name=items]").length > 0) {
+                            Common.refresh();
+                        }else{
+                            Common.go("/admin/picklist/peiOrder/finished");
+                        }
+                    }, 1000);
+                }
+            });
+        });
+
+        /**
+         * 实际重量
+         */
+        Common.ajaxForm($("form[name=weightForm]"), null, null);
+    });
+</script>
+<%}%>
+<%layout("../layout/body_layout.html"){%>
+<div class="query-zone" id="confirm_Con">
+    <form class="sui-form form-horizontal query-form" id="query-form">
+        <div class="sui-row">
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        总订单编号：
+                    </span>
+                    <input type="text" class="input h22" name="tradeCode" value="${parameter.tradeCode!}" />
+                </div>
+            </div>
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        子订单编号：
+                    </span>
+                    <input type="text" class="input h22" name="orderCode" value="${parameter.orderCode!}" />
+                </div>
+            </div>
+            <div class="span2">
+                <button class="sui-btn btn-primary" title="查询">查询</button>
+                <input type="button" class="sui-btn btn-primary btn-reset" value="重置" title="重置"/>
+            </div>
+        </div>
+    </form>
+</div>
+<div class="benCi_dingDan">
+    <p>未完成配货单的订单汇总</p>
+</div>
+<!--新布局 start-->
+<table class="sui-table table-bordered" id="weiwancheng_Tab">
+    <thead>
+    <th>商品详情</th>
+    <th width="50">数量</th>
+    <th width="50">重量</th>
+    <th width="56">单价</th>
+    <th width="50">状态</th>
+    <th width="60">优惠</th>
+    <th width="80">实付款</th>
+    <th width="80">操作</th>
+    </thead>
+    <tbody>
+    <%for(trade in pager.data){%>
+    <tr>
+        <td colspan="8">
+            <span class="tab_span01"><!--<input type="checkbox" name="items">--></span>
+            <span class="tab_span02">${trade.code}</span>
+            <span class="tab_span03">${dts.d2s(trade.created)}</span>
+        </td>
+    </tr>
+    <%for(order in trade.orders){%>
+    <tr>
+        <td>
+            <div class="tab_span01"></div>
+            <div class="tab_span02">${order.code}</div>
+            <div class="hd_ghsDiv">
+                <p>${order.supplierCompany}</p>
+                <p>${order.brand}</p>
+            </div>
+            <div class="wshop_goods"><img src="${img_url.getS(order.headImg)}" /></div>
+            <div class="xiangQing">
+                <span class="shop_xgTitle">${order.goodsName}</span>
+                <br />
+                <span class="tongYong_gg">${order.specPropValue}</span>
+            </div>
+        </td>
+        <td>${order.quantity}</td>
+        <td>${nums.g2k(order.weight)}</td>
+        <td>${nums.yuan(order.price)}</td>
+        <td>${order.status.name}</td>
+        <%if(orderLP.first){%>
+        <td rowspan="${orderLP.size}" class="wei_yhjuan">
+            <%if(!isEmpty(trade.coupon.couponTemplate.money!)){%>
+            ${trade.coupon.couponTemplate.useType.value!}${nums.yuan(trade.coupon.couponTemplate.money!)}元
+            <%}%>
+            <%if(trade.packSubsidy > 0){%>
+            打包优惠${nums.yuan(trade.packSubsidy)}元
+            <%}%>
+            <%if(trade.couponId == 0 && trade.packSubsidy == 0){%>
+            无
+            <%}%>
+        </td>
+        <td rowspan="${orderLP.size}">
+            <span style="font-size: 14px;display: block;">${nums.yuan(trade.payment)}元</span>
+            <span style="display: block;font-size: 12px;">( 含运费${nums.yuan(trade.postFee)}元 )</span>
+        </td>
+        <td rowspan="${orderLP.size}" class="hd_jddwei">
+            <a href="javascript:void(0);" class="sui-btn btn-small btn-sendGoods" data-code="${trade.code}" data-pick="${trade.pickOrderCode}">发货</a>
+            <div class="tianxiedh">
+                <span class="sui-btn btn-small btn-takeOrder tianxiedhsj">修改快递单号</span>
+                <div class="hd_qddwei">
+                    <form name="expressForm" method="post" action="/admin/picklist/picking/expressSave">
+                        <input type="hidden" name="tradeCode" value="${trade.code!}">
+                        <span class="wuliu_hdSpan">物流公司：</span>
+                        <span class="sui-dropdown dropdown-bordered select h22">
+                            <span class="dropdown-inner">
+                                <a role="button" data-toggle="dropdown" href="#" class="dropdown-toggle">
+                                    <input value="${trade.expressId!0}" name="expressId" type="hidden" />
+                                    <i class="caret"></i>
+                                    <span>
+                                        ${trade.expressName!'请选择'}
+                                    </span>
+                                </a>
+                                <ul role="menu" aria-labelledby="drop12" class="sui-dropdown-menu">
+                                    <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" >请选择</a></li>
+                                    <%for(item in express){%>
+                                    <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="${item.id}">${item.name}</a></li>
+                                    <%}%>
+                                </ul>
+                            </span>
+                        </span>
+                        <br /><br />
+                        <span class="wuliu_hdSpan">物流单号：</span>
+                        <span><input type="text" name="expressNum" value="${trade.expressCode}" /></span>
+                        <br /><br /><br />
+                        <a class="sui-btn xiala_close">关闭</a>
+                        <button class="sui-btn xiala_save">保存</button>
+                    </form>
+                </div>
+            </div>
+            <a href="detail?code=${trade.code}" class="sui-btn btn-small">查看详情</a>
+            <div id="shijizhongliang">
+                <form name="weightForm" method="post" action="/admin/picklist/picking/weightSave?tradeCode=${trade.code!}">
+                    <span class="sui-btn btn-small btn-realWeight">实际重量</span>
+                    <!-- 实际重量 start -->
+                    <div class="shijizlCon">
+                            <span style="display: block;margin: 60px 0 0 17px;">实际重量(kg)：
+                                <input type="text" name="realityWeight" value="${nums.g2k(trade.realityWeight)}" onkeyup="if(isNaN(value))execCommand('undo')" onafterpaste="if(isNaN(value))execCommand('undo')" />
+                            </span>
+                        <a class="sui-btn btn-small sjzlQuxiaoBtn btn-realWeight-cancel">取消</a>
+                        <button class="sui-btn btn-small dingbot">确定</button>
+                    </div>
+                    <!-- 实际重量 end -->
+                    <div class="shijizhongliang"></div>
+                </form>
+            </div>
+        </td>
+        <%}%>
+    </tr>
+    <%}%>
+    <%}elsefor{%>
+    <tr>
+        <td colspan="8" class="zanWuShuju"><p>没有数据</p></td>
+    </tr>
+    <%}%>
+    </tbody>
+</table>
+<!--新布局 end-->
+<#page val="${pager.page!}" size="large" params="${parameter.map!}"/>
+<%}%>

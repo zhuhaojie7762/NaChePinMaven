@@ -1,0 +1,681 @@
+<%layout("../layout/header_layout.html"){%>
+<title>客户编辑</title>
+<script type="text/javascript">
+    $(function () {
+        /**
+         * 关闭
+         */
+        $(".btn-close").unbind("click").bind("click", function () {
+            Common.go("/admin/customer");
+        });
+
+        /**
+         * 重置密码
+         */
+        $(".btn-resetPass").unbind("click").bind("click", function () {
+            Common.post("/admin/customer/resetPassword", {id: $(this).attr("data-id")});
+        });
+
+        /**
+         * 修改取货区域编码
+         */
+        $(".btn-resetPickCode").unbind("click").bind("click", function () {
+            $this = $(this);
+            Confirm.show({
+                id: '#dialog-tip',
+                mask: '1',
+                width: '20%',
+                title: '修改取货区域编码',
+                content: "<div class=\"input-prepend\"><span class=\"add-on\"><b style=\"color: #f00;\">*</b>编号</span>" +
+                "<input type='text' name='code' class='input h22' /></div>",
+                callback: function (win) {
+                    var code = $(win).find("input[name=code]").val();
+                    if (code == undefined || code.length == 0 || code.length > 10) {
+                        $(win).find("input[name=code]").css("border", "solid 1px red");
+                        return false;
+                    } else {
+                        $(win).find("input[name=code]").css("border", "");
+                    }
+                    Common.post("/admin/customer/resetPickCode",
+                            {id: $this.attr("data-id"), code: code}, function (json) {
+                                if (json.code == Common.SUCC) {
+                                    win.remove();
+                                    $('.dialog-mask').remove();
+                                    Common.refresh();
+                                    return true;
+                                } else {
+                                    Dialog.show({
+                                        id: '#dialog-tip',
+                                        mask: '0',
+                                        width: '20%',
+                                        title: 'fail!',
+                                        content: json.message,
+                                        callback: function () {
+                                        }
+                                    });
+                                    return false;
+                                }
+                            });
+                }
+            });
+        });
+
+        /**
+         * 保存
+         */
+        $(".btn-ok").unbind("click").bind("click", function () {
+            $("form.save-form").submit();
+        });
+
+        /**
+         * 修改省份
+         */
+        $("input[name=provinceId]").change(function () {
+            var id = $(this).val();
+            Common.post2({
+                url: '/cities',
+                param: {id: id},
+                success: function (json) {
+                    $(".cities").html(json.data);
+                }
+            });
+            $("input[name=cityId]").val("");
+            $("input[name=cityId]").siblings("span").text("请选择市");
+            $("input[name=countyId]").val("");
+            $("input[name=countyId]").siblings("span").text("请选择区");
+            $(".counties").html("");
+        });
+
+        /**
+         * 修改市
+         */
+        $("input[name=cityId]").change(function () {
+            var id = $(this).val();
+            Common.post2({
+                url: '/counties',
+                param: {id: id},
+                success: function (json) {
+                    $(".counties").html(json.data);
+                }
+            });
+            $("input[name=countyId]").val("");
+            $("input[name=countyId]").siblings("span").text("请选择区");
+        });
+
+        /**
+         * 删除品牌
+         */
+        $(".btn-delBrand").unbind("click").bind("click", function () {
+            if (confirm("确认要删除？")) {
+                var brandId = $(this).attr("data-id");
+                Common.post("/admin/brand/delBrand", {brandId: brandId}, function (json) {
+                    if (json.code == Common.SUCC) {
+                        Msg.success(json.message, function () {
+//                            Common.refresh();
+                            $(this).parents("ul").remove();
+                        });
+                    } else {
+                        Msg.danger(json.message);
+                    }
+                });
+            }
+        });
+    });
+
+</script>
+<style>
+    .baseInfo:after {
+        content: "基本信息";
+    }
+
+    .buyInfo:after {
+        content: "进货商角色信息";
+    }
+
+    .sellInfo:after {
+        content: "供货商角色信息";
+    }
+</style>
+<%}%>
+<%layout("../layout/body_layout.html"){%>
+<div class="query-zone">
+    <form class="sui-form form-horizontal detail-form save-form sui-validate" novalidate="novalidate" method="POST" enctype="multipart/form-data"
+          action="/admin/customer/save?id=${customer.id}">
+        <div class="control-group">
+            <div class="span2" style="margin-left: 0;">
+                <div class="input-prepend">
+                    <span class="add-on"><b style="color: #f00;">*</b>编号</span>
+                    <span class="add-text h18">${customer.code!}</span>
+                </div>
+            </div>
+        </div>
+        <div class="info-group baseInfo">
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">客户帐号</span>
+                        <span class="add-text h18">
+                            ${customer.username!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">手机号码</span>
+                        <input type="text" data-rules="number|required" data-error-msg="手机号必须是11位" class="input-fat h18 w100" placeholder="请输入11手机号" name="phone" value="${customer.phone!}">
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">注册时间</span>
+                        <span class="add-text h18">
+                            ${customer.created!, 'yyyy-MM-dd HH:mm:ss'}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span2">
+                    <div class="input-prepend">
+                        <span class="add-on">省</span>
+                        <span class="sui-dropdown dropdown-bordered select" style="">
+                            <span class="dropdown-inner">
+                                <a class="dropdown-toggle h22" role="button" href="javascript:void(0);" data-toggle="dropdown">
+                                    <input value="${customer.provinceId!}" data-rules="required" name="provinceId" type="hidden">
+                                    <i class="caret"></i>
+                                    <span>${customer.province!''}</span>
+                                </a>
+                                <ul class="sui-dropdown-menu" role="menu" aria-labelledby="drop4">
+                                    <%for(item in provinces!){%>
+                                    <li role="presentation">
+                                        <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="${item.id}">${item.name}</a>
+                                    </li>
+                                    <%}%>
+                                </ul>
+                            </span>
+                        </span>
+                    </div>
+                </div>
+                <div class="span2">
+                    <div class="input-prepend">
+                        <span class="add-on">市</span>
+                            <span class="sui-dropdown dropdown-bordered select" style="">
+                                <span class="dropdown-inner">
+                                <a class="dropdown-toggle h22" role="button" href="javascript:void(0);" data-toggle="dropdown">
+                                    <input name="cityId" value="${customer.cityId!0}" data-rules="required" type="hidden">
+                                    <i class="caret"></i>
+                                    <span>${customer.city!''}</span>
+                                </a>
+                                <ul class="sui-dropdown-menu cities" role="menu" aria-labelledby="drop4">
+                                    <%for(city in cities!){%>
+                                    <li role="presentation">
+                                        <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="${city.id}">${city.name}</a>
+                                    </li>
+                                    <%}%>
+                                </ul>
+                            </span>
+                        </span>
+                    </div>
+                </div>
+                <div class="span2">
+                    <div class="input-prepend">
+                        <span class="add-on">区</span>
+                            <span class="sui-dropdown dropdown-bordered select" style="">
+                                <span class="dropdown-inner">
+                                <a class="dropdown-toggle h22" role="button" href="javascript:void(0);" data-toggle="dropdown">
+                                    <input value="${customer.countyId!}" name="countyId" type="hidden" data-rules="required">
+                                    <i class="caret"></i>
+                                    <span>${customer.area!}</span>
+                                </a>
+                                <ul class="sui-dropdown-menu counties" role="menu" aria-labelledby="drop4">
+                                    <%for(county in counties!){%>
+                                    <li role="presentation">
+                                        <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="${county.id}">${county.name}</a>
+                                    </li>
+                                    <%}%>
+                                </ul>
+                            </span>
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">详细地址</span>
+                        <input type="text" class="input-fat h18 w300" placeholder="详细地址" name="address" value="${customer.address!}">
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">客户邮箱</span>
+                        <input type="text" class="input-fat h18 w150" placeholder="客户邮箱" name="email" value="${customer.email!}">
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">客户密码</span>
+                        <span class="add-text h18">
+                            *****
+                        </span>
+                        <input type="button" data-id="${customer.id!}" class="sui-btn btn-primary btn-resetPass"
+                               style="height: 28px;" value="重置密码"/>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">客户姓名</span>
+                        <input type="text" class="input-fat h18 w100" placeholder="客户姓名" name="name" value="${customer.name!}">
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">客户状态</span>
+                        <span class="add-text h18">
+                            ${customer.state.name!}
+                        </span>
+                    </div>
+                </div>
+
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <div class="input-prepend">
+                            <span class="add-on">
+                                客户类型
+                            </span>
+                            <span class="sui-dropdown dropdown-bordered select disabled">
+                                <span class="dropdown-inner">
+                                    <a role="button" href="javascript:void(0);" data-toggle="dropdown"
+                                       class="dropdown-toggle h22">
+                                        <input value="${customer.type!}" name="type" type="hidden">
+                                        <i class="caret"></i>
+                                        <span>
+                                            ${decode(customer.type.val, 0,'普通', 1, '进货商', 2, '供货商',
+                                            '请选择')}
+                                        </span>
+                                    </a>
+                                    <ul role="menu" aria-labelledby="drop4" class="sui-dropdown-menu">
+                                        <li role="presentation">
+                                            <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="">请选择</a>
+                                        </li>
+                                        <li role="presentation">
+                                            <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="0">普通</a>
+                                        </li>
+                                        <li role="presentation">
+                                            <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="1">进货商</a>
+                                        </li>
+                                        <li role="presentation">
+                                            <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="2">供货商</a>
+                                        </li>
+                                    </ul>
+                                </span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">商家权重</span>
+                            <input type="text" data-rules="number"
+                                   data-error-msg="权重必须是1-10" class="input-fat h18 w100" placeholder="输入0-10" maxlength="2" name="weighting" value="${customer.weighting!}">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="info-group buyInfo">
+            <%if(customer.type.val > 0){%>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">淘宝店网址</span>
+                        <input type="text" class="input-fat h18 w300" placeholder="淘宝店网址" name="shopUrl" value="${customer.shopUrl!}">
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">旺旺(店铺)</span>
+                        <input type="text" class="input-fat h18 w300" placeholder="旺旺(店铺)" name="wangwang" value="${customer.wangwang!}">
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">申请进货商时间</span>
+                        <span class="add-text h18">
+                            ${isEmpty(customer.purchaseTime) ? customer.supplierTime! : customer.purchaseTime!, 'yyyy-MM-dd HH:mm:ss'}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">进货商审核通过时间</span>
+                        <span class="add-text h18">
+                            ${isEmpty(customer.passPurchaseTime) ? customer.passSupplierTime! : customer.passPurchaseTime!, 'yyyy-MM-dd HH:mm:ss'}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">QQ</span>
+                        <input type="text" class="input-fat h18 w100" placeholder="QQ" name="qq" value="${customer.qq!}">
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <div class="input-prepend">
+                            <span class="add-on">
+                                商品类别
+                            </span>
+                             <span class="add-text h18">
+                            <label class="checkbox-pretty inline ${strutil.contain(customer.inGoodsType!'' , 'cushion')?'checked'}">
+                                <input type="checkbox" name="inGoodsType" value="cushion" ${strutil.contain(customer.inGoodsType!'' , 'cushion')?'checked'}><span>汽车坐垫</span>
+                            </label>
+                             <label class="checkbox-pretty inline ${strutil.contain(customer.inGoodsType!'' , 'floorMat')?'checked'}">
+                                 <input type="checkbox" name="inGoodsType" value="floorMat" ${strutil.contain(customer.inGoodsType!'' , 'floorMat')?'checked'}><span>汽车脚垫</span>
+                             </label>
+                             <label class="checkbox-pretty inline ${strutil.contain(customer.inGoodsType!'' , 'wheelCover')?'checked'}">
+                                 <input type="checkbox" name="inGoodsType" value="wheelCover" ${strutil.contain(customer.inGoodsType!'' , 'wheelCover')?'checked'}><span>方向盘套</span>
+                             </label>
+                             <label class="checkbox-pretty inline ${strutil.contain(customer.inGoodsType!'' , 'carTrim')?'checked'}">
+                                 <input type="checkbox" name="inGoodsType" value="carTrim" ${strutil.contain(customer.inGoodsType!'' , 'carTrim')?'checked'}><span>汽车内饰</span>
+                             </label>
+                             <label class="checkbox-pretty inline ${strutil.contain(customer.inGoodsType!'' , 'other')?'checked'}">
+                                 <input type="checkbox" name="inGoodsType" value="other" ${strutil.contain(customer.inGoodsType!'' , 'other')?'checked'}><span>其他</span>
+                             </label>
+                        </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <%if(customer.type.val == 1){%>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">支付宝帐户</span>
+                        <input type="text" class="input-fat h18 w150" placeholder="支付宝帐户" name="alipayCode" value="${customer.alipayCode!}" data-rules="required">
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">财付通帐户</span>
+                        <input type="text" class="input-fat h18 w150" placeholder="财付通帐户" name="tenpayCode" value="${customer.tenpayCode!}">
+                    </div>
+                </div>
+            </div>
+            <%}%>
+            <div class="control-group add_marLeftbq">
+                <div class="input-prepend">
+                    <span class="add-on">进货商客户标签类型</span>
+                    <span class="add-text h18">
+                        <%for(type in typeNum!){%>
+                        <label class="checkbox-pretty inline ${array.contain(signs, type)? 'checked'}">
+                            <input type="checkbox" name="sign" ${array.contain(signs, type)? 'checked'}
+                            value="${type}"><span>${type!}</span>
+                        </label>
+                        <%}%>
+                    </span>
+                </div>
+            </div>
+            <%}else{%>
+            无
+            <%}%>
+        </div>
+        <div class="info-group sellInfo">
+            <%if(customer.type.val > 1){%>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">公司名称</span>
+                        <input type="text" class="input-fat h18 w300" placeholder="公司名称" name="supplierCompany" value="${customer.supplierCompany!}">
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">供应商法人代表</span>
+                        <input type="text" class="input-fat h18 w100" placeholder="供应商法人代表" name="artificialPerson" value="${customer.artificialPerson!}">
+                    </div>
+                </div>
+               <!-- <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">产品品牌</span>
+                        <input type="text" class="input-fat h18 w100" placeholder="产品品牌" name="brand" value="${customer.brand!}">
+                    </div>
+                </div>-->
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">产品品牌</span>
+                    </div>
+                </div>
+                <div class="pinpai_update">
+                    <%for(item in brands!){%>
+                    <ul>
+                        <li><span class="pinpai">${item.name}</span></li>
+                        <li><a href="/admin/brand/detail?id=${item.id}" target="_blank">查看</a></li>
+                        <li><a href="/admin/brand/edit?id=${item.id}" target="_blank">修改</a></li>
+                        <li><span class="btn-delBrand" data-id="${item.id}" title="删除">删除</span></li>
+                    </ul>
+                    <%}%>
+                    <div class="pinpai_add">
+                        <li><a title="添加" href="/admin/brand/add?customerId=${customer.id}" target="_blank">+ 添加</a></li>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">公司介绍</span>
+                        <div class="pic_l">
+                            <textarea name="remarks" rows="3" class="input-xlarge w600"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">申请供货商时间</span>
+                        <span class="add-text h18">
+                            ${customer.supplierTime!, 'yyyy-MM-dd HH:mm:ss'}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">供货商审核通过时间</span>
+                        <span class="add-text h18">
+                            ${customer.passSupplierTime!, 'yyyy-MM-dd HH:mm:ss'}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">供货商备注</span>
+                        <div class="pic_l">
+                            <textarea name="remarks" rows="3" class="input-xlarge w600">${customer.remarks!}</textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">供应商营业执照</span>
+                        <!--<input type="file" data-id="" class="sui-btn btn-primary" onchange="previewImage(this)" />-->
+                        <span class="sui-btn btn-primary" style="height: 28px;line-height: 22px;position: relative;"/>
+                        <input type="file" name="businessLicence" class="sui-btn btn-primary" style="width: 138px;height: 28px;position: absolute;top:0;left:0;opacity: 0;" onchange="previewImage(this)" />修改供应商营业执照
+                    </div>
+                    <div class="pic_l">
+                        <span id="preview">
+                            <img id="imghead" width="382" src="${img_url.fullPath(customer.businessLicence!)}"/>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">支付宝帐号</span>
+                        <input type="text" class="input-fat h18 w150" placeholder="支付宝帐号" name="alipayCode" value="${customer.alipayCode!}">
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">财付通帐户</span>
+                        <input type="text" class="input-fat h18 w150" placeholder="财付通帐户" name="tenpayCode" value="${customer.tenpayCode!}">
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">紧急联系人姓名</span>
+                        <input type="text" class="input-fat h18 w100" placeholder="紧急联系人姓名" name="emergencyContact" value="${customer.emergencyContact!}">
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">紧急联系人电话</span>
+                        <input type="text" class="input-fat h18 w100" placeholder="紧急联系人电话" name="emergencyPhone" value="${customer.emergencyPhone!}">
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <div class="input-prepend">
+                            <span class="add-on">
+                                商品类别
+                            </span>
+                            <span class="add-text h18">
+                                <label class="checkbox-pretty inline ${strutil.contain(customer.outGoodsType!'' , 'cushion')?'checked'}">
+                                    <input type="checkbox" name="outGoodsType" value="cushion" ${strutil.contain(customer.outGoodsType!'' , 'cushion')?'checked'}><span>汽车坐垫</span>
+                                </label>
+                                 <label class="checkbox-pretty inline ${strutil.contain(customer.outGoodsType!'' , 'floorMat')?'checked'}">
+                                     <input type="checkbox" name="outGoodsType" value="floorMat" ${strutil.contain(customer.outGoodsType!'' , 'floorMat')?'checked'}><span>汽车脚垫</span>
+                                 </label>
+                                 <label class="checkbox-pretty inline ${strutil.contain(customer.outGoodsType!'' , 'wheelCover')?'checked'}">
+                                     <input type="checkbox" name="outGoodsType" value="wheelCover" ${strutil.contain(customer.outGoodsType!'' , 'wheelCover')?'checked'}><span>方向盘套</span>
+                                 </label>
+                                 <label class="checkbox-pretty inline ${strutil.contain(customer.outGoodsType!'' , 'carTrim')?'checked'}">
+                                     <input type="checkbox" name="outGoodsType" value="carTrim" ${strutil.contain(customer.outGoodsType!'' , 'carTrim')?'checked'}><span>汽车内饰</span>
+                                 </label>
+                                 <label class="checkbox-pretty inline ${strutil.contain(customer.outGoodsType!'' , 'other')?'checked'}">
+                                     <input type="checkbox" name="outGoodsType" value="other" ${strutil.contain(customer.outGoodsType!'' , 'other')?'checked'}><span>其他</span>
+                                 </label>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="span2">
+                    <div class="input-prepend">
+                        <span class="add-on"> 是否是生产厂商 </span>
+                            <span class="add-text">
+                            <label class="radio-pretty inline ${customer.isProducer?'checked'}">
+                                <input name="isProducer" value="true" type="radio" ${customer.isProducer?'checked'}>
+                                <span>是</span>
+                            </label>
+                            <label class="radio-pretty inline ${customer.isProducer?'':'checked'}">
+                                <input name="isProducer" value="false" type="radio" ${customer.isProducer?'':'checked'}>
+                                <span>否</span>
+                            </label>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">取货区域编码</span>
+                        <span class="add-text h18">
+                            ${customer.pickAreaCode!}
+                        </span>
+                        <input type="button" data-id="${customer.id!}" class="sui-btn btn-primary btn-resetPickCode"
+                               style="height: 28px;" value="修改"/>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">取货地址</span>
+                        <input type="text" class="input-fat h18 w300" placeholder="取货地址" name="pickAddress" value="${customer.pickAddress!}">
+                    </div>
+                </div>
+            </div>
+            <%}else{%>
+            无
+            <%}%>
+        </div>
+        <input type="button" class="sui-btn btn-primary btn-ok" value="保存"/>
+        <input type="button" class="sui-btn btn-primary btn-close" value="关闭"/>
+    </form>
+</div>
+<%include("../common/dialog.html"){}%>
+<%}%>
+<script type="text/javascript">
+    /*上传图片*/
+    function previewImage(file)
+    {
+        var MAXWIDTH  = 382;
+        var MAXHEIGHT = 579;
+        var div = document.getElementById('preview');
+        if (file.files && file.files[0])
+        {
+            div.innerHTML ='<img id=imghead>';
+            var img = document.getElementById('imghead');
+            img.onload = function(){
+                var rect = clacImgZoomParam(MAXWIDTH, MAXHEIGHT, img.offsetWidth, img.offsetHeight);
+                img.width  =  rect.width;
+                img.height =  rect.height;
+                img.style.marginTop = rect.top+'px';
+            }
+            var reader = new FileReader();
+            reader.onload = function(evt){img.src = evt.target.result;}
+            reader.readAsDataURL(file.files[0]);
+        }
+        else //兼容IE
+        {
+            var sFilter='filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=scale,src="';
+            file.select();
+            var src = document.selection.createRange().text;
+            div.innerHTML = '<img id=imghead>';
+            var img = document.getElementById('imghead');
+            img.filters.item('DXImageTransform.Microsoft.AlphaImageLoader').src = src;
+            var rect = clacImgZoomParam(MAXWIDTH, MAXHEIGHT, img.offsetWidth, img.offsetHeight);
+            status =('rect:'+rect.top+','+rect.left+','+rect.width+','+rect.height);
+            div.innerHTML = "<div id=divhead style='width:"+rect.width+"px;height:"+rect.height+"px;margin-top:"+rect.top+"px;"+sFilter+src+"\"'></div>";
+        }
+    }
+    function clacImgZoomParam( maxWidth, maxHeight, width, height ){
+        var param = {top:0, left:0, width:width, height:height};
+        if( width>maxWidth || height>maxHeight )
+        {
+            rateWidth = width / maxWidth;
+            rateHeight = height / maxHeight;
+
+            if( rateWidth > rateHeight )
+            {
+                param.width =  maxWidth;
+                param.height = Math.round(height / rateWidth);
+            }else
+            {
+                param.width = Math.round(width / rateHeight);
+                param.height = maxHeight;
+            }
+        }
+        param.left = Math.round((maxWidth - param.width) / 2);
+        param.top = Math.round((maxHeight - param.height) / 2);
+        return param;
+    }
+</script>

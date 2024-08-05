@@ -1,0 +1,26 @@
+<%for(item in expressList){%>
+<li>
+    <%if(item.postFee >= 0){%>
+        <span class="${(item.discount + item.cutMoney > 0) ? 'gongSi_wid' : 'gongSi_wid02'}">
+            <span>
+                <input class="express-company" data-name="${item.name}" data-id="${item.id}" data-fee="${item.postFee!0}" data-cut="${item.cutMoney!0}" data-discount="${item.discount!0}" name="express-company"  type="radio" value="" ${(item.id == defaultExpress.id)?'checked':''}  id="kuaidi${itemLP.index}" />
+            </span>
+            <label for="kuaidi${itemLP.index}" title="${item.name}">${item.name}</label>
+            <%if(item.discount > 0){%>
+                <span class="peiSong_h">${nums.yuan(item.postFee * item.discount)}</span>
+            <%}else{%>
+                <span class="peiSong_h">${(item.postFee - item.cutMoney / 100) > 0? nums.yuan(item.postFee * 100 - item.cutMoney) :'0.00'}</span>
+            <%}%>
+            <span>元</span>
+        </span>
+
+        <%if(item.discount > 0){%>
+            <span class="pingTai_yunF">原运费：${item.postFee}元</span>
+            <span class="pingTai_ys">平台补贴：${item.discount / 10}折</span>
+        <%}else{%>
+            <span class="pingTai_yunF">原运费：${item.postFee}元</span>
+            <span class="pingTai_ys">平台补贴：${item.postFee > 0 ? item.cutMoney / 100 : '0.00'}元</span>
+        <%}%>
+    <%}%>
+</li>
+<%}%>

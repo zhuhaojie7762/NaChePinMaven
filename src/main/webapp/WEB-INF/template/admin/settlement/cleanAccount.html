@@ -1,0 +1,192 @@
+<%layout("../layout/header_layout.html"){%>
+<title>供货商已结算账单</title>
+<%}%>
+<%layout("../layout/body_layout.html"){%>
+<script>
+    $(function () {
+        Pagination.init();
+        $("#doCheck").click(function() {
+            $("input[name=check]").prop("checked", $(this).prop("checked"));
+        });
+        $(".nav-tabs li").click(function () {
+            $(".nav-tabs li").removeClass("active");
+            $(this).addClass("active");
+            $(".tab").hide();
+            $("." + $(this).attr("tab")).show();
+            $("input[name=tabParam]").val($(this).attr("tab"));
+        });
+    });
+</script>
+<ul class="sui-nav nav-tabs">
+    <li tab="first" class="${tabParam!'first' == 'first' ? 'active'}"><a>供货商结算汇总</a></li>
+    <li tab="second" class="${tabParam! == 'second' ? 'active'}"><a>对账单记录</a></li>
+</ul>
+<div class="tab first" style="display: ${tabParam!'first' == 'first' ? 'block':'none'};">
+    <div class="query-zone" id="searchL">
+        <form class="sui-form form-horizontal query-form">
+            <input type="hidden" name="tabParam" value="${tabParam!'first'}" />
+            <div class="sui-row">
+                <div class="span2">
+                    <div class="input-prepend">
+                    <span class="add-on">
+                        供货商公司
+                    </span>
+                        <input type="text" class="input h22" name="supplierCompany" value="${cleanAccount.supplierCompany!}"/>
+                    </div>
+                </div>
+                <div class="span2">
+                    <div class="input-prepend">
+                    <span class="add-on">
+                       收款人帐号
+                    </span>
+                        <input type="text" class="input h22" name="alipayCode" value="${cleanAccount.alipayCode!}"/>
+                    </div>
+                </div>
+                <div class="span2">
+                    <div class="input-prepend">
+                    <span class="add-on">
+                        收款人名称
+                    </span>
+                        <input type="text" class="input h22" name="alipayName" value="${cleanAccount.alipayName!}"/>
+                    </div>
+                </div>
+                <div class="span4">
+                    <div class="input-prepend" style="padding-top: 3px;">
+                    <span class="add-on">
+                        结算方式
+                    </span>
+                    <span class="sui-dropdown dropdown-bordered select h22">
+                            <span class="dropdown-inner">
+                                <a id="select" role="button" href="javascript:void(0);" data-toggle="dropdown" class="dropdown-toggle">
+                                    <input type="hidden" name="methodParam" data-rules="required" value="${cleanAccount.settlementMethod!}" />
+                                    <i class="caret"></i>
+                                    <span>${cleanAccount.settlementMethod.name!'请选择'}</span>
+                                </a>
+                                <ul role="menu" aria-labelledby="drop12" class="sui-dropdown-menu">
+                                    <li role="presentation"><a role="menuitem" tabindex="" href="javascript:void(0);" value="">请选择</a></li>
+                                    <li role="presentation"><a role="menuitem" tabindex="" href="javascript:void(0);" value="daily">现结</a></li>
+                                    <li role="presentation"><a role="menuitem" tabindex="" href="javascript:void(0);" value="weekly">周结</a></li>
+                                    <li role="presentation"><a role="menuitem" tabindex="" href="javascript:void(0);" value="monthly">月结</a></li>
+                                </ul>
+                            </span>
+                    </span>
+                    </div>
+                </div>
+            </div>
+            <div class="sui-row">
+                <div class="span2">
+                    <div class="input-prepend">
+                    <span class="add-on">
+                        结算期间&nbsp;&nbsp;&nbsp;
+                    </span>
+                        <input type="text" class="input-date h22" name="startTime1" data-toggle="datepicker" data-date-timepicker='true' value="${cleanAccount.startTime!, 'yyyy-MM-dd HH:mm'}" />
+                        <span class="add-on2">-</span>
+                        <input type="text" class="input-date h22" name="endTime1" data-toggle="datepicker" data-date-timepicker='true' value="${cleanAccount.endTime!, 'yyyy-MM-dd HH:mm'}" />
+                    </div>
+                </div>
+            </div>
+            <div class="sui-row" style="margin:15px 0 0 2px;">
+                <button class="sui-btn btn-primary">查询</button>
+                <input type="button" class="sui-btn btn-primary btn-reset" onclick="javascript:Common.go('/admin/settlement/order/goCleanAccount?tabParam=first');" value="重置" />
+            </div>
+        </form>
+    </div>
+    <table class="sui-table table-bordered" id="yueJieTab">
+        <thead>
+        <tr>
+            <th width="90"><label><input type="checkbox" id="doCheck">&nbsp;全选/反选</label></th>
+            <th width="150">上次结算时间</th>
+            <th width="150">本次结算时间</th>
+            <th width="150">供货商公司</th>
+            <th width="60">需结算金额</th>
+            <th width="60">退款金额</th>
+            <th width="80">应结算金额</th>
+            <th width="100">收款信息</th>
+            <th width="60">结算状态</th>
+            <th width="50">结算方式</th>
+            <th width="50">操作</th>
+            <th>备注</th>
+        </tr>
+        </thead>
+        <tbody>
+        <%for(page in pages1.data){%>
+        <tr>
+            <td><input type="checkbox" name="check" value="${pageLP.index}" /></td>
+            <td>${dts.d2d(page.lastTime!)}~${dts.d2d(page.startTime!)}</td>
+            <td>${dts.d2d(page.startTime!)}~${dts.d2d(page.endTime!)}</td>
+            <td>${page.supplierCompany!}</td>
+            <td>${nums.yuan(page.saleMoney!)}</td>
+            <td>${nums.yuan(page.backMoney!)}</td>
+            <td>${nums.yuan(page.saleMoney - page.backMoney!)}</td>
+            <td>${page.alipayCode!} ${page.alipayName!}</td>
+            <td>${page.status.name!}</td>
+            <td>${page.settlementMethod.name!}</td>
+            <td><a href="/admin/settlement/order/detailCleanAccount?code=${page.code!}">明细</a></td>
+            <td>${page.remark!}</td>
+        </tr>
+        <%}elsefor{%>
+        <tr>
+            <td colspan="12" class="zanWuShuju"><p>没有数据</p></td>
+        </tr>
+        <%}%>
+        </tbody>
+    </table>
+    <#pagePlus val="${pages1.page!}" size="large" params="${parameter.map!}"/>
+</div>
+
+<!--
+    page two
+-->
+
+<div class="tab second" style="display: ${tabParam! == 'second' ? 'block':'none'};">
+    <div class="query-zone" id="confirm_Con">
+        <form class="sui-form form-horizontal query-form">
+            <input type="hidden" name="tabParam" value="${tabParam!'first'}" />
+            <div class="sui-row" id="jiesuanFangs">
+                <div class="span2">
+                    <div class="input-prepend">
+                    <span class="add-on">
+                        对账单名称
+                    </span>
+                        <input class="input h22" type="text" value="${parameter.code!}" name="code" />
+                    </div>
+                </div>
+                <div class="span2">
+                    <div class="input-prepend">
+                    <span class="add-on">
+                        结算时间
+                    </span>
+                        <input type="text" class="input-date h22" name="startTime2" data-toggle="datepicker" value="${parameter.startTime2!}" />
+                        <span class="add-on2">-</span>
+                        <input type="text" class="input-date h22" name="endTime2" data-toggle="datepicker" value="${parameter.endTime2!}" />
+                    </div>
+                </div>
+            </div>
+            <div class="sui-row" style="margin:15px 0 0 2px;">
+                <button class="sui-btn btn-primary">查询</button>
+                <input type="button" class="sui-btn btn-primary btn-reset" onclick="javascript:Common.go('/admin/settlement/order/goCleanAccount?tabParam=second');" value="重置" />
+            </div>
+        </form>
+    </div>
+    <table class="sui-table table-bordered">
+        <thead>
+            <th>结算时间</th>
+            <th>对账单名称</th>
+            <th>结算状态</th>
+        </thead>
+        <tbody>
+        <%for(page in pages2){%>
+            <tr>
+                <td>${dts.d2d(page.created!)}</td>
+                <td><a href="/admin/settlement/order/detail?code=${page.code}">${page.code!}</a></td>
+                <td>${page.status.name!}</td>
+            </tr>
+        <%}elsefor{%>
+            <tr>
+                <td colspan="3" class="zanWuShuju"><p>没有数据</p></td>
+            </tr>
+        <%}%>
+        </tbody>
+    </table>
+</div>
+<%}%>

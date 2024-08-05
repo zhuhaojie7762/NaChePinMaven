@@ -1,0 +1,334 @@
+<%layout("/web/layout/header_layout2.html"){%>
+<%}%>
+    <script type="text/javascript">
+        function calcTotal() {
+            var totalPrice = 0;
+            var totalCount = 0;
+            $("input[name=chkSon]:checked").each(function () {
+                totalPrice += parseFloat($(this).attr("data-price")) * parseFloat($(this).attr("data-num"));
+                totalCount += 1;
+            });
+            $(".totalPrice").text((totalPrice / 100.00).toFixed(2));
+            $(".total-count").text(totalCount);
+        }
+        $(function () {
+            /* 选择/取消商品 */
+            $("input[name=chkSon]").unbind("change").bind("change", function () {
+                if (!$(this).prop("checked")) {
+                    $("input[name=chkAll]").prop("checked", false);
+                    $(this).parents("td").find("input[name=chkBrand]").prop("checked", false);
+                } else {
+                    if ($(this).parents("td").find("input[name=chkSon]:not(:checked)").length == 0){
+                        $(this).parents("td").find("input[name=chkBrand]").prop("checked", true);
+                    }
+
+                    if ($("input[name=chkSon]:not(:checked)").length == 0){
+                        $("input[name=chkAll]").prop("checked", true);
+                    }
+                }
+                if ($("input[name=chkSon]:checked").length > 0){
+                    $(".btn-order").css("background","#fd7009");
+                }else{
+                    $(".btn-order").css("background","#e3e3e3");
+                }
+                calcTotal();
+            });
+            /* 选择/取消 某品牌商品 */
+            $("input[name=chkBrand]").unbind("click").bind("click", function () {
+                var checkFlag = $(this).prop("checked");
+                $(this).parents("td").find("input[name=chkSon]").prop("checked", checkFlag);
+                $("input[name=chkSon]").trigger("change");
+            });
+            /* 选择/取消 所有商品 */
+            $("input[name=chkAll]").unbind("click").bind("click", function () {
+                var checkFlag = $(this).prop("checked");
+                $("input[name=chkSon]").prop("checked", checkFlag);
+                $("input[name=chkBrand]").prop("checked", checkFlag);
+                $("input[name=chkAll]").prop("checked", checkFlag);
+                $("input[name=chkSon]").trigger("change");
+            });
+            /* 结算 */
+            $(".btn-order").unbind("click").bind("click", function () {
+                if ($("input[name=chkSon]:checked").length == 0) {
+                    Msg.warning("请选中要结算的商品");
+                    return;
+                }
+                var quantityCheck = true;
+                $("input[name=chkSon]:checked").each(function () {
+                    var quantity = $(this).parents("li").find("input[name=quantity]").val();
+                    if (!Common.Rules.digits.test(quantity)) {
+                        quantityCheck = false;
+                        return false;
+                    } else if (quantity < 1) {
+                        quantityCheck = false;
+                        return false;
+                    }
+                });
+                if (!quantityCheck) {
+                    Msg.warning("请选择购买数量");
+                    return;
+                }
+                var ids = new Array();
+                $("input[name=chkSon]:checked").each(function () {
+                    ids.push($(this).val());
+                });
+                Common.post("/trade/sendCartItems", {data: ids.join(",")}, function (json) {
+                    if (json.code == Common.SUCC) {
+                        Common.go("/trade/confirmOrder.html");
+                    } else {
+                        Msg.danger(json.message);
+                    }
+                });
+            });
+            /* 关注 */
+            $(".btn-follow").unbind("click").bind("click", function () {
+                var goodsCode = $(this).attr("data-code");
+                Common.post("/buy/follow", {goodsCode: goodsCode}, function (json) {
+                    if (json.code == Common.SUCC) {
+                        Msg.success(json.message, top);
+                        Common.refresh();
+                    } else {
+                        Msg.danger(json.message, top);
+                    }
+                });
+            });
+            /* 批量关注 */
+            $(".btn-follow-all").unbind("click").bind("click", function () {
+                if ($("input[name=chkSon]:checked").length == 0) {
+                    Msg.warning("请先选择商品!");
+                    return;
+                }
+                if(!confirm("确认要批量关注吗？")){
+                    return;
+                }
+                var codes = new Array();
+                $("input[name=chkSon]:checked").each(function(){
+                    codes.push($(this).attr("data-code"));
+                });
+                Common.post("/buy/followAll", {codes: codes.join(",")}, function (json) {
+                    if (json.code == Common.SUCC) {
+                        Msg.success(json.message, top);
+                        Common.refresh();
+                    } else {
+                        Msg.danger(json.message, top);
+                    }
+                });
+            });
+            /* 删除 */
+            $(".btn-del").unbind("click").bind("click", function () {
+                var id = $(this).attr("data-code");
+                Common.post("/cart/del", {id: id}, function (json) {
+                    if (json.code == Common.SUCC) {
+                        Msg.success(json.message, top);
+                        Common.refresh();
+                    } else {
+                        Msg.danger(json.message, top);
+                    }
+                });
+            });
+            /* 批量删除 */
+            $(".btn-del-all").unbind("click").bind("click", function () {
+                if ($("input[name=chkSon]:checked").length == 0) {
+                    Msg.warning("请先选择商品!");
+                    return;
+                }
+                if(!confirm("确认要批量删除吗？")){
+                    return;
+                }
+                var ids =  new Array();
+                $("input[name=chkSon]:checked").each(function(){
+                   ids.push($(this).val());
+                });
+                Common.post("/cart/delAll", {ids: ids.join(",")}, function (json) {
+                    if (json.code == Common.SUCC) {
+                        Msg.success(json.message, top);
+                        Common.refresh();
+                    } else {
+                        Msg.danger(json.message, top);
+                    }
+                });
+            });
+
+            /* 增加商品件数*/
+            $(".addgwcar").click(function () {
+                var t = $(this).parent().find('input[class*=text_box]');
+                t.val(parseInt(t.val()) + 1)
+                chgNum($(this).siblings("input[name=quantity]"));
+            });
+            /* 减少商品件数*/
+            $(".mingwcar").click(function () {
+                var t = $(this).parent().find('input[class*=text_box]');
+                t.val(parseInt(t.val()) - 1)
+                if (parseInt(t.val()) <= 0) {
+                    t.val(1);
+                }
+                chgNum($(this).siblings("input[name=quantity]"));
+            });
+            /* 修改商品件数 */
+            $("input[name=quantity]").unbind("change").bind("change", function(){
+                chgNum($(this));
+            });
+        });
+
+        function chgNum($this) {
+            var id = $this.attr("data-id");
+            var num = $this.val();
+            var price = $this.attr("data-price");
+            Common.post2({
+                url: "/cart/chgNum",
+                param: {
+                    id: id,
+                    num: num
+                },
+                success: function(json){
+                    $this.parents("span").siblings(".good-money").text((parseFloat(num) * parseFloat(price) / 100.00).toFixed(2));
+                    $("input[name=chkSon][value=" + id + "]").attr("data-num", num);
+                    calcTotal();
+                },
+                error: function (json) {
+                    if (json.data) {
+                        $this.val(json.data);
+                    }
+                    if (json.message) {
+                        MsgBox.danger($this, json.message);
+                    }
+                }
+            });
+        };
+
+    </script>
+</head>
+<body>
+<%layout("/web/layout/body_layout2.html"){%>
+<div style="width: 100%;overflow: hidden;background: #fcfcfd;">
+<form name="form1" method="post" action="">
+    <div class="ncpgwc_Con">
+        <div class="ncp_gouwucarKong" style="display: ${isEmpty(shoppingCarts)?'block':'none'}">
+            <p>您的购物车还是空的，赶紧行动吧！</p>
+        </div>
+        <div style="background: #fcfcfd; display: ${isEmpty(shoppingCarts)?'none':'block'}">
+            <p class="zongJi_pYs">
+                全部货品 ( <span class="ncp_quanBuHuoPin">${shoppingCarts.~size}</span> )
+                <span class="ncp_xgZongJi">
+                    <span>已选货品 ( 不含运费 ) 总计：</span>
+                    <span class="ncp_quanBuHuoPin totalPrice">0.00</span>
+                    <span>元</span>
+                    <span class="ncp_xgJieSuan_02 btn-order" id="topJieSuan" title="结算">结算</span>
+                </span>
+            </p>
+            <div>
+                <table class="sui-table table-bordered" id="zongJi_Tab">
+                    <thead>
+                        <th width="508">
+                            <label title="商品信息">
+                                <span class="checkTop02">
+                                    <input name="chkAll" type="checkbox" />
+                                </span>
+                                <span class="zx_addspxx">商品信息</span>
+                            </label>
+                        </th>
+                        <th width="100">商品货号</th>
+                        <th width="80">单价</th>
+                        <th width="200">数量</th>
+                        <th width="100">小计(元)</th>
+                        <th width="150">操作</th>
+                    </thead>
+                    <tbody>
+                    <%
+                        var oldBrand = "";
+                        var oldSellerId = 0;
+                    %>
+                    <%for(goods in shoppingCarts!){%>
+                    <%if(oldBrand != goods.brand && oldSellerId != goods.sellerId){
+                    oldBrand = goods.brand;
+                    oldSellerId = goods.sellerId;
+                    if(!goodsLP.first){%>
+                    </ul>
+                    </td>
+                    </tr>
+                    <%}%>
+                    <tr>
+                        <td colspan="6" border="0">
+                            <ul>
+                                <p class="zongJi_tdTil">
+                                    <span class="checkTop01">
+                                        <input type="checkbox" name="chkBrand" />
+                                    </span>
+                                    <span>品牌：</span>
+                                    <span class="ghs_jhsF">${goods.brand}</span>
+                                    <span>供货商：</span>
+                                    <span class="ghs_jhsF">${goods.supplierCompany}</span>
+                                </p>
+                                <%}%>
+                                <li>
+                                    <span class="shop_XinXiWidth">
+                                        <span><input type="checkbox" name="chkSon" data-size="${goods.size}" data-color="${goods.color}"
+                                                     data-price="${goods.price}" data-num="${goods.quantity}" data-code="${goods.goodsCode}" value="${goods.id}"/></span>
+                                        <a href="/goods/${goods.goodsCode}.html" target="_blank"><span><img src="${img_url.getS(goods.headImgUrl)}" width="80" /></span></a>
+                                        <a href="/goods/${goods.goodsCode}.html" target="_blank">
+                                            <span>
+                                                <span class="shop_xgTitle">${goods.goodsName}</span>
+                                                <br /><br />
+                                                <span class="shop_xgGuiGe">规格：${goods.specPropValue}</span>
+                                                <span class="shop_xgGuiGe shop_colorMar">颜色：${goods.color}</span>
+                                                <span class="shop_xgGuiGe">尺寸：${goods.size}</span>
+                                            </span>
+                                        </a>
+                                    </span>
+                                    <span class="shop_HuoHao">${goods.goodsItemNo}</span>
+                                    <span class="shop_DanJia">${nums.yuan(goods.price)}</span>
+                                    <span class="shop_NumSpan">
+                                        <div class="ncp_gwcNumJia">
+                                            <input class="mingwcar" name="" type="button" value="-"/>
+                                            <input class="text_box" name="quantity" type="text" data-price="${goods.price}" data-id="${goods.id}" value="${goods.quantity}" style="width: 42px;"/>
+                                            <input class="addgwcar" name="" type="button" value="+"/>
+                                        </div>
+                                    </span>
+                                    <span class="shop_xiaoJi good-money">${nums.yuan(goods.money)}</span>
+                                    <span class="shop_yiRuGuanZ">
+                                        <a href="javascript:void(0);" data-code="${goods.goodsCode}" class="ttLog_chaXun ${goods.followed?'':'btn-follow'}" >${goods.followed?'已关注':'移入关注'}</a>
+                                        <br />
+                                        <a href="javascript:void(0);" data-code="${goods.id}" class="ttLog_chongzhi btn-del"
+                                           title="删除">删除</a>
+                                    </span>
+                                </li>
+                    <%if(goodsLP.last){%>
+                            </ul>
+                        </td>
+                    </tr>
+                    <%}%>
+                    <%}%>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="tfoot_gxMian" id="ncp_gwJieSuan">
+        <div class="tfoot_gx">
+            <label title="全选">
+                <span class="tfootChek">
+                    <input type="checkbox" name="chkAll" id="gx_chkAll" title="全选" type="checkbox"/>
+                </span>
+                <span class="tfootQx"><label for="gx_chkAll">全选</label></span>
+            </label>
+            <span class="shop_yiRuGuanZ02">
+                <a href="javascript:void(0);" class="ttLog_chongzhi btn-del-all" title="删除">删除</a>
+                <a href="javascript:void(0);" class="ttLog_chaXun btn-follow-all" title="移入关注">移入关注</a>
+            </span>
+            <span class="float_r">
+                <span class="ncp_xgZongJi jieSuanSp">
+                    <span>已选</span>
+                    <span class="ncp_quanBuHuoPin total-count">0</span>
+                    <span>件货品</span>
+                    <span>合计 ( 不含运费 )：</span>
+                    <span class="ncp_quanBuHuoPin totalPrice">0.00</span>
+                    <span>元</span>
+                </span>
+                <span id="Tjs_btn" class="ncp_xgJieSuan_02 btn-order" title="结算">结算</span>
+            </span>
+        </div>
+    </div>
+</form>
+</div>
+<%}%>

@@ -1,0 +1,218 @@
+<%layout("../layout/header_layout.html"){%>
+<link rel="stylesheet" type="text/css" href="/static/css/web/peisongwuliu.css">
+<title>发货详情页</title>
+<script type="text/javascript">
+    $(function () {
+        $(".btn-close").unbind("click").bind("click", function () {
+            Common.backHistory();
+        });
+        /**
+         * 发货
+         */
+        $(".btn-send").click(function () {
+            if (!confirm("确认发货吗？")) {
+                return;
+            }
+            Common.post2({
+                url: "/admin/picklist/picking/deliverGoods",
+                param: { tradeCode : $(this).attr("data-code"), pickCode : $(this).attr("data-pick")},
+                success: function (result) {
+                    if (result.code == Common.SUCC) {
+                        Msg.success(result.message);
+                    }else{
+                        Msg.danger(result.message);
+                        return false;
+                    }
+                    setTimeout(function () {
+                        Common.refresh();
+                    }, 1000);
+                }
+            });
+        });
+    });
+</script>
+<style>
+    .buyInfo:after {
+        content: "物流信息";
+    }
+</style>
+<%}%>
+<%layout("../layout/body_layout.html"){%>
+<form class="sui-form form-horizontal detail-form" novalidate="novalidate" method="POST" id="zongDD_c" >
+    <div class="info-group zongDDbh zongDD_conys">
+        <p class="xiangqi_title hdredcolor">总订单详情</p>
+        <p><span class="spanL">总订单编号：</span><span>${trade.code}</span></p>
+        <p><span class="spanL">进货商信息：</span><span>${buyer.name!}&nbsp;&nbsp;${buyer.phone!}&nbsp;&nbsp;${buyer.address!}</span></p>
+        <br />
+        <%for(order in orders){%>
+        <p class="xiangqi_title zijutop">( 子订单：${order.code} ) 详情</p>
+        <p><span class="spanL">子订单编号：</span><span>${order.code}</span></p>
+        <p><span class="spanL">拣货人：</span><span>${order.pickerName!}</span></p>
+        <p><span class="spanL">拣货完成时间：</span><span>${order.pickTime, 'yyyy-MM-dd'}</span></p>
+        <p><span class="spanL">是否特殊商品：</span><span>${order.isSpecial?'是':'否'}</span></p>
+        <p><span class="spanL">供货商信息：</span><span>${order.sellerCompany}&nbsp;&nbsp;${order.sellerPhone}&nbsp;&nbsp;${order.sellerAddress}</span></p>
+        <br /><br />
+        <table class="sui-table table-bordered">
+            <thead>
+            <th width="240">货品详情</th>
+            <th>规格属性</th>
+            <th width="90">单价</th>
+            <th width="90">数量</th>
+            <th width="130">货品总价(元)</th>
+            <th width="60">状态</th>
+            </thead>
+            <tbody>
+            <tr>
+                <td>
+                    <img src="${img_url.getS(order.headImg)}" width="70" style="float:left;" />
+                    <p style="float: left;width: 160px;;">${order.goodsName}</p>
+                </td>
+                <td>
+                    <span>${order.specPropValue}</span>
+                </td>
+                <td>${nums.yuan(order.price)}</td>
+                <td>${order.quantity}</td>
+                <td>${nums.yuan(order.money)}</td>
+                <td>${order.status.name}</td>
+            </tr>
+            </tbody>
+        </table>
+        <%}%>
+    </div>
+    <div class="info-group buyInfo" id="wuLiuxx">
+        <div class="control-group">
+            <div class="xq_botom">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">订单总重量：</span>
+                    <span class="add-text h18">
+                       ${nums.g2k(trade.weight)}
+                    </span>
+                    </div>
+                </div>
+            </div>
+            <div class="xq_botom">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">订单运费：</span>
+                    <span class="add-text h18">
+                       ${nums.yuan(trade.postFee)}
+                    </span>
+                    </div>
+                </div>
+            </div>
+            <%for(order in orders){%>
+            <div class="xq_botom">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">${order.code}状态：</span>
+                        <span class="add-text h18">
+                           ${order.status.name}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <%}%>
+            <div class="xq_botom">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">收货人信息：</span>
+                    <span class="add-text h18">
+                         ${sendOrder.buyerName!} &nbsp;&nbsp;${sendOrder.buyerPhone!}&nbsp;&nbsp;${county.provinceName!}${county.cityName!}${county.name!}${sendOrder.buyerAddress!}
+                    </span>
+                    </div>
+                </div>
+            </div>
+            <div class="xq_botom">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">物流公司：</span>
+                    <span class="add-text h18">
+                     ${sendOrder.expressName!}
+                    </span>
+                    </div>
+                </div>
+            </div>
+            <div class="xq_botom">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">物流单号：</span>
+                    <span class="add-text h18">
+                       ${sendOrder.expressCode!}
+                    </span>
+                    </div>
+                </div>
+            </div>
+            <div class="xq_botom">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">买家留言：</span>
+                    <span class="add-text h18">
+                       ${order[0].buyerMessage!}
+                    </span>
+                    </div>
+                </div>
+            </div>
+            <div class="xq_botom">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">物流信息：</span>
+                    </div>
+                </div>
+            </div>
+            <div data-mohe-type="kuaidi_new" class="g-mohe " id="mohe-kuaidi_new">
+                <div id="mohe-kuaidi_new_nucom">
+                    <div class="mohe-wrap mh-wrap">
+                        <div class="mh-cont mh-list-wrap mh-unfold">
+                            <div class="mh-list">
+                                <ul>
+                                    <%if(!has(expressJson)){%>
+                                    <div class="kuaiDi_wuYs"><p>啊~~哦！暂无快递信息。</p></div>
+                                    <%}else if(expressJson.status == '2'){%>
+                                    ${expressJson.message!}
+                                    <%}else {%>
+                                    <%for(express in expressJson.data!){%>
+                                    <%if(expressLP.last){%>
+                                    <li>
+                                        <img class="lasteZui" src="/static/images/web/wuLiu_ok.png" width="18" />
+                                        <p>${express.time!}</p>
+                                        <p>${express.context!}</p>
+                                        <span class="after"></span>
+                                    </li>
+                                    <%}else if(expressLP.first){%>
+                                    <li class="first">
+                                        <img class="firstZui" src="/static/images/web/wuLiu_yuan02.png" width="16" />
+                                        <p>${express.time!}</p>
+                                        <p>${express.context!}</p>
+                                        <span class="beforeLv"></span><span class="after"></span>
+                                    </li>
+                                    <%}else{%>
+                                    <li>
+                                        <img class="huiImg" src="/static/images/web/wuLiu_yuan02.png" width="16" />
+                                        <p>${express.time!}</p>
+                                        <p>${express.context!}</p>
+                                        <span class="before"></span><span class="after"></span>
+                                    </li>
+                                    <%}%>
+                                    <%}%>
+                                    <%}%>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="hd_fahuoCon">
+        <p>
+            <a href="javascript:history.go(-1)" class="sui-btn btn-smal">返回</a>
+            <%if(trade.status.val == 35 && pickOrder.status.val!0 == 40){%>
+            <input type="button" class="sui-btn btn-primary btn-send" value="发货" data-code="${trade.code}" data-pick="${pickOrder.code!}"/>
+            <%}%>
+        </p>
+    </div>
+<!--    <input type="button" class="sui-btn btn-primary btn-close" value="返回"/>-->
+</form>
+<%include("../common/dialog.html"){}%>
+<%}%>

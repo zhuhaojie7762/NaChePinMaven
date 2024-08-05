@@ -1,0 +1,48 @@
+<%layout("../layout/header_layout.html"){%>
+<title>当日拣货中商家列表</title>
+<script type="text/javascript">
+    $(function () {
+        Pagination.init();
+    })
+</script>
+<%}%>
+<%layout("../layout/body_layout.html"){%>
+<table class="sui-table table-bordered">
+    <thead>
+        <th width="80">拣货单编号</th>
+        <th width="130">上一次操作时间</th>
+        <th width="130">状态</th>
+        <th>操作</th>
+    </thead>
+    <tbody>
+        <%for(item in pager.data!){%>
+        <tr>
+            <td>${item.code!}</td>
+            <td>${item.lastTime!}</td>
+            <td>${item.status.name!}</td>
+            <td>
+                <%if(item.status.val == 10){%>
+                    <a href="/admin/picklist/picking/pickOrder?pickCode=${item.code!}" class="sui-btn btn-small">继续上一次操作</a>
+                <%}%>
+                <%if(item.status.val == 20){%>
+                    <a href="/admin/picklist/picking/kuaiDiOrder?pickCode=${item.code!}" class="sui-btn btn-small">继续上一次操作</a>
+                <%}%>
+                <%if(item.status.val == 30){%>
+                    <a href="/admin/picklist/picking/printLoading?pickCode=${item.code!}" class="sui-btn btn-small">继续上一次操作</a>
+                <%}%>
+                <%if(item.status.val == 40){%>
+                    <a href="/admin/picklist/picking/sendOrder?pickCode=${item.code!}" class="sui-btn btn-small">继续上一次操作</a>
+                <%}%>
+            </td>
+        </tr>
+        <!--没有数据样式 start-->
+        <%}elsefor{%>
+        <tr>
+            <td colspan="4" class="zanWuShuju"><p>没有数据</p></td>
+        </tr>
+        <%}%>
+        <!--没有数据样式 end-->
+    </tbody>
+</table>
+<#page val="${pager.page!}" size="large" params="${parameter.map!}"/>
+<%}%>

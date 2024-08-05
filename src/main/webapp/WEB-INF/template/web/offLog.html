@@ -1,0 +1,98 @@
+<%layout("/web/layout/header_layout2.html"){%>
+<script type="text/javascript" src="http://g.alicdn.com/sj/dpl/1.5.1/js/sui.min.js?v=${v}"></script>
+<script type="text/javascript">
+    $(function(){
+        Pagination.init();
+        $(".ttLog_chongzhi").click(function() {
+            $(".ttlog_input").val("");
+            $("#startDate")[0].value = "";
+            $("#endDate")[0].value = "";
+        });
+    });
+</script>
+<style>
+    .ttlog_input, .ttlog_input02{width: 102px;}
+    .ttLog_chaXun{margin-right: 10px;}
+</style>
+<%}%>
+<%layout("/web/layout/body_layout2.html"){%>
+<div class="ttlog_main">
+    <div class="ttppzq_con02 ty_rerelative">
+        <div class="ty_gyClear"></div>
+        <form class="form-param query-form" method="get">
+            <fieldset id="riZhiSearch">
+                <legend>查询信息</legend>
+            <p class="ttlog_search ">
+                <span>商品名称：</span>
+                <span>
+                    <input type="text"  class="ttlog_input" type="text" onblur="javascript:this.className='ttlog_input'" onfocus="javascript:this.className='ttlog_input02'" value="${params.goodsName!}" name="goodsName" />
+                </span>
+                <span>品牌：</span>
+                <span>
+                    <input type="text" class="ttlog_input" type="text" onblur="javascript:this.className='ttlog_input'" onfocus="javascript:this.className='ttlog_input02'" value="${params.brand!}" name="brand" />
+                </span>
+                <span>货号：</span>
+                <span>
+                    <input type="text" class="ttlog_input" type="text" onblur="javascript:this.className='ttlog_input'" onfocus="javascript:this.className='ttlog_input02'" value="${params.itemNo!}" name="itemNo" />
+                </span>
+                <span>下架时间：</span>
+                <span id="demo2" class="date float_l">
+                    <span class="add-on">从</span>
+                    <input id="startDate" type="text" class="ttlog_input" onfocus="javascript:this.className='ttlog_input'" onblur="javascript:this.className='ttlog_input02'" value="${params.startDate!}" name="startDate" />
+                </span>
+                <script type="text/javascript">
+                    $('#demo2.date').datepicker({});
+                </script>
+                <span id="demo" class="date float_l">
+                    <span class="add-on">至</span>
+                    <input id="endDate" type="text" class="ttlog_input" onfocus="javascript:this.className='ttlog_input'" onblur="javascript:this.className='ttlog_input02'" value="${params.endDate!}" name="endDate" />
+                </span>
+                <script type="text/javascript">
+                    $('#demo.date').datepicker({});
+                </script>
+                <div style="position: absolute;top:42px;right:47px;">
+                    <span><input type="submit" style="width: 46px;" class="ttLog_chaXun" title="查询" value="查询" /></span>
+                    <span><input type="button" style="width: 46px;" class="ttLog_chongzhi" value="重置"/>
+                    </span>
+                </div>
+            </p>
+            </fieldset>
+        </form>
+        <div class="ty_gyClear"></div>
+        <table class="sui-table table-bordered" id="logPa">
+            <thead>
+            <tr>
+                <th width="80">商品编号</th>
+                <th width="300">商品名称</th>
+                <th width="100">品牌</th>
+                <th width="100">货号</th>
+                <th width="100">价格</th>
+                <th width="80">下架时间</th>
+                <th>下架备注</th>
+            </tr>
+            </thead>
+            <tbody>
+            <%for(goods in pager.data){%>
+            <tr>
+                <td><a title="${goods.code}" href="${ctx}/goods/${goods.code}.html" target="_blank">${goods.code}</a></td>
+                <td>${goods.name}</td>
+                <td>${goods.brand}</td>
+                <td>${goods.itemNo}</td>
+                <td>${goods.wholesalePrice/100,"##.00"}</td>
+                <td>${goods.offlineTime, "yyyy-MM-dd"}</td>
+                <td>${goods.offlineRemark}</td>
+            </tr>
+            <%}elsefor{%>
+            <tr>
+                <td colspan="7" class="zanWuShuju"><p>没有数据</p></td>
+            </tr>
+            <%}%>
+            </tbody>
+        </table>
+        <div class="ty_gyClear"></div>
+        <div class="lgrz_page">
+            <#webPagePlus val='${pager.page}' size='small' params = '${params!}' showNum = 'show' />
+        </div>
+    </div>
+</div>
+<%}%>

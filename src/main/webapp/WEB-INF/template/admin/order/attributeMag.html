@@ -1,0 +1,259 @@
+<%layout("../layout/header_layout.html"){%>
+<script src="/static/js/web/zixie.js"></script>
+<script src="/static/js/web/attributes.js"></script>
+<title>分类属性管理</title>
+<%}%>
+<%layout("../layout/body_layout.html"){%>
+<div class="query-zone" id="confirm_Con">
+    <form class="sui-form form-horizontal query-form" id="query-form">
+        <div class="sui-row">
+            <div class="span4">
+                <div class="input-prepend">
+                    <span class="add-on">属性</span>
+                    <input type="text" class="input h22" name="goodsItemNo" value="" />
+                </div>
+            </div>
+            <div class="span4">
+                <div class="input-prepend">
+                    <span class="add-on">属性值</span>
+                    <input type="text" class="input h22" name="goodsItemNo" value="" />
+                </div>
+            </div>
+            <button class="sui-btn btn-primary add_btnlef">查询</button>
+            <input type="button" class="sui-btn btn-primary btn-reset" value="重置"/>
+        </div>
+        <div class="add_clear"></div>
+    </form>
+</div>
+<div class="add_fenleiCon">
+    <span class="addshuxflBtn" title="新建属性及属性值" id="add_shuxing">新建属性及属性值</span>
+    <div class="add_shuxingxla sui-form" id="add_flctCon">
+        <div class="zong_kuozhan">
+            <img src="/static/images/add/add_xsjicon.png" class="add_xlxsjicon" />
+            <div class="sui-row">
+                <div class="span4">
+                    <div class="input-prepend">
+                        <span class="add-on">三级分类名称:</span>
+                        </span>
+                        <span class="sui-dropdown dropdown-bordered select h22">
+                            <span class="dropdown-inner">
+                                <a role="button" data-toggle="dropdown" href="#" class="dropdown-toggle">
+                                    <i class="caret"></i>
+                                    <span>请选择</span>
+                                </a>
+                                <ul role="menu" aria-labelledby="drop12" class="sui-dropdown-menu fenleixiala">
+                                    <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" >请选择</a></li>
+                                    <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="one" title="一级分类">一级分类</a></li>
+                                    <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="two" title="一级分类">二级分类</a></li>
+                                    <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="three" title="一级分类">三级分类</a></li>
+                                </ul>
+                            </span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="sui-row">
+                <div class="span4">
+                    <div class="input-prepend">
+                        <span class="add-on">&nbsp;&nbsp;属性名称:&nbsp;</span>
+                        <input type="text" class="input h22" name="goodsItemNo" value="" />
+                    </div>
+                </div>
+            </div>
+            <div class="sui-row">
+                <div class="span4">
+                    <div class="input-prepend">
+                        <span class="add-on">属性值:</span>
+                        <span class="sui-btn btn-small Adds"  >添加</span>
+                        <span class="sui-btn btn-small add_moreshan"  >删除</span>
+                        <span class="sui-btn btn-small Addss">添加多个</span>
+                    </div>
+                </div>
+            </div>
+            <table class="sui-table table-bordered tab" border="1px #ooo" id="shuxingT_tab" cellpadding="0" cellspacing="0" width="30%">
+                <thead>
+                <th width="60"><label><input type="checkbox" class="allCkb" id="allCkb" /> 全选</label></th>
+                <th>属性值</th>
+                </thead>
+            </table>
+            <div class="add_clear"></div>
+            <div class="sui-row">
+                <button class="sui-btn btn-primary add_btnlef">保存</button>
+                <input type="button" class="sui-btn btn-primary btn-reset" id="add_quxiao02" value="取消"/>
+            </div>
+        </div>
+    </div>
+</div>
+<table class="sui-table table-bordered" id="add_fenleitab">
+    <thead>
+    <th>三级分类名称</th>
+    <th>属性名称</th>
+    <th>属性值</th>
+    <th>创建时间</th>
+    <th width="312">操作</th>
+    </thead>
+    <tbody>
+    <tr>
+        <td>汽车小挂件</td>
+        <td>材质</td>
+        <td>人造革、冰丝、合成纤维</td>
+        <td>2016-11-29</td>
+        <td class="hdMore_btns">
+            <span class="sui-btn btn-small chakan" title="查看" >查看</span>
+            <div class="add_sxchakan">
+                <img src="/static/images/add/add_xsjicon.png" class="chak_xlxsjicon" />
+                <div></div>
+                <table class="sui-table table-bordered">
+                    <thead>
+                    <th width="60">属性</th>
+                    <th>属性值</th>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>材质</td>
+                        <td>
+                            <span>人造革</span>
+                            <span>冰丝</span>
+                            <span>合成纤维</span>
+                            <span>亚麻</span>
+                            <span>真皮</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>适用季节</td>
+                        <td>
+                            <span>春季</span>
+                            <span>夏季</span>
+                            <span>秋季</span>
+                            <span>四季可用</span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <div class="add_clear"></div>
+                <div><input class="sui-btn btn-small add_clbtn" value="关闭" type="button"></div>
+            </div>
+            <span class="sui-btn btn-small upbtn" title="修改" >修改</span>
+            <div class="add_shuxingxla sui-form" id="update_flctCon">
+                <div class="zong_kuozhan">
+                    <img src="/static/images/add/add_xsjicon.png" class="add_xlxsjicon" />
+                    <div class="sui-row">
+                        <div class="span4">
+                            <div class="input-prepend">
+                                <span class="add-on">三级分类名称:</span>
+                                </span>
+                        <span class="sui-dropdown dropdown-bordered select h22">
+                            <span class="dropdown-inner">
+                                <a role="button" data-toggle="dropdown" href="#" class="dropdown-toggle">
+                                    <i class="caret"></i>
+                                    <span>请选择</span>
+                                </a>
+                                <ul role="menu" aria-labelledby="drop12" class="sui-dropdown-menu fenleixiala">
+                                    <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" >请选择</a></li>
+                                    <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="one" title="一级分类">一级分类</a></li>
+                                    <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="two" title="一级分类">二级分类</a></li>
+                                    <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="three" title="一级分类">三级分类</a></li>
+                                </ul>
+                            </span>
+                        </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sui-row">
+                        <div class="span4">
+                            <div class="input-prepend">
+                                <span class="add-on">&nbsp;&nbsp;属性名称:&nbsp;</span>
+                                <input type="text" class="input h22" name="goodsItemNo" value="" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sui-row">
+                        <div class="span4">
+                            <div class="input-prepend">
+                                <span class="add-on">属性值:</span>
+                                <span class="sui-btn btn-small Adds"  >添加</span>
+                                <span class="sui-btn btn-small add_moreshan"  >删除</span>
+                                <span class="sui-btn btn-small Addss">添加多个</span>
+                            </div>
+                        </div>
+                    </div>
+                    <table class="sui-table table-bordered" border="1px #ooo" id="shuxing_tab" cellpadding="0" cellspacing="0" width="30%">
+                         <thead>
+                         <th width="60"><label><input type="checkbox" class="allCkb" /> 全选</label></th>
+                         <th>属性值</th>
+                         </thead>
+                     </table>
+                    <div class="add_clear"></div>
+                    <div class="sui-row">
+                        <button class="sui-btn btn-primary add_btnlef">保存</button>
+                        <input type="button" class="sui-btn btn-primary btn-reset" id="add_quxiao" value="取消"/>
+                    </div>
+                </div>
+            </div>
+        </td>
+    </tr>
+    <!--表格无数据样式 start-->
+    <!--<tr>-->
+    <!--<td colspan="5" class="zanWuShuju"><p>没有数据</p></td>-->
+    <!--</tr>-->
+    <!--表格无数据样式 end-->
+    </tbody>
+</table>
+<!--页码 start-->
+<div class="sui-pagination pagination-large">
+    <ul>
+        <li class="first disabled">
+            <a style="padding: 4px 5px">
+                <i class="sui-icon icon-pc-prev"></i>
+            </a>
+        </li>
+        <li class="prev disabled">
+            <a style="padding: 4px 5px">
+                <i class="sui-icon icon-pc-chevron-left"></i>
+            </a>
+        </li>
+        <li class="active">
+            <a>1</a>
+        </li>
+        <li>
+            <a>2</a>
+        </li>
+        <li>
+            <a>3</a>
+        </li>
+        <li>
+            <a>4</a>
+        </li>
+        <li>
+            <a>5</a>
+        </li>
+        <li class="next ">
+            <a style="padding: 4px 5px">
+                <i class="sui-icon icon-pc-chevron-right"></i>
+            </a>
+        </li>
+        <li class="last ">
+            <a style="padding: 4px 5px">
+                <i class="sui-icon icon-pc-next"></i>
+            </a>
+        </li>
+    </ul>
+    <div>
+        <span>共9页85条</span>
+        <span>
+            到
+            <input class="page-num" name="curNo" value="1" type="text">
+            <input class="page-confirm" value="确定" type="button">
+            页
+        </span>
+        <span>
+            每页条数
+            <input class="page-num" name="perSize" value="10" type="text">
+            <input class="page-confirm" value="确定" type="button">
+        </span>
+    </div>
+</div>
+<!--页码 end-->
+<%}%>
+</body>
+</html>

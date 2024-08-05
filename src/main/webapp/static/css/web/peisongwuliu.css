@@ -1,0 +1,78 @@
+p, form, ol, ul, li, h3, menu {
+        list-style: outside none none;
+    }
+
+    #mohe-kuaidi_new .mh-icon-new {height: 18px;left: -20px;
+        margin-left: -41px;
+        margin-top: -9px;
+        position: absolute;
+        top: 1.5em;
+        width: 41px;
+    }
+    #mohe-kuaidi_new .mh-list-wrap .mh-list li.first img.firstZui{
+        position: absolute;top:10px;left:-20px;
+    }
+    #mohe-kuaidi_new .mh-list-wrap .mh-list li img.lasteZui,#mohe-kuaidi_new .mh-list-wrap .mh-list li img.huiImg{
+        position: absolute;top:10px;left:-20px;
+        z-index: 666;
+    }
+    #mohe-kuaidi_new .mh-list-wrap .mh-list li.first {
+        color: #00bb9c;
+    }
+
+    #mohe-kuaidi_new .mh-list-wrap .mh-list li {
+        color: #666;
+    }
+    #mohe-kuaidi_new .mh-wrap a {
+        color: #229ccb;
+        text-decoration: none;
+    }
+    #mohe-kuaidi_new .mh-wrap a:hover {
+        text-decoration: underline;
+    }
+
+    #mohe-kuaidi_new .mh-list-wrap .mh-list {
+        /*margin: 0 15px;*/
+    }
+    #mohe-kuaidi_new .mh-list-wrap .mh-list ul {
+        min-height: 255px;
+        _height: 255px;
+        line-height: 2.5em;
+        padding-left: 75px;
+        padding-right: 20px;
+        --overflow: auto;
+       /* height: 626px;*/
+        position: relative;
+    }
+    #mohe-kuaidi_new .mh-list-wrap .mh-list li {
+        position: relative;
+        border-bottom: 1px solid #f5f5f5;
+        margin-bottom: 8px;
+        color: #666;
+    }
+#mohe-kuaidi_new .mh-list-wrap .mh-list li:last-child{border:0;}
+    #mohe-kuaidi_new .mh-list-wrap .mh-list li .before,#mohe-kuaidi_new .mh-list-wrap .mh-list li .beforeLv {
+        position: absolute;
+        left: -13px;
+        top: 2.2em;
+        height: 82%;
+        width: 0;
+    }
+    #mohe-kuaidi_new .mh-list-wrap .mh-list li .before{
+        border-left: 2px solid #ddd;
+    }
+    #mohe-kuaidi_new .mh-list-wrap .mh-list li .beforeLv {
+        border-left: 2px solid #00bb9c;
+    }
+    #mohe-kuaidi_new .mh-list-wrap .mh-list li .after {
+        position: absolute;
+        left: -16px;
+        top: 1.2em;
+        width: 8px;
+        height: 8px;
+        background: #ddd;
+        border-radius: 6px;
+    }
+    #mohe-kuaidi_new .mh-list-wrap .mh-list li.first .after {
+        background: #00bb9c;
+    }

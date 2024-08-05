@@ -1,0 +1,247 @@
+ /*公共样式 start*/
+    *{
+      margin: 0;
+      padding: 0;
+    }
+    table {
+      border-collapse: collapse;
+      border-spacing: 0;
+    }
+    fieldset,
+    img {
+      border: 0;
+    }
+    address,
+    caption,
+    cite,
+    code,
+    dfn,
+    em,
+    strong,
+    th,
+    var {
+      font-style: normal;
+      font-weight: normal;
+    }
+    li {
+      list-style: none;
+    }
+    .clearfix::after {
+        clear: both;
+        content: ".";
+        display: block;
+        height: 0;
+        visibility: hidden;
+    }
+    .clearfix {
+        display: inline-block;
+    }
+    .clearfix {
+        display: block;
+    }
+    caption,
+    th {
+      text-align: left;
+    }
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      font-size: 100%;
+    }
+    q:before,
+    q:after {
+      content: '';
+    }
+    abbr,
+    acronym {
+      border: 0;
+      font-variant: normal;
+    }
+    sup {
+      vertical-align: text-top;
+    }
+    sub {
+      vertical-align: text-bottom;
+    }
+    input,
+    textarea,
+    select {
+/*      font-family: inherit;*/
+      font-size: inherit;
+      font-weight: inherit;
+    }
+    input,
+    textarea,
+    select {
+      *font-size: 100%;
+    }
+    legend {
+      color: #000000;
+    }
+    article, aside, details, figcaption, figure, footer, zdwmc_header, hgroup, main, nav, section, summary, canvas {
+        display: block;
+    }
+    html, body {
+        color: #222;
+        cursor: default;
+        min-width: 1190px;
+        font-family:"冬青黑体简体中文","Hiragino Sans GB","Microsoft YaHei","微软雅黑","STHeiti","WenQuanYi Micro Hei",SimSun,sans-serif !important;
+        font-size: 12px;
+    }
+    textarea{font-family:"冬青黑体简体中文","Hiragino Sans GB","Microsoft YaHei","微软雅黑","STHeiti","WenQuanYi Micro Hei",SimSun,sans-serif !important; resize: none;}
+    audio, canvas, video {
+        display: inline-block;
+    }
+    table, tbody, tfoot, tzdwmc_head, tr, th, td {
+        border: 0 none;
+    }
+    audio:not([controls]) {
+        display: none;
+        height: 0;
+    }
+    fieldset {
+        border: 1px solid #f0f0f0!important;
+        padding: 0 10px;
+    }
+    a {
+        background: transparent none repeat scroll 0 0;
+        color: #333333;
+        cursor: pointer;
+        outline: medium none;
+        text-decoration: none;
+    }
+    a:active, a:hover {
+        outline: 0 none;
+    }
+    :focus {
+        outline: medium none;
+    }
+    body a, body a * {
+        outline: medium none;
+    }
+    button, input {
+        line-height: normal;
+    }
+    input{border:1px solid #e0e0e0;}
+    button, select {
+        text-transform: none;
+    }
+    button, html input[type="button"], input[type="reset"], input[type="submit"], .sj_loginspan {
+        cursor: pointer;
+    }
+    button[disabled], html input[disabled] {
+        cursor: default;
+    }
+    input[type="checkbox"], input[type="radio"] {
+        box-sizing: border-box;
+        padding: 0;
+    }
+    input:focus {
+        outline: medium none;
+    }
+    input[type="search"] {
+        box-sizing: content-box;
+    }
+    button::-moz-focus-inner, input::-moz-focus-inner {
+        border: 0 none;
+        padding: 0;
+    }
+    input.submit {
+        border: 0 none;
+        cursor: pointer;
+        margin: 0;
+    }
+    textarea {
+        overflow: auto;
+        vertical-align: top;
+    }
+
+    ul, ol, li {
+        list-style-type: none;
+    }
+    form {
+        display: inline;
+    }
+    .float_l{float:left;}
+    .float_r{float:right;}
+    .ty_rerelative{position: relative;}
+    .ty_absolute{position: absolute;}
+    .ty_gyClear{clear: both;}
+    .font16{font-size: 16px;}
+    .tt_comTop{width: 100%;height: 15px;margin: 0 auto;}
+     /*message  start*/
+     .messager {
+         position: fixed;
+         z-index: 99999;
+         max-width: 80%;
+         padding-right: 50px;
+         color: #fff;
+         background-color: #353535;
+         background-color: rgba(0, 0, 0, .8);
+         border-radius: 20px;
+         top: 0px;
+         margin: 0 auto;
+     }
+
+     .messager-content {
+         padding: 10px 20px;
+     }
+
+     .messager-actions {
+         position: absolute;
+         top: 10px;
+         right: 15px;
+     }
+
+     .messager-actions > .action.close {
+         font-size: 20px;
+         font-weight: 400;
+         opacity: 1;
+     }
+
+     .messager-actions > .action {
+         color: #fafafa;
+         color: rgba(255, 255, 255, .6);
+         text-shadow: none;
+         background: 0 0;
+         border: none;
+     }
+
+     button.close {
+         -webkit-appearance: none;
+         padding: 0;
+         cursor: pointer;
+         background: 0 0;
+         border: 0;
+     }
+
+     .close {
+         float: right;
+         font-size: 19.5px;
+         font-weight: 700;
+         line-height: 1;
+         color: #000;
+         text-shadow: 0 1px 0 #fff;
+         filter: alpha(opacity=20);
+         opacity: .6;
+     }
+
+     .messager-success {
+         background-color: #38b03f;
+     }
+
+     .messager-danger {
+         background-color: #ea644a;
+     }
+
+     .messager-info {
+         background-color: #03b8cf;
+     }
+
+     .messager-warning {
+         background-color: #f1a325;
+     }
+     /*message end*/

@@ -1,0 +1,1485 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN""http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="carlist_content-Type" carlist_content="text/html; charset=utf-8"/>
+    <meta name="viewport" carlist_content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+    <title>纳车品供销服务平台</title>
+    <link rel="stylesheet" type="text/css" href="/static/css/web/common.css?v=${v}">
+    <link href="/static/images/web/ncp_logo.ico" rel="icon" type="image/x-icon"/>
+    <link href="/static/images/web/ncp_logo.ico" rel="shortcut icon" type="image/x-icon"/>
+    <link rel="stylesheet" type="text/css" href="/static/css/web/style.css?v=${v}">
+    <link rel="stylesheet" type="text/css" href="/static/css/msg_box.css?v=${v}">
+    <script type="text/javascript" src="/static/js/web/jquery-1.9.1.min.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/web/jquery.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/web/zixie.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/web/baidu.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/common.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/jquery.form.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/MsgBox.js?v=${v}"></script>
+    <script type="text/javascript">
+        $(function () {
+            $("body").on("click", ".btn_follow", function () {
+                if(${isEmpty(session.curCustomer)}){
+                    Common.go("/login.html");
+                }
+                var btn = $(this);
+                var goodsCode = btn.attr("data-code");
+                if($(this).attr("rel") == "true") {
+                    /* 取消关注 */
+                    Common.post("/buy/delFollow", {goodsCode: goodsCode}, function (json) {
+                        if (json.code == Common.SUCC) {
+                            btn.removeClass("heartAnimation").attr("rel", "false");
+                            btn.css("background-position", "left");
+                            btn.children(".ncp_dTguanZhu").html("加关注");
+                            btn.children(".ncp_dTguanZhu").removeClass("ncp_gzColorRed");
+                        } else {
+                            Msg.danger(json.message);
+                        }
+                    });
+                }else{
+                    /* 添加关注 */
+                    Common.post("/buy/follow", {goodsCode: goodsCode}, function (json) {
+                        if (json.code == Common.SUCC) {
+                            btn.css("background-position", "");
+                            btn.addClass("heartAnimation").attr("rel", "true");
+                            btn.children(".ncp_dTguanZhu").html("已关注");
+                            btn.children(".ncp_dTguanZhu").addClass("ncp_gzColorRed");
+                        } else {
+                            Msg.danger(json.message);
+                        }
+                    });
+                }
+            });
+            $(".btn_goods_search").unbind("click").bind("click", function () {
+                $("input[name=tab]").val($("#ind_tabFl .active").attr("data-tab"));
+                $(this).parents("form").submit();
+            });
+        });
+    </script>
+    <!--zdj youhua start-->
+    <!--<script type="text/javascript">
+        $(document).ready(function(){
+            $('.tt_carZhishu03 dd ul li').addClass(function(n){
+                return 'addJys_' + n;
+            });
+        });
+    </script>-->
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $("#carZuoDian li").addClass(function(n){
+                return "carYongPin_" + n;
+            });
+            $("#carJiaoDian li").addClass(function(n){
+                return "carJiaoDian_" + n;
+            });
+            $("#carFangXpan li").addClass(function(n){
+                return "carFangXpan_" + n;
+            });
+            $("#carNeiShi li").addClass(function(n){
+                return "carNeiShi_" + n;
+            });
+            $("#carQiTa li").addClass(function(n){
+                return "carQiTa_" + n;
+            });
+            $("#xinPin_tuiJ li").addClass(function(n){
+                return "xinPin_tuiJ_" + n;
+            });
+            $("#reXiao_paiH li").addClass(function(n){
+                return "xinPin_tuiJ_" + n;
+            });
+        });
+    </script>
+    <!--zdj youhua end-->
+</head>
+<body class="add_indbody">
+
+<%include("/web/common/topTwo.html"){}%>
+
+<%
+    var purchase1 = "/login.html";
+    var supplier1 = "/login.html";
+    var purchase2 = "/login.html";
+    var supplier2 = "/login.html";
+    if(!isEmpty(session.curCustomer)){
+        if(session.curCustomer.type.val == 0){
+            purchase1 = "/member/purchase.html";
+            supplier1 = "/member/supplier.html";
+            purchase2 = "/member/purchase.html?showMsg=true";
+            supplier2 = "/member/supplier.html?showMsg=true";
+        }else if(session.curCustomer.type.val == 1){
+            purchase1 = "/member/index.html";
+            supplier1 = "/member/supplier.html";
+            purchase2 = "/seek/seek.html";
+            supplier2 = "/member/supplier.html?showMsg=true";
+        }else{
+            purchase1 = "/member/index.html";
+            supplier1 = "/member/index.html";
+            purchase2 = "/seek/seek.html";
+            supplier2 = "/seek/tailGoods.html";
+        }
+    }
+%>
+<!--更换Banner start-->
+<script type="text/javascript" src="/static/js/jquery.kinMaxShow-1.0.min.js"></script>
+<script type="text/javascript">
+    $(function(){
+        $("#kinMaxShow").kinMaxShow({
+        height:300,
+        button:{
+        showIndex:false,
+        normal:{background:'url(/static/images/button.png) no-repeat -14px 0',marginRight:'8px',border:'0',right:'50%',bottom:'20px'},
+        focus:{background:'url(/static/images/button.png) no-repeat 0 0',border:'0'}
+        },
+        callback:function(index,action){
+        switch(index){
+/*        case 0 :
+        if(action=='fadeIn'){
+        $(this).find('.sub_1_1').animate({left:'658px'},390)
+        $(this).find('.sub_1_2').animate({top:'160px'},320)
+        }else{
+        $(this).find('.sub_1_1').animate({left:'-960px'},390)
+        $(this).find('.sub_1_2').animate({top:'-160px'},300)
+        };
+        break;*/
+        case 0 :
+        if(action=='fadeIn'){
+            /*$(this).find('.sub_4_1').animate({right:'248px'},360)*/
+//            $(this).find('.sub_4_1').animate({right:'342px'},360)
+            $(this).find('.sub_4_1').animate({ opacity: 1 }, 'slow');
+            $(this).find('.sub_4_2').animate({top:'100px'},360)
+        }else{
+           /* $(this).find('.sub_4_1').animate({right:'-380px'},360)*/
+//            $(this).find('.sub_4_1').animate({right:'-380px'},360)
+            $(this).find('.sub_4_1').animate({ opacity: 0.1 }, 'slow')
+            $(this).find('.sub_4_2').animate({top:'-360px'},360)
+        };
+        break;
+            case 1 :
+                if(action=='fadeIn'){
+                    $(this).find('.sub_3_1').animate({right:'170px'},300)
+                    $(this).find('.sub_3_2').animate({top:'76px'},420)
+                    $(this).find('.sub_3_3').animate({left:'105px'},420)
+                }else{
+                    $(this).find('.sub_3_1').animate({right:'-980px'},300)
+                    $(this).find('.sub_3_2').animate({top:'-460px'},420)
+                    $(this).find('.sub_3_3').animate({left:'-660px'},420)
+                };
+        break;
+        case 2 :
+            if(action=='fadeIn'){
+                $(this).find('.sub_1_1').animate({bottom:'-8px'},360)
+                $(this).find('.sub_1_2').animate({top:'27px'},420)
+                $(this).find('.sub_1_3').animate({left:'105px'},420)
+            }else{
+                $(this).find('.sub_1_1').animate({bottom:'-200px'},360)
+                $(this).find('.sub_1_2').animate({top:'-360px'},420)
+                $(this).find('.sub_1_3').animate({left:'-660px'},420)
+            };
+            break;
+        /*add start*/
+            case 3 :
+                if(action=='fadeIn'){
+                    $(this).find('.sub_2_1').animate({top:'23px'},300)
+                    $(this).find('.sub_2_2').animate({bottom:'93px'},320)
+                }else{
+                    $(this).find('.sub_2_1').animate({top:'-400px'},300)
+                    $(this).find('.sub_2_2').animate({bottom:'-320px'},300)
+                };
+        break;
+    }       /*add end*/
+        }
+        });
+    });
+</script>
+<div id="kinMaxShow">
+    <!--add start-->
+    <div onclick="window.open('http://www.nachepin.com/goods/SP01747.html');" class="add_shouxingY">
+        <img src="/static/images/add/ncpIndex_banner04.png" />
+        <div style="width: 1190px;height: 300px;margin:0 auto;position: relative;" >
+            <img class="sub_4_1" src="/static/images/add/add_hbfont.png" />
+            <img class="sub_4_2" src="/static/images/add/add_youfont.png" usemap="#Map_4_2"  border="0" />
+            <map name="Map_4_2" id="Map_4_2">
+                <area shape="rect" coords="3,97,104,124" href="/activePage.html" target="_blank"/>
+            </map>
+        </div>
+    </div>
+    <!--add end-->
+    <div onclick="window.open('http://www.nachepin.com/goods/SP01987.html');" class="add_shouxingY">
+        <img src="/static/images/add/ncpIndex_banner02.png"   />
+        <div style="width: 1190px;height: 300px;margin:0 auto;position: relative;" >
+            <img class="sub_3_1" src="/static/images/add/ncpIndxe_banzi03.png" />
+            <img class="sub_3_2" src="/static/images/add/ncpIndex_banzi04.png" usemap="#Map_3_2"  border="0" />
+            <img class="sub_3_3" src="/static/images/add/add_shuye.png" />
+            <map name="Map_3_2" id="Map_3_2">
+                <area shape="rect" coords="1,98,106,124" href="http://www.lanrenzhijia.com" target="_blank"/>
+            </map>
+        </div>
+    </div>
+    <div div onclick="window.open('http://www.nachepin.com/goods/SP01758.html');" class="add_shouxingY" >
+        <img src="/static/images/add/ncpIndex_banner01.png" />
+        <div style="width: 1190px;height: 300px;margin:0 auto;position: relative;">
+            <img class="sub_1_1" src="/static/images/add/ncpIndex_banzi01.png" />
+            <img class="sub_1_2" src="/static/images/add/ncpIndex_banzi02.png" usemap="#Map_1_2"  border="0" />
+            <map name="Map_1_2" id="Map_1_2">
+                <area shape="rect" coords="2,96,106,123" href="http://www.baidu.com" target="_blank"/>
+            </map>
+        </div>
+    </div>
+    <div onclick="window.open('/contactUs.html');" class="add_shouxingY" >
+        <img src="/static/images/add/ncpIndex_banner03.png" />
+        <div style="width: 1190px;height: 300px;margin:0 auto;position: relative;" >
+            <img class="sub_2_1" src="/static/images/add/ncpIndex_banzi05.png" />
+            <img class="sub_2_2" src="/static/images/add/ncpIndex_banzi06.png" usemap="#Map_2_2"  border="0" />
+            <map name="Map_2_2" id="Map_2_2">
+                <area shape="rect" coords="3,97,104,124" href="/contactUs.html" target="_blank"/>
+            </map>
+        </div>
+    </div>
+</div>
+<!--更换Banner end-->
+<!--销量排行榜 end-->
+<!--<div class="tt_bannerCon">
+    <div class="tt_banNcon">
+        <div class="tt_searchMain">
+            <div id="wrap">
+                <div id="menu">
+                    <ul>
+                        <li id="m1" class="on">
+                            <a href="#" onmouseover="javascript:gopage(1)" title="我要找货">
+                                <span class="tt_picqiehuan">我要找货</span>
+                            </a>
+                        </li>
+                        <li id="m2">
+                            <a href="#" onmouseover="javascript:gopage(2)" title="找物流">
+                                <span class="tt_picqiehuan02">找物流</span>
+                            </a>
+                        </li>
+                        <li id="m3">
+                            <a href="javascript:void(0);" onmouseover="javascript:gopage(3)" title="小批量定制">
+                                <span class="tt_picqiehuan03">小批量定制</span>
+                            </a>
+                        </li>
+                        <li id="m4">
+                            <a href="javascript:void(0);" onmouseover="javascript:gopage(4)" title="尾货处理">
+                                <span class="tt_picqiehuan04">尾货处理</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div id="content">
+                    <script type="text/javascript">
+                        function chgclassUl(o) {
+                            var u = document.getElementById('qiehuanUl');
+                            var c = u.childNodes;
+                            for (var i = 0; i < c.length; i++) {
+                                if (c[i].tagName && c[i].tagName.toLowerCase() == 'div') {
+                                    if (c[i] == o) {
+                                        c[i].className = 'tt_xzTab';
+                                    } else {
+                                        c[i].className = 'tt_xzTab02';
+                                    }
+                                }
+                            }
+                        }
+                        function nTabs(thisObj, Num) {
+                            if (thisObj.className == "active")return;
+                            var tabObj = thisObj.parentNode.id;
+                            var tabList = document.getElementById(tabObj).getElementsByTagName("li");
+                            for (i = 0; i < tabList.length; i++) {
+                                if (i == Num) {
+                                    thisObj.className = "active";
+                                    $("#" + tabObj + "_Content" + i).animate({width: 'toggle'});
+                                } else {
+                                    tabList[i].className = "normal";
+                                    $("#" + tabObj + "_Content" + i).fadeOut();
+                                }
+                            }
+                        }
+                    </script>
+                    <div id="tt_c1">
+                            <div class="ind_tabFl" style="height: 200px;padding:0 5px 20px 8px;">
+                                <ul id="ind_tabFl" id="qiehuanUl">
+                                    <li class="active" onclick="nTabs(this,0);" data-tab="cushion" title="汽车坐垫">汽车坐垫
+                                    </li>
+                                    <li class="normal" onclick="nTabs(this,1);" data-tab="floorMat" title="汽车脚垫">汽车脚垫
+                                    </li>
+                                    <li class="normal" onclick="nTabs(this,2);" data-tab="wheelCover" title="方向盘套">
+                                        方向盘套
+                                    </li>
+                                    <li class="normal" onclick="nTabs(this,3);" data-tab="carTrim" title="汽车内饰">汽车内饰
+                                    </li>
+                                    <li class="normal" onclick="nTabs(this,4);" data-tab="seat" title="安全座椅">安全座椅
+                                    </li>
+                                </ul>
+                                &lt;!&ndash; 1 start &ndash;&gt;
+                                <div id="ind_tabFl_Content0" style="height: 200px;">
+                                    <form action="/goods/list.html">
+                                        <input type="hidden" name="tab" value="cushion"/>
+                                        <dl class="tt_jutop02">
+                                            <dt class="tt_pinpai">坐垫品牌</dt>
+                                            <dd class="float_l"><input type="text" name="brand" onfocus="javascript:this.className='ttind_ipu'" onblur="javascript:this.className=''"/></dd>
+                                        </dl>
+                                        <dl class="tt_jutop">
+                                            <dt class="tt_pinpai">商品名</dt>
+                                            <dd class="float_l"><input type="text" name="goodsName" onfocus="javascript:this.className='ttind_ipu'" onblur="javascript:this.className=''"/></dd>
+                                        </dl>
+                                        <dl class="tt_jutop">
+                                            <dt class="tt_pinpai">商品货号</dt>
+                                            <dd class="float_l"><input type="text" name="itemNo" onfocus="javascript:this.className='ttind_ipu'" onblur="javascript:this.className=''"/></dd>
+                                        </dl>
+                                        <div class="tt_searchBtn btn_goods_search" title="搜索">搜索</div>
+                                        </form>
+                                </div>
+                                &lt;!&ndash; 1 end &ndash;&gt;
+                                &lt;!&ndash; 2 start &ndash;&gt;
+                                <div id="ind_tabFl_Content1" class="undis" style="height: 200px;">
+                                    <form action="/goods/list.html">
+                                        <input type="hidden" name="tab" value="floorMat"/>
+                                    <dl class="tt_jutop02">
+                                        <dt class="tt_pinpai">脚垫品牌</dt>
+                                        <dd class="float_l"><input type="text" name="brand" onfocus="javascript:this.className='ttind_ipu'" onblur="javascript:this.className=''"/></dd>
+                                    </dl>
+                                    <dl class="tt_jutop">
+                                        <dt class="tt_pinpai">商品名</dt>
+                                        <dd class="float_l"><input type="text" name="goodsName" onfocus="javascript:this.className='ttind_ipu'" onblur="javascript:this.className=''"/></dd>
+                                    </dl>
+                                    <dl class="tt_jutop">
+                                        <dt class="tt_pinpai">商品货号</dt>
+                                        <dd class="float_l"><input type="text" name="itemNo" onfocus="javascript:this.className='ttind_ipu'" onblur="javascript:this.className=''"/></dd>
+                                    </dl>
+                                    <div class="tt_searchBtn btn_goods_search" title="搜索">搜索</div>
+                                        </form>
+                                </div>
+                                &lt;!&ndash; 2 end &ndash;&gt;
+                                &lt;!&ndash; 3 start &ndash;&gt;
+                                <div id="ind_tabFl_Content2" class="undis" style="height: 200px;">
+                                    <form action="/goods/list.html">
+                                        <input type="hidden" name="tab" value="wheelCover"/>
+                                    <dl class="tt_jutop02">
+                                        <dt class="tt_pinpai">盘套品牌</dt>
+                                        <dd class="float_l"><input type="text" name="brand" onfocus="javascript:this.className='ttind_ipu'" onblur="javascript:this.className=''"/></dd>
+                                    </dl>
+                                    <dl class="tt_jutop">
+                                        <dt class="tt_pinpai">商品名</dt>
+                                        <dd class="float_l"><input type="text" name="goodsName" onfocus="javascript:this.className='ttind_ipu'" onblur="javascript:this.className=''"/></dd>
+                                    </dl>
+                                    <dl class="tt_jutop">
+                                        <dt class="tt_pinpai">商品货号</dt>
+                                        <dd class="float_l"><input type="text" name="itemNo" onfocus="javascript:this.className='ttind_ipu'" onblur="javascript:this.className=''"/></dd>
+                                    </dl>
+                                    <div class="tt_searchBtn btn_goods_search" title="搜索">搜索</div>
+                                        </form>
+                                </div>
+                                &lt;!&ndash; 3 end &ndash;&gt;
+                                &lt;!&ndash; 4 start &ndash;&gt;
+                                <div id="ind_tabFl_Content3" class="undis" style="height: 200px;">
+                                    <form action="/goods/list.html">
+                                        <input type="hidden" name="tab" value="carTrim"/>
+                                    <dl class="tt_jutop02">
+                                        <dt class="tt_pinpai">内饰品牌</dt>
+                                        <dd class="float_l"><input type="text" name="brand"
+                                                                   onfocus="javascript:this.className='ttind_ipu'"
+                                                                   onblur="javascript:this.className=''"/></dd>
+                                    </dl>
+                                    <dl class="tt_jutop">
+                                        <dt class="tt_pinpai">商品名</dt>
+                                        <dd class="float_l"><input type="text" name="goodsName"
+                                                                   onfocus="javascript:this.className='ttind_ipu'"
+                                                                   onblur="javascript:this.className=''"/></dd>
+                                    </dl>
+                                    <dl class="tt_jutop">
+                                        <dt class="tt_pinpai">商品货号</dt>
+                                        <dd class="float_l"><input type="text" name="itemNo"
+                                                                   onfocus="javascript:this.className='ttind_ipu'"
+                                                                   onblur="javascript:this.className=''"/></dd>
+                                    </dl>
+                                    <div class="tt_searchBtn btn_goods_search" title="搜索">搜索</div>
+                                        </form>
+                                </div>
+                                &lt;!&ndash; 4 end &ndash;&gt;
+                                &lt;!&ndash; 新增安全座椅 start &ndash;&gt;
+                                <div id="ind_tabFl_Content4" class="undis" style="height: 200px;">
+                                    <form action="/goods/list.html">
+                                        <input type="hidden" name="tab" value="carTrim"/>
+                                        <dl class="tt_jutop02">
+                                            <dt class="tt_pinpai">座椅品牌</dt>
+                                            <dd class="float_l"><input type="text" name="brand"
+                                                                       onfocus="javascript:this.className='ttind_ipu'"
+                                                                       onblur="javascript:this.className=''"/></dd>
+                                        </dl>
+                                        <dl class="tt_jutop">
+                                            <dt class="tt_pinpai">商品名</dt>
+                                            <dd class="float_l"><input type="text" name="goodsName"
+                                                                       onfocus="javascript:this.className='ttind_ipu'"
+                                                                       onblur="javascript:this.className=''"/></dd>
+                                        </dl>
+                                        <dl class="tt_jutop">
+                                            <dt class="tt_pinpai">商品货号</dt>
+                                            <dd class="float_l"><input type="text" name="itemNo"
+                                                                       onfocus="javascript:this.className='ttind_ipu'"
+                                                                       onblur="javascript:this.className=''"/></dd>
+                                        </dl>
+                                        <div class="tt_searchBtn btn_goods_search" title="搜索">搜索</div>
+                                    </form>
+                                </div>
+                                &lt;!&ndash; 新增安全座椅 end &ndash;&gt;
+                            </div>
+                    </div>
+                    <div id="tt_c2" style="display:none">
+                        <dl class="float_l">
+                            <dt><span>天台</span><span><img
+                                    src="/static/images/web/tt_zhijian.png"/></span><span>杭州</span></dt>
+                            <dd>
+                                <ul class="ty_gyClear">
+                                    <li>
+                                        <a href="/express/1.html" title="银啸物流">银啸</a>
+                                    </li>
+                                    <li>
+                                        <a href="/logistics/logisticsOne.html" title="环球物流">环球</a>
+                                    </li>
+                                    <li>
+                                        <a href="/logistics/logisticsTwo.html" title="迅达物流">迅达</a>
+                                    </li>
+                                    <li>
+                                        <a href="/logistics/logisticsThree.html" title="国群联运站">国群联运站</a>
+                                    </li>
+                                    <li>
+                                        <a href="/logistics/logisticsFour.html" title="百顺货运">百顺货运</a>
+                                    </li>
+                                    <li>
+                                        <a href="/logistics/logisticsFive.html" title="天台顺吉物流">天台顺吉</a>
+                                    </li>
+                                    <li>
+                                        <a href="/logistics/logisticsSix.html" title="腾云物流">腾云</a>
+                                    </li>
+                                </ul>
+                            </dd>
+                        </dl>
+                        <dl class="float_l">
+                            <dt><span>天台</span><span><img
+                                    src="/static/images/web/tt_zhijian.png"/></span><span>义乌</span></dt>
+                            <dd>
+                                <ul class="ty_gyClear">
+                                    <li>
+                                        <a href="/express/1.html" title="银啸物流">银啸</a>
+                                    </li>
+                                    <li>
+                                        <a href="/logistics/logisticsOne.html" title="环球物流">环球</a>
+                                    </li>
+                                    <li>
+                                        <a href="/logistics/logisticsTwo.html" title="迅达物流">迅达</a>
+                                    </li>
+                                    <li>
+                                        <a href="/logistics/logisticsThree.html" title="国群联运站">国群联运站</a>
+                                    </li>
+                                    <li>
+                                        <a href="/logistics/logisticsFour.html" title="百顺货运">百顺货运</a>
+                                    </li>
+                                    <li>
+                                        <a href="/logistics/logisticsFive.html" title="天台顺吉物流">天台顺吉</a>
+                                    </li>
+                                    <li>
+                                        <a href="/logistics/logisticsSix.html" title="腾云物流">腾云</a>
+                                    </li>
+                                </ul>
+                            </dd>
+                        </dl>
+                        <dl class="float_l">
+                            <dt><span>天台</span><span><img src="/static/images/web/tt_zhijian.png"/></span><span>温州</span></dt>
+                            <dd>
+                                <ul class="ty_gyClear">
+                                    <li>
+                                        <a href="/express/1.html" title="银啸物流">银啸</a>
+                                    </li>
+                                    <li>
+                                        <a href="/logistics/logisticsOne.html" title="环球物流">环球</a>
+                                    </li>
+                                    <li>
+                                        <a href="/logistics/logisticsTwo.html" title="迅达物流">迅达</a>
+                                    </li>
+                                    <li>
+                                        <a href="/logistics/logisticsThree.html" title="国群联运站">国群联运站</a>
+                                    </li>
+                                    <li>
+                                        <a href="/logistics/logisticsFour.html" title="百顺货运">百顺货运</a>
+                                    </li>
+                                    <li>
+                                        <a href="/logistics/logisticsFive.html" title="天台顺吉物流">天台顺吉</a>
+                                    </li>
+                                    <li>
+                                        <a href="/logistics/logisticsSix.html" title="腾云物流">腾云</a>
+                                    </li>
+                                </ul>
+                            </dd>
+                        </dl>
+                        <dl class="float_l">
+                            <dt><span>天台</span><span><img
+                                    src="/static/images/web/tt_zhijian.png"/></span><span>宁波</span></dt>
+                            <dd>
+                                <ul class="ty_gyClear">
+                                    <li>
+                                        <a href="/express/1.html" title="银啸物流">银啸</a>
+
+                               </li>
+                                    <li>
+                                        <a href="/logistics/logisticsOne.html" title="环球物流">环球</a>
+                                    </li>
+                                    <li>
+                                        <a href="/logistics/logisticsTwo.html" title="迅达物流">迅达</a>
+                                    </li>
+                                    <li>
+                                        <a href="/logistics/logisticsThree.html" title="国群联运站">国群联运站</a>
+                                    </li>
+                                    <li>
+                                        <a href="/logistics/logisticsFour.html" title="百顺货运">百顺货运</a>
+                                    </li>
+                                    <li>
+                                        <a href="/logistics/logisticsFive.html" title="天台顺吉物流">天台顺吉</a>
+                                    </li>
+                                    <li>
+                                        <a href="/logistics/logisticsSix.html" title="腾云物流">腾云</a>
+                                    </li>
+                                </ul>
+                            </dd>
+                        </dl>
+                    </div>
+                    <div id="tt_c3" style="display:none">
+                        <p class="tt_ptop">小批量定制，万户商家抢单，成本小，速度快。</p>
+
+                        <p><a href="/seek/seekList.html" target="_blank" title="马上去瞧瞧">
+                            <div class="tt_dingzhiBtn tt_ptop02">马上去瞧瞧</div>
+                        </a></p>
+                    </div>
+                    <div id="tt_c4" style="display:none">
+                        <p class="tt_ptop">&nbsp;&nbsp;尾货处理，10万淘宝商家待购，迅速变现。</p>
+
+                        <p><a href="/seek/tailGoodsList.html" target="_blank">
+                            <div class="tt_dingzhiBtn tt_ptop02" title="赶紧去看看">赶紧去看看</div>
+                        </a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>-->
+<div class="tt_pic">
+    <div class="tt_picCon">
+        <img src="/static/images/web/tt_indPic.png"/>
+    </div>
+</div>
+<div class="tt_carZS" style="background: #fff;">
+    <!--<dl class="tt_carZhishu">
+        <dt>
+            汽车用品指数
+            <span><a href="http://www.jhdindex.com/" class="float_r" target="_blank" title="更多">更多</a></span>
+        </dt>
+        <dd class="tt_qufen"></dd>
+    </dl>-->
+    <!--zdj index add-->
+    <dl class="tt_carZhishu ncp_JuTopZS" style="background: #fff;">
+        <!--<dt title="汽车用品指数">汽车用品指数</dt>-->
+        <div title="汽车用品指数" class="gaiDong_title"><span class="indTitleTao"></span>汽车用品指数<span><a href="http://www.jhdindex.com/" class="float_r" target="_blank" title="更多">更多</a></span></div>
+        <dd class="tt_qufen">
+            <ul>
+                <li>
+                    <dl>
+                        <dt>
+                            <span class="tt_cZScity">坐垫</span>
+                            <span class="tt_cZStime">2016年11月</span>
+                        </dt>
+                        <dd>
+                            <span class="tt_puJuan">涨跌值</span>
+                            <span class="tt_puJuanZS">0.51</span>
+                        </dd>
+                        <dd>
+                            <span class="tt_puJuan02">涨跌幅</span>
+                            <span class="tt_puJuanZS">0.62%</span>
+                        </dd>
+                    </dl>
+                </li>
+                <li>
+                    <dl>
+                        <dt>
+                            <span class="tt_cZScity">脚垫</span>
+                            <span class="tt_cZStime">2016年11月</span>
+                        </dt>
+                        <dd>
+                            <span class="tt_puJuan">涨跌值</span>
+                            <span class="tt_puJuanZS">0.92</span>
+                            <!--<span class="tt_puJuanZS03">-1.69</span>-->
+                        </dd>
+                        <dd>
+                            <span class="tt_puJuan02">涨跌幅</span>
+                            <span class="tt_puJuanZS02">1.00%</span>
+                            <!--<span class="tt_puJuanZS03">-1.85%</span>-->
+                        </dd>
+                    </dl>
+                </li>
+                <li>
+                    <dl>
+                        <dt>
+                            <span class="tt_cZScity">方向盘套</span>
+                            <span class="tt_cZStime">2016年11月</span>
+                        </dt>
+                        <dd>
+                            <span class="tt_puJuan">涨跌值</span>
+                            <span class="tt_puJuanZS">4.48</span>
+                        </dd>
+                        <dd>
+                            <span class="tt_puJuan02">涨跌幅</span>
+                            <span class="tt_puJuanZS">5.41%</span>
+                        </dd>
+                    </dl>
+                </li>
+                <img style="margin:6px 0 0 7px;" src="${ctx}/static/images/add/ncp_zhiShuTu.png" />
+            </ul>
+        </dd>
+    </dl>
+</div>
+<!--zdj index add-->
+<div class="tt_carZS" style="background: #fff;">
+    <dl class="tt_carZhishu02 ncp_JuTopZS" style="background: #fff;padding-bottom: 20px;">
+        <div title="小批量定制及尾货处理" class="gaiDong_title"><span class="indTitleTao"></span>小批量定制及尾货处理</div>
+<!--        <div class="ncp_fuBiaoTi">小批量定制需求和尾货处理，优质服务，及时处理</div>-->
+        <dd class="tt_xiaopiLi">
+            <ul class="tt_lingwai">
+                <span class="tt_zhishuTi">小批量定制需求</span>
+                <span class="tt_more" style="float: right;"><a href="${ctx}/seek/seekList.html">更多</a></span>
+                <div id="ind_gunDong" class="ind_gunDongYs">
+                    <div class="gunDongYs_juBu">
+                        <div id="ind_gunDong1">
+                            <ul>
+                                <%for(seek in seeks){%>
+                                <li >
+                                    <span class="tt_namew" ><a href="${ctx}/seek/seekDetails/${seek.code}.html" title="${seek.goodsName}">${seek.goodsName}</a></span>
+                                    <span class="tt_namew02"><a href="${ctx}/seek/seekDetails/${seek.code}.html" title="${seek.quantity}">${seek.quantity}</a></span>
+                                </li>
+                                <%}%>
+                            </ul>
+                        </div>
+                        <div id="ind_gunDong2"></div>
+                    </div>
+                </div>
+            </ul>
+            <!-- 第1条 start -->
+            <script type="text/javascript">
+                var ind_gunDong = document.getElementById("ind_gunDong");
+                var ind_gunDong1 = document.getElementById("ind_gunDong1");
+                var ind_gunDong2 = document.getElementById("ind_gunDong2");
+                ind_gunDong2.innerHTML=document.getElementById("ind_gunDong1").innerHTML;
+                function Marquee(){
+                    if(ind_gunDong.scrollLeft-ind_gunDong2.offsetWidth>=-400){
+                        ind_gunDong.scrollLeft-=ind_gunDong1.offsetWidth;
+                    }
+                    else{
+                        ind_gunDong.scrollLeft++;
+                    }
+                }
+                var myvar=setInterval(Marquee,30);
+                ind_gunDong.onmouseout=function (){myvar=setInterval(Marquee,30);}
+                ind_gunDong.onmouseover=function(){clearInterval(myvar);}
+            </script>
+            <!-- 第1条 end -->
+            <div class="ty_gyClear"></div>
+            <ul class="tt_lingwai">
+                <span class="tt_zhishuTi">尾货处理</span>
+                <span class="tt_more"><a href="${ctx}/seek/tailGoodsList.html">更多</a></span>
+                <div>
+                    <div id="ind_gdMain" class="ind_gdMainYs">
+                        <div class="gunDongYs_juBu">
+                            <div id="ind_gdMain1">
+                                <ul>
+                                    <%for(tail in tailGoods){%>
+                                    <li>
+                                        <span class="tt_namew"><a href="${ctx}/seek/tailGoodsDetails/${tail.code}.html" title="${tail.goodsName}">${tail.goodsName}</a></span>
+                                        <span class="tt_namew02">
+                                            <a href="${ctx}/seek/tailGoodsDetails/${tail.code}.html" title="${tail.quantity}">${tail.quantity}</a>
+                                        </span>
+                                    </li>
+                                    <%}%>
+                                </ul>
+                            </div>
+                            <div id="ind_gdMain2"></div>
+                        </div>
+                    </div>
+                </div>
+            </ul>
+            <!-- 第2条 start -->
+            <script type="text/javascript">
+                var ind_gdMain = document.getElementById("ind_gdMain");
+                var ind_gdMain1 = document.getElementById("ind_gdMain1");
+                var ind_gdMain2 = document.getElementById("ind_gdMain2");
+                ind_gdMain2.innerHTML=document.getElementById("ind_gdMain1").innerHTML;
+                function Marquee02(){
+                    if(ind_gdMain.scrollLeft-ind_gdMain2.offsetWidth>=-400){
+                        ind_gdMain.scrollLeft-=ind_gdMain1.offsetWidth;
+                    }
+                    else{
+                        ind_gdMain.scrollLeft++;
+                    }
+                }
+                var myvar02=setInterval(Marquee02,30);
+                ind_gdMain.onmouseout=function (){myvar02=setInterval(Marquee02,30);}
+                ind_gdMain.onmouseover=function(){clearInterval(myvar02);}
+            </script>
+            <!-- 第2条 end -->
+        </dd>
+    </dl>
+</div>
+<div class="tt_carZS">
+    <dl class="tt_carZhishu03">
+        <div title="新品推荐" class="gaiDong_title gaiDong_bottomJu02"><span class="indTitleTao"></span>新品推荐</div>
+        <dd>
+            <ul id="xinPin_tuiJ">
+                <%for(goods in newGoods){%>
+                <li class="ty_rerelative">
+                    <a href="${ctx}/goods/${goods.code}.html" target="_blank" title="${goods.name}">
+                        <img src="${img_url.getS(goods.headImgUrl1)}" width="198" height="198"/>
+                    </a>
+                    <a href="${ctx}/goods/${goods.code}.html" target="_blank" title="${goods.name}">
+                        <p class="tt_listTitle xinPinDw">${goods.name}</p>
+                    </a>
+                    <%if(isEmpty(session.curCustomer)){%>
+                    <p class="tt_listPrice03"><a href="${ctx}/login.html" title="登录后查看价格">登录后查看价格</a></p>
+                    <%}else{%>
+                    <p><span class="moneyFuHaoLeft">￥</span><span class="tt_listPrice">${(goods.wholesalePrice / 100), "#0.00"}</span></p>
+                    <%}%>
+                    <p class="tt_zhizaochang">
+                        <span class="float_l">${goods.brand}</span>
+                        <span class="float_r ind_guanZhu">
+                            <%if(goods.followed){%>
+                            <div class="ncp_heart heartAnimation btn_follow" data-code="${goods.code}" rel="true">
+                                <span class="ncp_dTguanZhu ncp_gzColorRed">已关注</span>
+                            </div>
+                            <%}else{%>
+                            <div class="ncp_heart btn_follow" data-code="${goods.code}" rel="false">
+                                <span class="ncp_dTguanZhu ">加关注</span>
+                            </div>
+                            <%}%>
+                        </span>
+                    </p>
+                </li>
+                <%}elsefor{%>
+                <div class="ncp_wushujuMain">
+                    <p>暂无数据</p>
+                </div>
+                <%}%>
+            </ul>
+        </dd>
+    </dl>
+</div>
+<!--销量排行榜 start-->
+<div class="tt_carZS">
+    <dl class="tt_carZhishu03">
+        <div title="热销排行" class="gaiDong_title gaiDong_bottomJu02"><span class="indTitleTao"></span>热销排行</div>
+        <dd>
+            <ul id="reXiao_paiH">
+                <%for(goods in cushionHotAll){%>
+                <li class="ty_rerelative">
+                    <a href="${ctx}/goods/${goods.code}.html" target="_blank" title="${goods.name}">
+                        <img src="${img_url.getS(goods.headImgUrl1)}" width="198" height="198"/>
+                    </a>
+                    <a href="${ctx}/goods/${goods.code}.html" target="_blank" title="${goods.name}">
+                        <p class="tt_listTitle xinPinDw">${goods.name}</p>
+                    </a>
+                    <%if(isEmpty(session.curCustomer)){%>
+                    <p class="tt_listPrice03"><a href="${ctx}/login.html" title="登录后查看价格">登录后查看价格</a></p>
+                    <%}else{%>
+                    <p><span class="moneyFuHaoLeft">￥</span><span class="tt_listPrice">${(goods.wholesalePrice / 100), "#0.00"}</span></p>
+                    <%}%>
+                    <p class="tt_zhizaochang">
+                        <span class="float_l">${goods.brand}</span>
+                        <span class="float_r ind_guanZhu">
+                            <%if(goods.followed){%>
+                            <div class="ncp_heart heartAnimation btn_follow" data-code="${goods.code}" rel="true">
+                                <span class="ncp_dTguanZhu ncp_gzColorRed">已关注</span>
+                            </div>
+                            <%}else{%>
+                            <div class="ncp_heart btn_follow" data-code="${goods.code}" rel="false">
+                                <span class="ncp_dTguanZhu ">加关注</span>
+                            </div>
+                            <%}%>
+                        </span>
+                    </p>
+                </li>
+                <%}elsefor{%>
+                <div class="ncp_wushujuMain">
+                    <p>暂无数据</p>
+                </div>
+                <%}%>
+            </ul>
+        </dd>
+    </dl>
+</div>
+<!--销量排行榜 end-->
+
+<!-- <%/*%><div class="ty_gyClear"></div>
+<script type="text/javascript" src="/static/js/web/jquery.easing.1.3.js"></script>
+<script type="text/javascript" src="/static/js/web/jquery.coda-slider-2.0.js"></script>
+<script type="text/javascript">
+    $().ready(function() {
+        $('#coda-slider-1').codaSlider();
+    });
+</script>-->
+<!--<div class="reXiaoPaiHang">
+    <div class="ty_gyClear"></div>
+    <p class="rxp_title">热销排行</p>
+    <div class="ty_gyClear"></div>
+    <div class="coda-slider-wrapper">
+        <div class="coda-slider preload" id="coda-slider-1">
+            <div class="panel">
+                <div class="panel-wrapper">
+                    <h2 class="title" title="汽车坐垫">汽车坐垫</h2>
+                    <dl class="tt_carZhishu03">
+                        <dd>
+                            <ul id="carZuoDian">
+                                <%for(goods in cushionHot){%>
+                                <li class="ty_rerelative">
+                                    <a href="/goods/${goods.code}.html" target="_blank" title="${goods.name}">
+                                        <img src="${img_url.getS(goods.headImgUrl1)}" width="198" height="198"/>
+                                    </a>
+                                    <a href="/goods/${goods.code}.html" target="_blank" title="${goods.name}">
+                                        <p class="tt_listTitle xinPinDw">${goods.name}</p>
+                                    </a>
+                                    <%if(isEmpty(session.curCustomer)){%>
+                                    <p class="tt_listPrice03"><a href="/login.html" title="登录后查看价格">登录后查看价格</a></p>
+                                    <%}else{%>
+                                    <p><span class="moneyFuHaoLeft">￥</span><span class="tt_listPrice">${nums.yuan(goods.wholesalePrice)}</span></p>
+                                    <%}%>
+                                    <p class="tt_zhizaochang">
+                                        <span class="float_l">${goods.brand}</span>
+                                        <span class="float_r ind_guanZhu">
+                                            <%if(goods.followed){%>
+                                            <div class="ncp_heart heartAnimation btn_follow" data-code="${goods.code}" rel="true">
+                                                <span class="ncp_dTguanZhu ncp_gzColorRed">已关注</span>
+                                            </div>
+                                            <%}else{%>
+                                            <div class="ncp_heart btn_follow" data-code="${goods.code}" rel="false">
+                                                <span class="ncp_dTguanZhu">加关注</span>
+                                            </div>
+                                            <%}%>
+                                        </span>
+                                    </p>
+                                </li>
+                                <%}%>
+                            </ul>
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+            <div class="ty_gyClear"></div>
+            <div class="panel">
+                <div class="panel-wrapper">
+                    <h2 class="title" title="汽车脚垫">汽车脚垫</h2>
+                    <dl class="tt_carZhishu03">
+                        <dd>
+                            <ul id="carJiaoDian">
+                                <%for(goods in floorMatHot){%>
+                                <li class="ty_rerelative">
+                                    <a href="/goods/${goods.code}.html" target="_blank" title="${goods.name}">
+                                        <img src="${img_url.getS(goods.headImgUrl1)}" width="198" height="198"/>
+                                    </a>
+                                    <a href="/goods/${goods.code}.html" target="_blank" title="${goods.name}">
+                                        <p class="tt_listTitle xinPinDw">${goods.name}</p>
+                                    </a>
+                                    <%if(isEmpty(session.curCustomer)){%>
+                                    <p class="tt_listPrice03"><a href="/login.html" title="登录后查看价格">登录后查看价格</a></p>
+                                    <%}else{%>
+                                    <p><span class="moneyFuHaoLeft">￥</span><span class="tt_listPrice">${nums.yuan(goods.wholesalePrice)}</span></p>
+                                    <%}%>
+                                    <p class="tt_zhizaochang">
+                                        <span class="float_l">${goods.brand}</span>
+                                        <%if(goods.followed){%>
+                                        <div class="ncp_heart heartAnimation btn_follow" data-code="${goods.code}" rel="true">
+                                            <span class="ncp_dTguanZhu ncp_gzColorRed">已关注</span>
+                                        </div>
+                                        <%}else{%>
+                                        <div class="ncp_heart btn_follow" data-code="${goods.code}" rel="false">
+                                            <span class="ncp_dTguanZhu">加关注</span>
+                                        </div>
+                                        <%}%>
+                                    </p>
+                                </li>
+                                <%}%>
+                            </ul>
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+            <div class="panel">
+                <div class="panel-wrapper">
+                    <h2 class="title" title="方向盘套">方向盘套</h2>
+                    <dl class="tt_carZhishu03">
+                        <dd>
+                            <ul id="carFangXpan">
+                                <%for(goods in wheelCoverHot){%>
+                                <li class="ty_rerelative">
+                                    <a href="/goods/${goods.code}.html" target="_blank" title="${goods.name}">
+                                        <img src="${img_url.getS(goods.headImgUrl1)}" width="198" height="198"/>
+                                    </a>
+                                    <a href="/goods/${goods.code}.html" target="_blank" title="${goods.name}">
+                                        <p class="tt_listTitle xinPinDw">${goods.name}</p>
+                                    </a>
+                                    <%if(isEmpty(session.curCustomer)){%>
+                                    <p class="tt_listPrice03"><a href="/login.html" title="登录后查看价格">登录后查看价格</a></p>
+                                    <%}else{%>
+                                    <p><span class="moneyFuHaoLeft">￥</span><span class="tt_listPrice">${nums.yuan(goods.wholesalePrice)}</span></p>
+                                    <%}%>
+                                    <p class="tt_zhizaochang">
+                                        <span class="float_l">${goods.brand}</span>
+                                        <%if(goods.followed){%>
+                                        <div class="ncp_heart heartAnimation btn_follow" data-code="${goods.code}" rel="true">
+                                            <span class="ncp_dTguanZhu ncp_gzColorRed">已关注</span>
+                                        </div>
+                                        <%}else{%>
+                                        <div class="ncp_heart btn_follow" data-code="${goods.code}" rel="false">
+                                            <span class="ncp_dTguanZhu">加关注</span>
+                                        </div>
+                                        <%}%>
+                                    </p>
+                                </li>
+                                <%}%>
+                            </ul>
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+            <div class="panel">
+                <div class="panel-wrapper">
+                    <h2 class="title" title="汽车内饰">汽车内饰</h2>
+                    <dl class="tt_carZhishu03">
+                        <dd>
+                            <ul id="carNeiShi">
+                                <%for(goods in carTrimHot){%>
+                                <li class="ty_rerelative">
+                                    <a href="/goods/${goods.code}.html" target="_blank" title="${goods.name}">
+                                        <img src="${img_url.getS(goods.headImgUrl1)}" width="198" height="198"/>
+                                    </a>
+                                    <a href="/goods/${goods.code}.html" target="_blank" title="${goods.name}">
+                                        <p class="tt_listTitle xinPinDw">${goods.name}</p>
+                                    </a>
+                                    <%if(isEmpty(session.curCustomer)){%>
+                                    <p class="tt_listPrice03"><a href="/login.html" title="登录后查看价格">登录后查看价格</a></p>
+                                    <%}else{%>
+                                    <p><span class="moneyFuHaoLeft">￥</span><span class="tt_listPrice">${nums.yuan(goods.wholesalePrice)}</span></p>
+                                    <%}%>
+                                    <p class="tt_zhizaochang">
+                                        <span class="float_l">${goods.brand}</span>
+                                        <%if(goods.followed){%>
+                                        <div class="ncp_heart heartAnimation btn_follow" data-code="${goods.code}" rel="true">
+                                            <span class="ncp_dTguanZhu ncp_gzColorRed">已关注</span>
+                                        </div>
+                                        <%}else{%>
+                                        <div class="ncp_heart btn_follow" data-code="${goods.code}" rel="false">
+                                            <span class="ncp_dTguanZhu">加关注</span>
+                                        </div>
+                                        <%}%>
+                                    </p>
+                                </li>
+                                <%}%>
+                            </ul>
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+            <div class="panel">
+                <div class="panel-wrapper">
+                    <h2 class="title" title="其他">其他</h2>
+                    <dl class="tt_carZhishu03">
+                        <dd>
+                            <ul id="carQiTa">
+                                <%for(goods in otherHot){%>
+                                <li class="ty_rerelative">
+                                    <a href="/goods/${goods.code}.html" target="_blank" title="${goods.name}">
+                                        <img src="${img_url.getS(goods.headImgUrl1)}" width="198" height="198"/>
+                                    </a>
+                                    <a href="/goods/${goods.code}.html" target="_blank" title="${goods.name}">
+                                        <p class="tt_listTitle xinPinDw">${goods.name}</p>
+                                    </a>
+                                    <%if(isEmpty(session.curCustomer)){%>
+                                    <p class="tt_listPrice03"><a href="/login.html" title="登录后查看价格">登录后查看价格</a></p>
+                                    <%}else{%>
+                                    <p><span class="moneyFuHaoLeft">￥</span><span class="tt_listPrice">${nums.yuan(goods.wholesalePrice)}</span></p>
+                                    <%}%>
+                                    <p class="tt_zhizaochang">
+                                        <span class="float_l">${goods.brand}</span>
+                                        <%if(goods.followed){%>
+                                        <div class="ncp_heart heartAnimation btn_follow" data-code="${goods.code}" rel="true">
+                                            <span class="ncp_dTguanZhu ncp_gzColorRed">已关注</span>
+                                        </div>
+                                        <%}else{%>
+                                        <div class="ncp_heart btn_follow" data-code="${goods.code}" rel="false">
+                                            <span class="ncp_dTguanZhu">加关注</span>
+                                        </div>
+                                        <%}%>
+                                    </p>
+                                </li>
+                                <%}%>
+                            </ul>
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+        &lt;!&ndash; .coda-slider &ndash;&gt;
+    </div>
+</div><%*/%> -->
+<!--销量排行榜 end-->
+<!--品牌分类 start-->
+<div class="pinPai_flCon">
+    <div class="ty_gyClear"></div>
+    <!--汽车坐垫分类 start-->
+<!-- <%/*%>   <p class="rxp_title">汽车坐垫</p>
+    <div id="index_outer">
+        <ul id="pinPai_flTab">
+            <%for(var i = 0; i< cushionSize; i++){%>
+            <%
+            var cushionList;
+            switch(i){
+            case 0:
+                cushionList=cushion0!;
+                break;
+            case 1:
+                cushionList=cushion1!;
+                break;
+            case 2:
+                cushionList=cushion2!;
+                break;
+            case 3:
+                cushionList=cushion3!;
+                break;
+            default:
+                cushionList=cushion4!;
+            }
+            %>
+            <li class="${i==0?'current'}">${cushionList[0].brand}</li>
+            <%}%>
+        </ul>
+        <div id="pinPai_con">
+            <%for(var i = 0; i< cushionSize; i++){%>
+            <%
+            var cushionList;
+            switch(i){
+            case 0:
+                cushionList=cushion0!;
+                break;
+            case 1:
+                cushionList=cushion1!;
+                break;
+            case 2:
+                cushionList=cushion2!;
+                break;
+            case 3:
+                cushionList=cushion3!;
+                break;
+            default:
+                cushionList=cushion4!;
+            }
+            %>
+            <ul style="display:${i==0?'block':'none'};">
+                <dl>
+                    <dt>
+                        <a href="/goods/list.html?tab=cushion" target="_blank" title="汽车坐垫"><img src="/static/images/web/ncp_jiaodianGG.png"/></a>
+                    </dt>
+                    <dd class="pinPaiFl_right">
+                        <dl class="float_r ind_rzrcar02">
+                            <%for(goods in cushionList!){%>
+                            <dd class="ty_rerelative">
+                                <a href="/goods/${goods.code}.html" target="_blank" title="${goods.name}">
+                                    <img src="${img_url.getS(goods.headImgUrl1)}" width="190" height="190"/>
+                                </a>
+                                <a href="/goods/${goods.code}.html" target="_blank" title="${goods.name}">
+                                    <p class="tt_listTitle putongDwYs">${goods.name}</p>
+                                </a>
+                                <%if(isEmpty(session.curCustomer)){%>
+                                <p class="tt_listPrice03"><a href="/login.html" title="登录后查看价格">登录后查看价格</a></p>
+                                <%}else{%>
+                                <p><span class="moneyFuHao">￥</span><span class="tt_listPrice">${nums.yuan(goods.wholesalePrice)}</span></p>
+                                <%}%>
+                                <p class="tt_zhizaochang">
+                                    <span class="float_l">${goods.brand}</span>
+                                </p>
+                                <span class="float_r ind_guanZhu02 ">
+                                    <%if(goods.followed){%>
+                                    <div class="ncp_heart heartAnimation btn_follow" data-code="${goods.code}" rel="true">
+                                        <span class="ncp_dTguanZhu ncp_gzColorRed">已关注</span>
+                                    </div>
+                                    <%}else{%>
+                                    <div class="ncp_heart btn_follow" data-code="${goods.code}" rel="false">
+                                        <span class="ncp_dTguanZhu">加关注</span>
+                                    </div>
+                                    <%}%>
+                                </span>
+                            </dd>
+                            <%}%>
+                        </dl>
+                    </dd>
+                </dl>
+            </ul>
+            <%}%>
+        </div>
+    </div><%*/%> -->
+    <!--汽车坐垫 start -->
+    <div class="ty_gyClear"></div>
+    <!--汽车坐垫分类 start-->
+    <div id="index_outer">
+        <div title="汽车坐垫" class="gaiDong_title gaiDong_bottomJu"><span class="indTitleTao"></span>汽车坐垫<span><a href="/goods/list.html?tab=cushion" class="float_r" target="_blank" title="更多">更多</a></span></div>
+        <div id="pinPai_con">
+            <ul style="display:block">
+                <dl>
+                    <dt>
+                        <a href="http://www.nachepin.com/goods/list.html?tab=all&sorts=&brand=%E6%9B%B4%E5%A4%9A%E7%88%B1&goodsName=&itemNo=&color=&size=&minPrice=&maxPrice=" target="_blank" title="汽车脚垫"><img src="/static/images/add/add_zuotaogg.png"/></a>
+                    </dt>
+                    <dd class="pinPaiFl_right">
+                        <dl class="float_r ind_rzrcar02">
+                            <%for(goods in cushionList!){%>
+                            <dd class="ty_rerelative">
+                                <a href="${ctx}/goods/${goods.code}.html" target="_blank" title="${goods.name}">
+                                    <img src="${img_url.getS(goods.headImgUrl1)}" width="190" height="190"/>
+                                </a>
+                                <a href="${ctx}/goods/${goods.code}.html" target="_blank" title="${goods.name}">
+                                    <p class="tt_listTitle putongDwYs">${goods.name}</p>
+                                </a>
+                                <%if(isEmpty(session.curCustomer)){%>
+                                <p class="tt_listPrice03"><a href="/login.html" title="登录后查看价格">登录后查看价格</a></p>
+                                <%}else{%>
+                                <p><span class="moneyFuHao">￥</span><span class="tt_listPrice">${nums.yuan(goods.wholesalePrice)}</span></p>
+                                <%}%>
+                                <p class="tt_zhizaochang">
+                                    <span class="float_l">${goods.brand}</span>
+                                </p>
+                                <span class="float_r ind_guanZhu02 ">
+                                    <%if(goods.followed){%>
+                                    <div class="ncp_heart heartAnimation btn_follow" data-code="${goods.code}" rel="true">
+                                        <span class="ncp_dTguanZhu ncp_gzColorRed">已关注</span>
+                                    </div>
+                                    <%}else{%>
+                                    <div class="ncp_heart btn_follow" data-code="${goods.code}" rel="false">
+                                        <span class="ncp_dTguanZhu">加关注</span>
+                                    </div>
+                                    <%}%>
+                                </span>
+                            </dd>
+                            <%}%>
+                        </dl>
+                    </dd>
+                </dl>
+            </ul>
+        </div>
+    </div>
+    <div class="ty_gyClear"></div>
+    <!--汽车坐垫分类 end-->
+    <!--汽车脚垫分类 start-->
+    <div id="index_outer02">
+        <div title="汽车脚垫" class="gaiDong_title gaiDong_bottomJu"><span class="indTitleTao"></span>汽车脚垫<span><a href="/goods/list.html?tab=floorMat" class="float_r" target="_blank" title="更多">更多</a></span></div>
+        <div id="pinPai_con02">
+            <ul style="display:block">
+                <dl>
+                    <dt>
+                        <a href="http://www.nachepin.com/goods/list.html?tab=all&sorts=&brand=%E7%99%BE%E4%BF%A1%E5%A4%A9%E8%AF%9A&goodsName=&itemNo=&color=&size=&minPrice=&maxPrice=" target="_blank" title="汽车脚垫"><img src="/static/images/add/add_jiaodiangg.png"/></a>
+                    </dt>
+                    <dd class="pinPaiFl_right">
+                        <dl class="float_r ind_rzrcar02">
+                            <%for(goods in floorMat!){%>
+                            <dd class="ty_rerelative">
+                                <a href="/goods/${goods.code}.html" target="_blank" title="${goods.name}">
+                                    <img src="${img_url.getS(goods.headImgUrl1)}" width="190" height="190"/>
+                                </a>
+                                <a href="/goods/${goods.code}.html" target="_blank" title="${goods.name}">
+                                    <p class="tt_listTitle putongDwYs">${goods.name}</p>
+                                </a>
+                                <%if(isEmpty(session.curCustomer)){%>
+                                <p class="tt_listPrice03"><a href="/login.html" title="登录后查看价格">登录后查看价格</a></p>
+                                <%}else{%>
+                                <p><span class="moneyFuHao">￥</span><span class="tt_listPrice">${nums.yuan(goods.wholesalePrice)}</span></p>
+                                <%}%>
+                                <p class="tt_zhizaochang">
+                                    <span class="float_l">${goods.brand}</span>
+                                </p>
+                                <span class="float_r ind_guanZhu02 ">
+                                    <%if(goods.followed){%>
+                                    <div class="ncp_heart heartAnimation btn_follow" data-code="${goods.code}" rel="true">
+                                        <span class="ncp_dTguanZhu ncp_gzColorRed">已关注</span>
+                                    </div>
+                                    <%}else{%>
+                                    <div class="ncp_heart btn_follow" data-code="${goods.code}" rel="false">
+                                        <span class="ncp_dTguanZhu">加关注</span>
+                                    </div>
+                                    <%}%>
+                                </span>
+                            </dd>
+                            <%}%>
+                        </dl>
+                    </dd>
+                </dl>
+            </ul>
+        </div>
+    </div>
+    <div class="ty_gyClear"></div>
+    <!--汽车脚垫分类 end-->
+    <div class="ty_gyClear"></div>
+    <!--方向盘套 start-->
+    <div id="index_outer03">
+        <div title="方向盘套" class="gaiDong_title gaiDong_bottomJu"><span class="indTitleTao"></span>方向盘套<span><a href="/goods/list.html?tab=wheelCover" class="float_r" target="_blank" title="更多">更多</a></span></div>
+        <div id="pinPai_con03">
+            <ul style="display:block">
+                <dl>
+                    <dt>
+                        <a href="http://www.nachepin.com/goods/list.html?tab=all&sorts=&brand=%E9%91%AB%E5%B0%9A%E7%BE%8E&goodsName=&itemNo=&color=&size=&minPrice=&maxPrice=" target="_blank" title="方向盘套"><img src="/static/images/add/add_pantaogg.png"/></a>
+                    </dt>
+                    <dd class="pinPaiFl_right">
+                        <dl class="float_r ind_rzrcar02">
+                            <%for(goods in wheelCover!){%>
+                            <dd class="ty_rerelative">
+                                <a href="/goods/${goods.code}.html" target="_blank" title="${goods.name}">
+                                    <img src="${img_url.getS(goods.headImgUrl1)}" width="190" height="190"/>
+                                </a>
+                                <a href="/goods/${goods.code}.html" target="_blank" title="${goods.name}">
+                                    <p class="tt_listTitle putongDwYs">${goods.name}</p>
+                                </a>
+                                <%if(isEmpty(session.curCustomer)){%>
+                                <p class="tt_listPrice03"><a href="/login.html" title="登录后查看价格">登录后查看价格</a></p>
+                                <%}else{%>
+                                <p><span class="moneyFuHao">￥</span><span class="tt_listPrice">${nums.yuan(goods.wholesalePrice)}</span></p>
+                                <%}%>
+                                <p class="tt_zhizaochang">
+                                    <span class="float_l">${goods.brand}</span>
+                                </p>
+                                <span class="float_r ind_guanZhu02 ">
+                                    <%if(goods.followed){%>
+                                    <div class="ncp_heart heartAnimation btn_follow" data-code="${goods.code}" rel="true">
+                                        <span class="ncp_dTguanZhu ncp_gzColorRed">已关注</span>
+                                    </div>
+                                    <%}else{%>
+                                    <div class="ncp_heart btn_follow" data-code="${goods.code}" rel="false">
+                                        <span class="ncp_dTguanZhu">加关注</span>
+                                    </div>
+                                    <%}%>
+                                </span>
+                            </dd>
+                            <%}%>
+                        </dl>
+                    </dd>
+                </dl>
+            </ul>
+        </div>
+    </div>
+    <div class="ty_gyClear"></div>
+    <!--方向盘套 end-->
+    <div class="ty_gyClear"></div>
+    <!--汽车内饰 start-->
+    <div id="index_outer04">
+        <div title="汽车内饰" class="gaiDong_title gaiDong_bottomJu"><span class="indTitleTao"></span>汽车内饰<span><a href="/goods/list.html?tab=carTrim" class="float_r" target="_blank" title="更多">更多</a></span></div>
+        <div id="pinPai_con04">
+            <ul style="display:block">
+                <dl>
+                    <dt>
+                        <a href="http://www.nachepin.com/goods/list.html?tab=all&sorts=&brand=%E5%8D%9A%E6%9D%A5%E7%BE%8E&goodsName=&itemNo=&color=&size=&minPrice=&maxPrice= " target="_blank" title="汽车内饰"><img src="/static/images/add/add_shipingg.png"/></a>
+                    </dt>
+                    <dd class="pinPaiFl_right">
+                        <dl class="float_r ind_rzrcar02">
+                            <%for(goods in carTrimList!){%>
+                            <dd class="ty_rerelative">
+                                <a href="/goods/${goods.code}.html" target="_blank" title="${goods.name}">
+                                    <img src="${img_url.getS(goods.headImgUrl1)}" width="190" height="190"/>
+                                </a>
+                                <a href="/goods/${goods.code}.html" target="_blank" title="${goods.name}">
+                                    <p class="tt_listTitle putongDwYs">${goods.name}</p>
+                                </a>
+                                <%if(isEmpty(session.curCustomer)){%>
+                                <p class="tt_listPrice03"><a href="/login.html" title="登录后查看价格">登录后查看价格</a></p>
+                                <%}else{%>
+                                <p><span class="moneyFuHao">￥</span><span class="tt_listPrice">${nums.yuan(goods.wholesalePrice)}</span></p>
+                                <%}%>
+                                <p class="tt_zhizaochang">
+                                    <span class="float_l">${goods.brand}</span>
+                                </p>
+                                <span class="float_r ind_guanZhu02 ">
+                                    <%if(goods.followed){%>
+                                    <div class="ncp_heart heartAnimation btn_follow" data-code="${goods.code}" rel="true">
+                                        <span class="ncp_dTguanZhu ncp_gzColorRed">已关注</span>
+                                    </div>
+                                    <%}else{%>
+                                    <div class="ncp_heart btn_follow" data-code="${goods.code}" rel="false">
+                                        <span class="ncp_dTguanZhu">加关注</span>
+                                    </div>
+                                    <%}%>
+                                </span>
+                            </dd>
+                            <%}%>
+                        </dl>
+                    </dd>
+                </dl>
+            </ul>
+        </div>
+    </div>
+    <div class="ty_gyClear"></div>
+<!--  <%/*%>  <p class="rxp_title">汽车内饰</p>
+    <div id="index_outer04">
+        <ul id="pinPai_flTab04">
+            <%for(var i = 0; i < carTrimSize; i++){%>
+            <%
+            var carTrimList;
+            switch(i){
+            case 0:
+                carTrimList=carTrim0!;
+                break;
+            case 1:
+                carTrimList=carTrim1!;
+                break;
+            case 2:
+                carTrimList=carTrim2!;
+                break;
+            case 3:
+                carTrimList=carTrim3!;
+                break;
+            default:
+                carTrimList=carTrim4!;
+            }
+            %>
+            <li class="${i==0?'current'}">${carTrimList[0].brand}</li>
+            <%}%>
+        </ul>
+        <div id="pinPai_con04">
+            <%for(var i = 0; i < carTrimSize; i++){%>
+            <%
+            var carTrimList;
+            switch(i){
+            case 0:
+                carTrimList=carTrim0!;
+                break;
+            case 1:
+                carTrimList=carTrim1!;
+                break;
+            case 2:
+                carTrimList=carTrim2!;
+                break;
+            case 3:
+                carTrimList=carTrim3!;
+                break;
+            default:
+                carTrimList=carTrim4!;
+            }
+            %>
+            <ul style="display:${i==0?'block':'none'};">
+                <dl>
+                    <dt>
+                        <a href="/goods/list.html?tab=carTrim" target="_blank" title="汽车内饰"><img src="/static/images/web/neishi_GG.png"/></a>
+                    </dt>
+                    <dd class="pinPaiFl_right">
+                        <dl class="float_r ind_rzrcar02">
+                            <%for(goods in carTrimList!){%>
+                            <dd class="ty_rerelative">
+                                <a href="/goods/${goods.code}.html" target="_blank" title="${goods.name}">
+                                    <img src="${img_url.getS(goods.headImgUrl1)}" width="190" height="190"/>
+                                </a>
+                                <a href="/goods/${goods.code}.html" target="_blank" title="${goods.name}">
+                                    <p class="tt_listTitle putongDwYs">${goods.name}</p>
+                                </a>
+                                <%if(isEmpty(session.curCustomer)){%>
+                                <p class="tt_listPrice03"><a href="/login.html" title="登录后查看价格">登录后查看价格</a></p>
+                                <%}else{%>
+                                <p><span class="moneyFuHao">￥</span><span class="tt_listPrice">${nums.yuan(goods.wholesalePrice)}</span></p>
+                                <%}%>
+                                <p class="tt_zhizaochang">
+                                    <span class="float_l">${goods.brand}</span>
+                                </p>
+                                <span class="float_r ind_guanZhu02 ">
+                                    <%if(goods.followed){%>
+                                    <div class="ncp_heart heartAnimation btn_follow" data-code="${goods.code}" rel="true">
+                                        <span class="ncp_dTguanZhu ncp_gzColorRed">已关注</span>
+                                    </div>
+                                    <%}else{%>
+                                    <div class="ncp_heart btn_follow" data-code="${goods.code}" rel="false">
+                                        <span class="ncp_dTguanZhu">加关注</span>
+                                    </div>
+                                    <%}%>
+                                </span>
+                            </dd>
+                            <%}%>
+                        </dl>
+                    </dd>
+                </dl>
+            </ul>
+            <%}%>
+        </div>
+    </div><%*/%>-->
+    <%/*%>
+    <div id="index_outer05">
+        <div title="安全座椅" class="gaiDong_title gaiDong_bottomJu"><span class="indTitleTao"></span>安全座椅<span><a href="/goods/list.html?tab=seat" class="float_r" target="_blank" title="更多">更多</a></span></div>
+        <div id="pinPai_con05">
+            <ul style="display:block">
+                <dl>
+                    <dt>
+                        <a href="${ctx}/goods/list.html?tab=seat" target="_blank" title="安全座椅"><img src="/static/images/web/neishi_GG.png"/></a>
+                    </dt>
+                    <dd class="pinPaiFl_right">
+                        <dl class="float_r ind_rzrcar02">
+                            <%for(goods in seat!){%>
+                            <dd class="ty_rerelative">
+                                <a href="/goods/${goods.code}.html" target="_blank" title="${goods.name}">
+                                    <img src="${img_url.getS(goods.headImgUrl1)}" width="190" height="190"/>
+                                </a>
+                                <a href="/goods/${goods.code}.html" target="_blank" title="${goods.name}">
+                                    <p class="tt_listTitle putongDwYs">${goods.name}</p>
+                                </a>
+                                <%if(isEmpty(session.curCustomer)){%>
+                                <p class="tt_listPrice03"><a href="/login.html" title="登录后查看价格">登录后查看价格</a></p>
+                                <%}else{%>
+                                <p><span class="moneyFuHao">￥</span><span class="tt_listPrice">${nums.yuan(goods.wholesalePrice)}</span></p>
+                                <%}%>
+                                <p class="tt_zhizaochang">
+                                    <span class="float_l">${goods.brand}</span>
+                                </p>
+                                <span class="float_r ind_guanZhu02 ">
+                                    <%if(goods.followed){%>
+                                    <div class="ncp_heart heartAnimation btn_follow" data-code="${goods.code}" rel="true">
+                                        <span class="ncp_dTguanZhu ncp_gzColorRed">已关注</span>
+                                    </div>
+                                    <%}else{%>
+                                    <div class="ncp_heart btn_follow" data-code="${goods.code}" rel="false">
+                                        <span class="ncp_dTguanZhu">加关注</span>
+                                    </div>
+                                    <%}%>
+                                </span>
+                            </dd>
+                            <%}%>
+                        </dl>
+                    </dd>
+                </dl>
+            </ul>
+        </div>
+    </div>
+    <%*/%>
+    <div class="ty_gyClear"></div>
+    </div>
+</div>
+<!-- 4 end -->
+<div class="ty_gyClear"></div>
+<div class="ncp_gjHuoShang">
+    <div class="ncpmod_main">
+        <div class="ncpbaitiao_intro">
+            <i class="step_01"></i>
+            <i class="step_02"></i>
+            <i class="step_03"></i>
+            <i class="step_04"></i>
+            <i class="step_05"></i>
+        </div>
+        <a class="ncp_msShenQ"  href="${supplier1}" title="去申请成为供货商"></a>
+    </div>
+    <div class="ncpmod_main02">
+        <div class="ncpbaitiao_intro02">
+            <i class="step_01"></i>
+            <i class="step_02"></i>
+            <i class="step_03"></i>
+            <i class="step_04"></i>
+            <i class="step_05"></i>
+        </div>
+        <a class="ncp_msShenQ" href="${purchase1}" title="去申请成为进货商"></a>
+    </div>
+</div>
+<!--
+<div class="ty_gyClear tt_indjgTop"></div>-->
+<%include("/web/common/foot.html"){}%>
+</body>
+</html>

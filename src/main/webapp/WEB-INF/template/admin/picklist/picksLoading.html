@@ -1,0 +1,57 @@
+<div id="piliang_Con">
+    <table class="sui-table table-bordered">
+        <thead>
+        <th width="60">总订单号</th>
+        <th width="60">子订单号</th>
+        <th width="60">收货信息</th>
+        <th>物流公司</th>
+        <th width="100">快递单号</th>
+        </thead>
+        <tbody>
+        <%for(trade in trades){%>
+        <input type="hidden" name="tradeCode" value="${trade.code!}" />
+        <%for(order in trade.orders){%>
+        <tr>
+            <%if(orderLP.first){%>
+            <td rowspan="${orderLP.size!}">${trade.code!}</td>
+            <%}%>
+            <td>${order.code!}</td>
+            <td>
+                ${trade.sendOrder.buyerName}&nbsp;${trade.sendOrder.buyerPhone}&nbsp;${trade.sendOrder.buyerAddress}&nbsp;${trade.sendOrder.buyerPostCode}
+            </td>
+            <%if(orderLP.first){%>
+            <td rowspan="${orderLP.size!}">
+                <span class="sui-dropdown dropdown-bordered select h22">
+                    <span class="dropdown-inner">
+                        <a id="select" role="button" href="javascript:void(0);" data-toggle="dropdown" class="dropdown-toggle">
+                            <input type="hidden" name="expressId" data-rules="required" value="${trade.expressId!0}" />
+                            <i class="caret"></i>
+                            <span>${trade.expressName!'请选择'}</span>
+                        </a>
+                        <ul role="menu" aria-labelledby="drop12" class="sui-dropdown-menu">
+                            <li role="presentation"><a role="menuitem" tabindex="" href="javascript:void(0);" value="0" >请选择</a></li>
+                            <%for(express in expressLists){%>
+                            <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="${express.id!}">${express.name!}</a></li>
+                            <%}%>
+                        </ul>
+                    </span>
+                </span>
+            </td>
+            <%}%>
+            <%if(orderLP.first){%>
+            <td rowspan="${orderLP.size!}">
+                <input type="text" name="expressNum" value="${trade.expressCode!}" />
+            </td>
+            <%}%>
+        </tr>
+        <%}%>
+        <%}%>
+        </tbody>
+    </table>
+    <div class="hdbom_btns">
+        <button class="sui-btn pliangbtn_save">保存</button>
+        &nbsp;&nbsp;
+        <a class="sui-btn" id="pis_xlclose">关闭</a>
+    </div>
+    <em></em>
+</div>

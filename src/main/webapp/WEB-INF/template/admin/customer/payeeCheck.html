@@ -1,0 +1,154 @@
+<%layout("../layout/header_layout.html"){%>
+<title>供货商收款帐号审核</title>
+<script type="text/javascript" src="/static/js/web/hd_zixie.js?v=${v}"></script>
+<%}%>
+<%layout("../layout/body_layout.html"){%>
+<div class="query-zone" id="searchL">
+    <form class="sui-form form-horizontal query-form" action="payeeQuery">
+        <div class="sui-row">
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        供货商帐号
+                    </span>
+                    <input type="text" class="input h22" name="userName" value="${queryAp.userName!}" />
+                </div>
+            </div>
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        供货商名称
+                    </span>
+                    <input type="text" class="input h22" name="name" value="${queryAp.name!}" />
+                </div>
+            </div>
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        供货商公司
+                    </span>
+                    <input type="text" class="input h22" name="company" value="${queryAp.company!}"/>
+                </div>
+            </div>
+            <div class="span4">
+                <div class="input-prepend" style="padding-top: 3px;">
+                    <span class="add-on">
+                        审核状态
+                    </span>
+                    <span class="sui-dropdown dropdown-bordered select h22">
+                        <span class="dropdown-inner">
+                            <a id="select" role="button" href="javascript:void(0);" data-toggle="dropdown" class="dropdown-toggle">
+                                <input type="hidden" name="checkId" data-rules="required" value="${queryAp.status.val!9}" />
+                                <i class="caret"></i>
+                                <span>${queryAp.status.name!'请选择'}</span>
+                            </a>
+                            <ul role="menu" aria-labelledby="drop12" class="sui-dropdown-menu">
+                                <li role="presentation"><a role="menuitem" tabindex="" href="javascript:void(0);" value="9" >请选择</a></li>
+                                <li role="presentation"><a role="menuitem" tabindex="" href="javascript:void(0);" value="0" >待审核</a></li>
+                                <li role="presentation"><a role="menuitem" tabindex="" href="javascript:void(0);" value="1" >审核通过</a></li>
+                                <li role="presentation"><a role="menuitem" tabindex="" href="javascript:void(0);" value="2" >审核不通过</a></li>
+                            </ul>
+                        </span>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="sui-row" style="margin:15px 0 0 2px;">
+            <input type="submit" class="sui-btn btn-primary" value="查询" />
+            <input type="button" class="sui-btn btn-primary btn-reset" onclick="javascript:Common.go('/admin/customer/goPayeeCheck');" value="重置"/>
+        </div>
+    </form>
+</div>
+<!--图片预览弹出框 start-->
+<div id="bgDiv"></div>
+<div id="sqsImgBig">
+    <div class="casewinright">
+        <div class="sqsCdel">
+            <a onclick = "document.getElementById('sqsImgBig').style.display='none';document.getElementById('bgDiv').style.display='none';">
+                <img src="/static/images/web/close.png" width="35" height="35"/>
+            </a>
+        </div>
+        <div class="winright">
+            <img src="" width="100%"/>
+        </div>
+    </div>
+</div>
+<!--图片预览弹出框 end-->
+<table class="sui-table table-bordered" id="yueJieTab">
+    <thead>
+    <tr>
+        <th width="80">供货商帐号</th>
+        <th width="100">供货商名称</th>
+        <th width="160">供货商公司</th>
+        <th width="60">收款人帐号</th>
+        <th width="90">收款人真实姓名</th>
+        <th width="50">授权书</th>
+        <th width="200">备注</th>
+        <th>状态</th>
+        <th>操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    <%for(item in pages.data!){%>
+    <tr>
+        <td>${item.userName!}</td>
+        <td>${item.name!}</td>
+        <td>${item.company!}</td>
+        <td>${item.payeeAccount!}</td>
+        <td>${item.payeeName!}</td>
+        <td><img src="${img_url.getL(item.certificate)}" class="houdangxiaoshou" height="60" onclick="bigImg(this)"  title="点击预览大图" /></td>
+        <td>
+            <%if(item.status.val == 0){%>
+                <input type="text" name="remark" id="remark_${item.id!}" value="${item.remark!}" maxlength="450" />
+            <%}else if(item.status.val == 2){%>
+                ${item.remark!}
+            <%}else{%>
+                ${item.remark!}
+            <%}%>
+        </td>
+        <td><span class="shenhexiaobiaoqian">${item.status.name!}</span></td>
+        <td>
+            <%if(item.status.val == 0){%>
+                <%if(item.status.val!=1){%>
+                    <input type="button" class="sui-btn btn-small" onclick="doCheck(1, '${item.id!}');" value="审核通过" />
+                <%}%>
+                <%if(item.status.val!=2){%>
+                    <input type="button" class="sui-btn btn-small" onclick="doCheck(2, '${item.id!}');" value="审核不通过" />
+                <%}%>
+            <%}%>
+        </td>
+    </tr>
+    <%}elsefor{%>
+    <tr>
+        <td colspan="11" class="zanWuShuju"><p>没有数据</p></td>
+    </tr>
+    <%}%>
+    </tbody>
+</table>
+<#page val="${pages.page!}" size="large" params="${parameter.map!}"/>
+<%}%>
+<script>
+    $(function () {
+        Pagination.init();
+    });
+    function doCheck(status, id) {
+        var remark = $.trim($("#remark_" + id).val());
+        if (status == 2 && remark.length == 0) {
+            Msg.danger("请填写驳回理由！");
+            return;
+        }
+
+        Common.post2({
+            url: "/admin/customer/doCheck",
+            param: { statusCode : status, id : id, remark : remark },
+            success: function (result) {
+                if (result.code == Common.SUCC) {
+                    Msg.success(result.message);
+                }
+                setTimeout(function () {
+                    Common.refresh();
+                }, 1000);
+            }
+        });
+    }
+</script>

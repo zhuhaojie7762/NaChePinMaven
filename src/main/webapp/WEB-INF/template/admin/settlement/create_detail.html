@@ -1,0 +1,106 @@
+<%layout("../layout/header_layout.html"){%>
+<title>供货商结算明细页</title>
+<%}%>
+<%layout("../layout/body_layout.html"){%>
+<table class="sui-table table-bordered">
+    <thead>
+    <tr class="juzhongTh">
+        <th colspan="10">${supplier.supplierCompany}供货商 ( ${dts.d2d(startTime)} ~ ${dts.d2d(endTime)} ) 订单明细</th>
+    </tr>
+    <tr>
+        <th width="80">供货商帐号</th>
+        <th width="120">供货商名称</th>
+        <th width="170">供货商公司名称</th>
+        <th width="70">总订单编号</th>
+        <th width="70">订单编号</th>
+        <th width="70">下单时间</th>
+        <th width="70">商品货号</th>
+        <th width="80">商品单价</th>
+        <th width="80">商品数量</th>
+        <th width="80">商品总金额</th>
+    </tr>
+    </thead>
+    <tbody>
+    <%var sumSales = 0;%>
+    <%for(item in sales){%>
+    <tr>
+        <td>${supplier.username}</td>
+        <td>${supplier.name}</td>
+        <td>${supplier.supplierCompany}</td>
+        <td>${item.tradeCode}</td>
+        <td>${item.code}</td>
+        <td>${dts.d2s(item.payTime)}</td>
+        <td>${item.goodsItemNo}</td>
+        <td>${nums.yuan(item.price)}</td>
+        <td>${item.quantity}</td>
+        <td>${nums.yuan(item.money)}</td>
+    </tr>
+    <%sumSales = sumSales + item.money;%>
+    <%}%>
+    </tbody>
+    <tfoot>
+    <tr class="juyouTfoot">
+        <td colspan="10">合计：${nums.yuan(sumSales)}</td>
+    </tr>
+    </tfoot>
+</table>
+<table class="sui-table table-bordered">
+    <thead>
+    <tr class="juzhongTh">
+        <th colspan="10">${supplier.supplierCompany}供货商 ( ${dts.d2d(startTime)} ~ ${dts.d2d(endTime)} ) 结算表</th>
+    </tr>
+    <tr>
+        <th>供货商名称</th>
+        <th>进货商账号</th>
+        <th>订单编号</th>
+        <th>支付时间</th>
+        <th>退货申请时间</th>
+        <th>同意申请时间</th>
+        <th>退款原因</th>
+        <th>订单状态</th>
+        <th>退款金额</th>
+    </tr>
+    </thead>
+    <tbody>
+    <%var sumBack = 0;%>
+    <%for(item in backs){%>
+    <tr>
+        <td>${supplier.name}</td>
+        <td>${supplier.username}</td>
+        <td>${item.code}</td>
+        <td>${dts.d2s(item.payTime)}</td>
+        <td>${dts.d2s(item.applyRefundTime)}</td>
+        <td>${dts.d2s(item.refundConfirmTime)}</td>
+        <td>${item.refundReason}</td>
+        <td>${item.status.name}</td>
+        <td>${nums.yuan(item.supplierMoney)}</td>
+    </tr>
+    <%sumBack = sumBack + item.supplierMoney;%>
+    <%}%>
+    <tfoot>
+    <tr class="juyouTfoot">
+        <td colspan="10">合计：${nums.yuan(sumBack)}</td>
+    </tr>
+    </tfoot>
+    </tbody>
+</table>
+<table class="sui-table table-bordered">
+    <thead>
+    <tr class="juzhongTh">
+        <th colspan="3">本期结算金额</th>
+    </tr>
+    <tr>
+        <th>本期需结算金额</th>
+        <th>本期退款金额</th>
+        <th>实际应结算金额</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td>${nums.yuan(sumSales)}</td>
+        <td>${nums.yuan(sumBack)}</td>
+        <td>${nums.yuan(sumSales - sumBack)}</td>
+    </tr>
+    </tbody>
+</table>
+<%}%>

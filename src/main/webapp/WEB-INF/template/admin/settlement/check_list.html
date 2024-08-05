@@ -1,0 +1,31 @@
+<%layout("../layout/header_layout.html"){%>
+<title>${pageTitle!}</title>
+<%}%>
+<%layout("../layout/body_layout.html"){%>
+<table class="sui-table table-bordered" id="yueJieTab">
+    <thead>
+    <tr>
+        <th width="80">结算开始时间</th>
+        <th width="80">结算结束时间</th>
+        <th width="220">对账单名称</th>
+        <th>结算状态</th>
+        <th>结算方式</th>
+    </tr>
+    </thead>
+    <tbody>
+    <%for(item in data){%>
+    <tr>
+        <td>${dts.d2d(item.startTime)}</td>
+        <td>${dts.d2d(item.endTime)}</td>
+        <td><a href="/admin/settlement/check/goChecking?code=${item.code!}&checkId=${checkId!}" >${item.code}</a></td>
+        <td>${item.status.name}</td>
+        <td></td>
+    </tr>
+    <%}elsefor{%>
+    <tr>
+        <td colspan="5" class="zanWuShuju"><p>没有数据</p></td>
+    </tr>
+    <%}%>
+    </tbody>
+</table>
+<%}%>

@@ -1,0 +1,300 @@
+<%layout("../layout/header_layout.html"){%>
+<title>首页参数设置</title>
+<style>
+    .ind_banInfo::after {content: "Banner图";}
+    .ind_feileiInfo::after {content: "分类广告图";}
+</style>
+<script type="text/javascript">
+    $(function(){
+        var banner_count = ${mainBanners.~size};
+        //新增
+        $(".btn-addBan").click(function(){
+            var len = $("input[name=mainImage]").length;
+            if(len < 10){
+                banner_count++;
+                $('#new_indTab').append('<tr>' +
+                        '<td><div><img src="/static/images/zuixin/new_updateImg.png" class="img_banner" title="上传Banner图片" /></div>' +
+                        '<input type="file" name="mainImage'+ banner_count +'" class="new_scfile btn-file" title="上传Banner图片"  />' +
+                        '<input type="hidden" name="hasFile" value="" data-rules="required" data-empty-msg="请上传图片"></td>' +
+                        '<td><input type="text" name="url" value="" /><input type="hidden" name="id" value="0">' +
+                        '<input type="hidden" name="type" value="main" /><input type="hidden" name="imageName" value="mainImage'+banner_count+'" /></td>' +
+                        '<td><a href="javascript:void(0);" class="btn-up">上移</a>' +
+                        '<a href="javascript:void(0);" class="btn-down">下移</a>' +
+                        '<a href="javascript:void(0);" class="btn-del">删除</a></td></tr>');
+            }else{
+                alert("已达到设置最大值");
+            }
+        });
+
+        //删除一行
+        $(document).on("click", ".btn-del", function() {
+            if (confirm("确定要删除吗")) {
+                $(this).parent().parent().remove();
+            }
+        });
+
+        //上移
+        $(document).on("click", ".btn-up", function() {
+            var $tr = $(this).parents("tr");
+            if ($tr.index() != 0) {
+                $tr.fadeOut().fadeIn();
+                $tr.prev().before($tr);
+
+            }
+        });
+        //下移
+        $(document).on("click", ".btn-down", function() {
+            var $tr = $(this).parents("tr");
+            var len = $(".btn-down").length;
+            if ($tr.index() != len - 1) {
+                $tr.fadeOut().fadeIn();
+                $tr.next().after($tr);
+            }
+        });
+
+        //保存
+        $(".btn-submit").unbind("click").bind("click", function(){
+//            $(".hdncp_addPageMban").show();
+            $("form.form-banner").submit();
+        });
+
+        $("form.form-banner").validate({
+            rules:{
+                url:{
+                    required: true
+                },
+                hasFile:{
+                    required: true
+                }
+            },
+            messages: {
+                hasFile: "请上传图片"
+            },
+            success: function() {
+                $(".hdncp_addPageMban").show();
+                $(".btn-submit").unbind("click");
+                return true;
+            }
+        });
+
+        Common.ajaxForm($("form.form-banner"), null, function(json){
+            if(json.code == Common.SUCC){
+                Msg.success(json.message, function(){
+                    Common.refresh();
+                });
+            }else{
+                Msg.danger(json.message);
+                $(".btn-submit").bind("click", function(){
+                    $("form.form-banner").submit();
+                });
+                $(".hdncp_addPageMban").hide();
+            }
+        });
+
+        //加载主Banner图片
+        $(document).on("change", ".btn-file", function () {
+            if ($(this).prop('files') && $(this).prop('files')[0]) {
+                var div = $(this).siblings("div");
+                $(this).next("input").val("1");
+                div.html("<img class='img_banner' />");
+                var img = div.children("img");
+                img.attr("onload", imgLoad(this));
+                var reader = new FileReader();
+                reader.onload = function (evt) {
+                    img.attr("src", evt.target.result);
+                }
+                reader.readAsDataURL($(this).prop('files')[0]);
+            }
+        });
+
+        //加载分类广告图
+        $(document).on("change", ".btn-classFile", function () {
+            if ($(this).prop('files') && $(this).prop('files')[0]) {
+                var div = $(this).siblings("div");
+                $(this).next("input").val("1");
+                div.html("<img class='img_class' />");
+                var img = div.children("img");
+                img.attr("onload", imgLoad2(this));
+                var reader = new FileReader();
+                reader.onload = function (evt) {
+                    img.attr("src", evt.target.result);
+                }
+                reader.readAsDataURL($(this).prop('files')[0]);
+            }
+        });
+    });
+
+    function imgLoad(img){
+        var MAXWIDTH = 1920;
+        var MAXHEIGHT = 380;
+        var rect = clacImgZoomParam(MAXWIDTH, MAXHEIGHT, img.offsetWidth, img.offsetHeight);
+        img.width = rect.width;
+        img.height = rect.height;
+        //img.style.marginTop = rect.top + 'px';
+    }
+
+    function imgLoad2(img){
+        var MAXWIDTH = 260;
+        var MAXHEIGHT = 579;
+        var rect = clacImgZoomParam(MAXWIDTH, MAXHEIGHT, img.offsetWidth, img.offsetHeight);
+        img.width = rect.width;
+        img.height = rect.height;
+       // img.style.marginTop = rect.top + 'px';
+    }
+
+    function clacImgZoomParam( maxWidth, maxHeight, width, height ){
+        var param = {top:0, left:0, width:width, height:height};
+        if( width>maxWidth || height>maxHeight )
+        {
+            rateWidth = width / maxWidth;
+            rateHeight = height / maxHeight;
+
+            if( rateWidth > rateHeight )
+            {
+                param.width =  maxWidth;
+                param.height = Math.round(height / rateWidth);
+            }else
+            {
+                param.width = Math.round(width / rateHeight);
+                param.height = maxHeight;
+            }
+        }
+        param.left = Math.round((maxWidth - param.width) / 2);
+        param.top = Math.round((maxHeight - param.height) / 2);
+        return param;
+    };
+</script>
+<%}%>
+<%layout("../layout/body_layout.html"){%>
+<div class="hdncp_addPageMban" style="display: none;">
+    <!--进度条 start -->
+    <div class="warning001"><p>文件较大，请耐心等待……</p></div>
+    <!--进度条 end -->
+</div>
+<form action="/admin/settings/saveBanner" class="form-banner"  method="post" enctype="multipart/form-data">
+    <div class="info-group ind_banInfo">
+        <div class="new_indBanCon">
+            <p><span>尺寸：</span>1920px * 380px</p>
+            <p><span>数量：</span><strong>最大可设置10张</strong></p>
+            <p><span>内容设置：</span></p>
+            <div class="btn-addBan sui-btn btn-primary new_addBans">添加Banner图</div>
+            <table class="sui-table table-bordered" id="new_indTab">
+                <thead>
+                <th width="200">Banner图</th>
+                <th width="480">链接</th>
+                <th>操作</th>
+                </thead>
+                <tbody>
+                <%for(item in mainBanners!){%>
+                <tr>
+                    <td>
+                        <div id="new_pre">
+                            <img src="${img_url.getM(item.image)}" class="img_banner" title="上传Banner图片" />
+                        </div>
+                        <input type="file" name="mainImage${itemLP.index}" class="new_scfile btn-file" title="上传Banner图片" />
+                        <input type="hidden" name="hasFile" value="${item.image!}">
+                    </td>
+                    <td>
+                        <input type="text" name="url" value="${item.url!}" />
+                        <input type="hidden" name="id" value="${item.id!0}" />
+                        <input type="hidden" name="type" value="main" />
+                        <input type="hidden" name="imageName" value="mainImage${itemLP.index}" />
+                    </td>
+                    <td>
+                        <a href="javascript:void(0);" class="btn-up">上移</a>
+                        <a href="javascript:void(0);" class="btn-down">下移</a>
+                        <a href="javascript:void(0);" class="btn-del">删除</a>
+                    </td>
+                </tr>
+                <%}%>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="info-group ind_feileiInfo">
+        <div class="new_indBanCon">
+            <p><span>尺寸：</span>260px * 579px</p>
+            <p>
+                <span>内容设置：</span>
+            </p>
+            <table class="sui-table table-bordered" id="new_indTab02">
+                <thead>
+                <th width="80">分类广告图</th>
+                <th width="60">分类名称</th>
+                <th>链接</th>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>
+                        <div id="new_class">
+                            <img src="${img_url.getM(cushionBanners.image!)}" class="img_class" width="50" title="上传分类广告图片" />
+                        </div>
+                        <input type="file" name="cushionImage" class="new_scfile btn-classFile" title="上传分类广告图片" />
+                        <input type="hidden" name="hasFile" value="${cushionBanners.image!}">
+                    </td>
+                    <td>坐垫/座套</td>
+                    <td>
+                        <input type="text" name="url" value="${cushionBanners.url!}" />
+                        <input type="hidden" name="id" value="${cushionBanners.id!0}" />
+                        <input type="hidden" name="type" value="cushion" />
+                        <input type="hidden" name="imageName" value="cushionImage" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div id="new_class02">
+                            <img src="${img_url.getM(floorMatBanners.image!)}" class="img_class" title="上传分类广告图片" />
+                        </div>
+                        <input type="file" name="floorMatImage" class="new_scfile btn-classFile" title="上传分类广告图片" />
+                        <input type="hidden" name="hasFile" value="${floorMatBanners.image!}">
+                    </td>
+                    <td>脚垫/后备箱垫</td>
+                    <td>
+                        <input type="text" name="url" value="${floorMatBanners.url!}"/>
+                        <input type="hidden" name="id" value="${floorMatBanners.id!0}" />
+                        <input type="hidden" name="type" value="floorMat" />
+                        <input type="hidden" name="imageName" value="floorMatImage" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div id="new_class03">
+                            <img src="${img_url.getM(wheelCoverBanners.image!)}" class="img_class" title="上传分类广告图片" />
+                        </div>
+                        <input type="file" name="wheelCoverImage" class="new_scfile btn-classFile" title="上传分类广告图片" />
+                        <input type="hidden" name="hasFile" value="${wheelCoverBanners.image!}">
+                    </td>
+                    <td>方向盘套</td>
+                    <td>
+                        <input type="text" name="url" value="${wheelCoverBanners.url!}" />
+                        <input type="hidden" name="id" value="${wheelCoverBanners.id!0}" />
+                        <input type="hidden" name="type" value="wheelCover" />
+                        <input type="hidden" name="imageName" value="wheelCoverImage" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div id="new_class04">
+                            <img src="${img_url.getM(carTrimBanners.image!)}" class="img_class" title="上传分类广告图片" />
+                        </div>
+                        <input type="file" name="carTrimImage" class="new_scfile btn-classFile" title="上传分类广告图片" />
+                        <input type="hidden" name="hasFile" value="${carTrimBanners.image!}">
+                    </td>
+                    <td>功能小件</td>
+                    <td>
+                        <input type="text" name="url" value="${carTrimBanners.url!}" />
+                        <input type="hidden" name="id" value="${carTrimBanners.id!0}" />
+                        <input type="hidden" name="type" value="carTrim" />
+                        <input type="hidden" name="imageName" value="carTrimImage" />
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="new_saveCon">
+            <span class="sui-btn btn-primary new_jiange btn-submit" title="保存">保存</span>
+            <!--<span class="sui-btn new_jiange02" title="取消">取消</span>-->
+        </div>
+    </div>
+</form>
+<%}%>

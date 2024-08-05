@@ -1,0 +1,288 @@
+<%layout("../../layout/header_layout.html"){%>
+<title>进货商退货退款退款确认</title>
+<script type="text/javascript">
+    $(function () {
+        Pagination.init();
+        $(".btn-deal").unbind("click").bind("click", function () {
+            var code = $(this).attr("data-code");
+            var alipay = $(this).attr("data-alipay");
+            var name = $(this).attr("data-name");
+            var fee = $(this).attr("data-fee");
+            Confirm.show({
+                id: '#dialog-tip',
+                mask: '1',
+                width: '20%',
+                title: '确认已退款',
+                content: "确认支付给" + alipay + "(" + name + ")，金额" + fee,
+                callback: function (win) {
+                    Common.post("/admin/finance/refund/deal",
+                            {codes: code}, function (json) {
+                                if (json.code == Common.SUCC) {
+                                    win.remove();
+                                    $('.dialog-mask').remove();
+                                    Common.refresh();
+                                    return true;
+                                } else {
+                                    Dialog.show({
+                                        id: '#dialog-tip',
+                                        mask: '0',
+                                        width: '20%',
+                                        title: 'fail!',
+                                        content: json.message,
+                                        callback: function () {
+                                        }
+                                    });
+                                    return false;
+                                }
+                            });
+                }
+            });
+        });
+
+        $("#doCheck").click(function() {
+            $("input[name=check]").prop("checked", $(this).prop("checked"));
+        });
+
+        $(".btn-export").click(function() {
+            var btnCheck = $("input[name=check]:checkbox:checked");
+            if (btnCheck.length == 0) {
+                Msg.danger("亲，请先选择要导出的订单！");
+                return;
+            }
+
+            var codes = new Array();
+            btnCheck.each(function (i, item) {
+                codes.push($(item).val());
+            });
+            window.open("/admin/finance/refund/outExcel?codes=" + codes);
+        });
+
+        /**
+         * 导出批量付款的EXCEL
+         */
+        $(".btn-batchPay").unbind("click").bind("click", function() {
+            if(!confirm("确定导出批量付款的EXCEL？")){
+                return;
+            }
+            var btnCheck = $("input[name=check]:checkbox:checked");
+            if (btnCheck.length == 0) {
+                Msg.danger("亲，请先选择要导出的订单！");
+                return;
+            }
+
+            var codes = new Array();
+            btnCheck.each(function (i, item) {
+                codes.push($(item).val());
+            });
+            Common.downLoadFile({url:"/admin/finance/refund/batchPay",
+                data:{codes:codes.join(",")}});
+        });
+
+        /**
+         * 已付款批量确认
+         */
+        $(".btn-batchPaid").unbind("click").bind("click", function() {
+            if(!confirm("批量退款确认？")){
+                return;
+            }
+            if($("input[name=check]:checkbox:checked").length == 0){
+                Msg.danger("选择需要批量确认的已付款订单");
+                return;
+            }
+            var codes = new Array();
+            $("input[name=check]:checkbox:checked").each(function (i, item) {
+                codes.push($(item).val());
+            });
+            Common.post("/admin/finance/refund/deal", {codes:codes.join(",")}, function(json){
+                if (json.code == Common.SUCC) {
+                    Msg.success(json.message);
+                    Common.refresh();
+                }else{
+                    Msg.danger(json.message);
+                }
+            });
+        });
+
+    });
+</script>
+<%}%>
+<%layout("../../layout/body_layout.html"){%>
+<div class="query-zone" id="toDay_Con">
+    <form class="sui-form form-horizontal query-form" id="query-form">
+        <div class="sui-row">
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        退款人名称
+                    </span>
+                    <input type="text" class="input h22" name="nameParam" value="${refund.nameParam!}" />
+                </div>
+            </div>
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        子订单编号
+                    </span>
+                    <input type="text" class="input h22" name="codeParam" value="${refund.codeParam!}" />
+                </div>
+            </div>
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        退款申请时间
+                    </span>
+                    <input type="text" class="input-date h22" name="startTimeParam" data-toggle="datepicker"
+                           data-date-timepicker='true' value="${refund.startTimeParam!}">
+                    <span class="add-on2">-</span>
+                    <input type="text" class="input-date h22" name="endTimeParam" data-toggle="datepicker"
+                           data-date-timepicker='true' value="${refund.endTimeParam!}">
+                </div>
+            </div>
+        </div>
+        <div class="sui-row">
+            <div class="span4">
+                <div class="input-prepend" style="padding-top: 3px;">
+                    <span class="add-on">
+                        &nbsp;&nbsp;&nbsp;订单状态
+                    </span>
+                    <span class="sui-dropdown dropdown-bordered select h22">
+                            <span class="dropdown-inner">
+                                <a id="select" role="button" href="javascript:void(0);" data-toggle="dropdown" class="dropdown-toggle">
+                                    <input type="hidden" name="statusParam" data-rules="required" value="${refund.statusParam.val!}" />
+                                    <i class="caret"></i>
+                                    <span>${refund.statusParam.name!'请选择'}</span>
+                                </a>
+                                <ul role="menu" aria-labelledby="drop12" class="sui-dropdown-menu">
+                                    <li role="presentation"><a role="menuitem" tabindex="" href="javascript:void(0);" value="" >请选择</a></li>
+                                    <li role="presentation"><a role="menuitem" tabindex="" href="javascript:void(0);" value="90" >全额待退款</a></li>
+                                    <li role="presentation"><a role="menuitem" tabindex="" href="javascript:void(0);" value="100" >协商待退款</a></li>
+                                    <li role="presentation"><a role="menuitem" tabindex="" href="javascript:void(0);" value="32" >取消订单待退款</a></li>
+                                    <li role="presentation"><a role="menuitem" tabindex="" href="javascript:void(0);" value="115" >退款订单待退款</a></li>
+                                    <li role="presentation"><a role="menuitem" tabindex="" href="javascript:void(0);" value="32" >取消订单已退款</a></li>
+                                    <li role="presentation"><a role="menuitem" tabindex="" href="javascript:void(0);" value="101" >退货订单已退款</a></li>
+                                    <li role="presentation"><a role="menuitem" tabindex="" href="javascript:void(0);" value="116" >退款订单已退款</a></li>
+                                </ul>
+                            </span>
+                    </span>
+                </div>
+            </div>
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                       收款人账号
+                    </span>
+                    <input type="text" class="input h22" name="paidAlpayCodeParam" value="${refund.paidAlpayCodeParam!}" />
+                </div>
+            </div>
+        </div>
+        <div class="sui-row" id="jiesuanFangs">
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        &nbsp;&nbsp;&nbsp;物流公司
+                    </span>
+                    <span class="sui-dropdown dropdown-bordered select h22">
+                            <span class="dropdown-inner">
+                                <a id="select" role="button" href="javascript:void(0);" data-toggle="dropdown" class="dropdown-toggle">
+                                    <input type="hidden" name="expressIdParam" data-rules="required" value="${refund.expressIdParam!0}" />
+                                    <i class="caret"></i>
+                                    <span>${refund.expressNameParam!'请选择'}</span>
+                                </a>
+                                <ul role="menu" aria-labelledby="drop12" class="sui-dropdown-menu">
+                                    <li role="presentation"><a role="menuitem" tabindex="" href="javascript:void(0);" value="0" >请选择</a></li>
+                                    <%for(express in expressLists){%>
+                                    <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="${express.id!}">${express.name!}</a></li>
+                                    <%}%>
+                                </ul>
+                            </span>
+                    </span>
+                </div>
+            </div>
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        &nbsp;&nbsp;&nbsp;快递单号
+                    </span>
+                    <input type="text" class="input h22" name="expressCodeParam" value="${refund.expressCodeParam!}" />
+                </div>
+            </div>
+        </div>
+        <div class="sui-row">
+            <button class="sui-btn btn-primary">查询</button>
+            <input type="button" class="sui-btn btn-primary btn-reset" onclick="javascript:Common.go('/admin/finance/refund');" value="重置"/>
+            <input type="button" class="sui-btn btn-primary btn-export" value="导出订单信息"/>
+            <input type="button" class="sui-btn btn-primary btn-batchPay" value="导出批量付款用EXCEL"/>&nbsp;
+            <input type="button" class="sui-btn btn-primary btn-batchPaid" value="已付款批量确认"/>
+        </div>
+    </form>
+</div>
+<table class="sui-table table-bordered" id="yueJieTab">
+    <thead>
+    <tr>
+        <th width="80"><label><input type="checkbox" id="doCheck">&nbsp;全选/反选</label></th>
+
+       <!-- <th>订单类型</th>
+        <th>收款人姓名</th>
+        <th>收款人账号</th>-->
+
+        <th width="80">退款人账号</th>
+        <th width="80">子订单编号</th>
+        <th width="80">支付时间</th>
+        <th width="80">退货申请时间</th>
+        <th width="160">退货原因</th>
+        <th width="70">订单状态</th>
+        <th width="70">退款金额(元)</th>
+
+       <!-- <th>特殊处理原因</th>
+        <th>金额差异</th>
+        <th>实际退款金额</th>
+        <th>特殊处理原因</th>-->
+
+        <th width="70">完成日期</th>
+        <th>操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    <%for(trade in pager.data!){%>
+    <%for(item in trade.orders!){%>
+    <tr>
+        <td><input type="checkbox" name="check" value="${item.code!}" /></td>
+
+       <!-- <td>订单类型</td>
+        <td>收款人姓名</td>
+        <td>收款人账号</td>-->
+
+        <td>${trade.customer.username!}</td>
+        <td>${item.code!}</td>
+        <td>${item.payTime, 'yyyy-MM-dd HH:mm'}</td>
+        <td>${item.applyRefundTime, 'yyyy-MM-dd HH:mm'}</td>
+        <td>${item.refundReason!}</td>
+        <td>${item.status.name!}</td>
+        <td>${item.refundFee / 100, '#0.00'}</td>
+
+       <!-- <td>特殊处理原因</td>
+        <td>金额差异</td>
+        <td>实际退款金额</td>
+        <td>特殊处理原因</td>-->
+
+        <td>${item.endTime, 'yyyy-MM-dd HH:mm'}</td>
+        <td>
+            <%if(item.status.val == 32 || item.status.val == 90 || item.status.val == 100 || item.status.val == 115){%>
+            <a data-code="${item.code}" data-alipay="${trade.paidAlipayCode!}" data-name="${trade.customer.username!}"
+               data-fee="${item.refundFee / 100, '#0.00'}" class="sui-btn btn-small btn-deal">
+                确认退款
+            </a>
+            <%}%>
+        </td>
+    </tr>
+    <%}%>
+    <%}elsefor{%>
+    <tr>
+        <td colspan="16" class="zanWuShuju"><p>没有数据</p></td>
+    </tr>
+    <%}%>
+    </tbody>
+</table>
+<#page val="${pager.page!}" size="large" params="${parameter.map!}"/>
+<%include("../../common/dialog.html"){};%>
+<%}%>

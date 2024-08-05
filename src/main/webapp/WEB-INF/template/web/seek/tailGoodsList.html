@@ -1,0 +1,64 @@
+<%layout("/web/layout/header_layout2.html"){%>
+    <script type="text/javascript">
+        $(function(){
+            Pagination.init();
+        });
+    </script>
+<%}%>
+<%layout("/web/layout/body_layout2.html"){%>
+<div class="ttlog_main">
+    <div class="ttppzq_con ty_rerelative">
+        <p class="ttppzq_title ttppzq_marTo"><span class="xiaodingZhiTao"></span>尾货处理流程：</p>
+        <p class="ttwhcl_liucImg"></p>
+        <div class="ty_gyClear"></div>
+        <p class="ttppzq_top" id="weiHuoChuli">
+            <span class="ttppzq_title"><span class="xiaodingZhiTao"></span>尾货处理信息</span>
+            <span class="ttppzq_ps">&nbsp;&nbsp;( *注：纳车品供销服务平台对于尾货处理信息的真实性不承担任何责任 )</span>
+            <%if(customer.type.val == 2){%>
+            <a href="/member/tailGoods/list.html"><span class="ttwhlist_title">我的尾货处理</span></a>
+            <a href="/seek/tailGoods.html" title="尾货处理申请"><span class="ttwhlist_title110">尾货处理申请</span></a>
+            <%}else{%>
+            <a href="/member/supplier.html?showMsg=true"><span class="ttwhlist_title">我的尾货处理</span></a>
+            <a href="/member/supplier.html?showMsg=true" title="尾货处理申请"><span class="ttwhlist_title110">尾货处理申请</span></a>
+            <%}%>
+
+        </p>
+        <div class="ty_gyClear"></div>
+        <p class="ttppzq_top">
+        <table class="sui-table table-bordered" id="zx_xpldzlcheng">
+            <thead>
+            <tr>
+                <th width="52">编号</th>
+                <th>供货商公司名</th>
+                <th width="120">联系人</th>
+                <th width="120">联系电话</th>
+                <th width="120">尾货产品名称</th>
+                <th width="50">数量</th>
+                <th width="100">材质</th>
+                <th width="60">总价</th>
+                <th width="60">提货方式</th>
+                <th width="70">操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <%for(item in pager.data){%>
+            <tr>
+                <td>${item.code}</td>
+                <td>${customer.type.val==0?'仅供货商、进货商可见':item.company} </td>
+                <td>${customer.type.val==0?'仅供货商、进货商可见':item.contacts}</td>
+                <td>${customer.type.val==0?'仅供货商、进货商可见':item.phone}</td>
+                <td>${item.goodsName}</td>
+                <td>${item.quantity}</td>
+                <td>${item.material}</td>
+                <td>${item.money}</td>
+                <td>${item.getMethod}</td>
+                <td><a href="/seek/tailGoodsDetails/${item.code}.html" title="查看详情" class="ttLog_chongzhi">查看</a></td>
+            </tr>
+            <%}%>
+            </tbody>
+        </table>
+        <#webPage val='${pager.page}' size='large' params = '${params!}' showNum = 'hide' />
+        </p>
+    </div>
+</div>
+<%}%>

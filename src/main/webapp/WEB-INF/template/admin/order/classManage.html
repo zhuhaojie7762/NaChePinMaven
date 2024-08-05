@@ -1,0 +1,760 @@
+<%layout("../layout/header_layout.html"){%>
+<script src="/static/js/web/zixie.js"></script>
+<title>分类管理</title>
+<%}%>
+<%layout("../layout/body_layout.html"){%>
+<div class="query-zone" id="confirm_Con">
+    <form class="sui-form form-horizontal query-form" id="query-form">
+        <div class="sui-row">
+            <div class="span4">
+                <div class="input-prepend">
+                    <span class="add-on">分类名称</span>
+                    <input type="text" class="input h22" name="goodsItemNo" value="" />
+                </div>
+            </div>
+            <div class="span4">
+                <div class="input-prepend">
+                    <span class="add-on">分类等级</span>
+                    </span>
+                    <span class="sui-dropdown dropdown-bordered select h22">
+                        <span class="dropdown-inner">
+                            <a role="button" data-toggle="dropdown" href="#" class="dropdown-toggle">
+                                <i class="caret"></i>
+                                <span>请选择</span>
+                            </a>
+                            <ul role="menu" aria-labelledby="drop12" class="sui-dropdown-menu">
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" >请选择</a></li>
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="" title="一级分类">一级分类</a></li>
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="" title="一级分类">二级分类</a></li>
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="" title="一级分类">三级分类</a></li>
+                            </ul>
+                        </span>
+                    </span>
+                </div>
+            </div>
+            <div class="span4">
+                <div class="input-prepend">
+                    <span class="add-on add_ghsxzleft">属性名称</span>
+                    <input type="text" class="input h22" name="goodsName" value="" />
+                </div>
+            </div>
+            <button class="sui-btn btn-primary add_btnlef">查询</button>
+            <input type="button" class="sui-btn btn-primary btn-reset" value="重置"/>
+        </div>
+        <div class="add_clear"></div>
+    </form>
+</div>
+<script>
+    $(document).ready(function(){
+        /*新增下拉*/
+        $("#add_fenlei").click(function(){
+            var fenlei=$(this).next('div');
+            fenlei.slideToggle();
+        });
+        $("#add_quxiao").click(function(){
+            $(this).parent().parent().hide();
+        });
+        /*修改下拉*/
+        $("#add_fenleitab td span.upbtn").click(function(){
+            var updiv=$(this).next('div');
+            updiv.slideToggle();
+        });
+        $("#add_fenleitab td .tdquxiao").click(function(){
+            $(this).parent().parent().hide();
+        });
+        /*查看下拉*/
+        $("#add_fenleitab td span.chakan").click(function(){
+            var ckdiv=$(this).next('div');
+            ckdiv.slideToggle();
+        });
+        $("#add_fenleitab td .add_clbtn").click(function(){
+            $(this).parent().parent().hide();
+        });
+        /*上级名称不可用*/
+        $(".fenleixiala li").click(function(){
+            if(($(this).text())=='一级分类'){
+                $(".fenleiul li").css('display','none');
+            }
+            else{
+                $(".fenleiul li").css('display','block');
+            }
+        });
+    });
+</script>
+<div class="add_fenleiCon">
+    <span class="add_newaddBtn" title="新建分类" id="add_fenlei">新建分类</span>
+    <div class="add_fenleixla sui-form" id="add_flctCon">
+        <img src="/static/images/add/add_xsjicon.png" class="add_xlxsjicon" />
+        <div class="sui-row">
+            <div class="span4">
+                <div class="input-prepend">
+                    <span class="add-on">分类名称</span>
+                    <input type="text" class="input h22" name="goodsItemNo" value="" />
+                </div>
+            </div>
+        </div>
+        <div class="sui-row">
+            <div class="span4">
+                <div class="input-prepend">
+                    <span class="add-on">分类级别</span>
+                    </span>
+                    <span class="sui-dropdown dropdown-bordered select h22">
+                        <span class="dropdown-inner">
+                            <a role="button" data-toggle="dropdown" href="#" class="dropdown-toggle">
+                                <i class="caret"></i>
+                                <span>请选择</span>
+                            </a>
+                            <ul role="menu" aria-labelledby="drop12" class="sui-dropdown-menu fenleixiala">
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" >请选择</a></li>
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="one" title="一级分类">一级分类</a></li>
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="two" title="一级分类">二级分类</a></li>
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="three" title="一级分类">三级分类</a></li>
+                            </ul>
+                        </span>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="add_clear"></div>
+        <div class="sui-row">
+            <div class="span4">
+                <div class="input-prepend">
+                    <span class="add-on">上级名称</span>
+                    <span class="sui-dropdown dropdown-bordered select h22">
+                        <span class="dropdown-inner">
+                            <a role="button" data-toggle="dropdown" href="#" class="dropdown-toggle">
+                                <i class="caret"></i>
+                                <span>请选择</span>
+                            </a>
+                            <ul role="menu" aria-labelledby="drop12" class="sui-dropdown-menu fenleiul">
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="" title="分类属性01">上级名称01</a></li>
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="" title="分类属性02">上级名称02</a></li>
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="" title="分类属性03">上级名称03</a></li>
+                            </ul>
+                        </span>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="add_clear"></div>
+        <div class="sui-row">
+            <button class="sui-btn btn-primary add_btnlef">保存</button>
+            <input type="button" class="sui-btn btn-primary btn-reset" id="add_quxiao" value="取消"/>
+        </div>
+    </div>
+</div>
+<table class="sui-table table-bordered" id="add_fenleitab">
+    <thead>
+    <th>一级</th>
+    <th>二级</th>
+    <th>三级</th>
+    <th>属性</th>
+    <th>创建时间</th>
+    <th width="312">操作</th>
+    </thead>
+    <tbody>
+    <tr>
+        <td>汽车用品</td>
+        <td>汽车内饰用品</td>
+        <td>脚垫</td>
+        <td>材质</td>
+        <td>2016-11-29</td>
+        <td class="hdMore_btns">
+            <span class="sui-btn btn-small chakan" title="查看" >查看</span>
+            <div class="add_chakan">
+                <img src="/static/images/add/add_xsjicon.png" class="chak_xlxsjicon" />
+                <div class="add_lm">类目名称：</div>
+                <div class="add_dm">
+                    <ul>
+                        <li>一级类目</li>
+                        <li>二级类目</li>
+                        <li>三级类目</li>
+                    </ul>
+                    <ul>
+                        <li>汽车用品</li>
+                        <li>汽车装饰</li>
+                        <li>汽车坐垫</li>
+                    </ul>
+                </div>
+                <div class="add_clear"></div>
+                <div class="add_lm add_tabmart">三级类目属性：</div>
+                <div class="add_dm add_tabmart">
+                    <table class="sui-table table-bordered">
+                        <thead>
+                        <th width="30">属性</th>
+                        <th>属性值</th>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>材质</td>
+                            <td>
+                                <span>人造革</span>
+                                <span>冰丝</span>
+                                <span>合成纤维</span>
+                                <span>亚麻</span>
+                                <span>真皮</span>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="add_clear"></div>
+                <div><input class="sui-btn btn-small add_clbtn" value="关闭" type="button"></div>
+            </div>
+            <span class="sui-btn btn-small upbtn" title="修改" >修改</span>
+            <div class="add_fenleixla sui-form add_upfenlei" >
+                <img src="/static/images/add/add_xsjicon.png" class="upd_xlxsjicon" />
+                <div class="sui-row">
+                    <div class="span4">
+                        <div class="input-prepend">
+                            <span class="add-on">分类名称</span>
+                            <input type="text" class="input h22" name="goodsItemNo" value="" />
+                        </div>
+                    </div>
+                </div>
+                <div class="sui-row">
+                    <div class="span4">
+                        <div class="input-prepend">
+                            <span class="add-on">分类级别</span>
+                            <span class="sui-dropdown dropdown-bordered select h22">
+                                <span class="dropdown-inner">
+                                    <a role="button" data-toggle="dropdown" href="#" class="dropdown-toggle">
+                                        <i class="caret"></i>
+                                        <span>请选择</span>
+                                    </a>
+                                    <ul role="menu" aria-labelledby="drop12" class="sui-dropdown-menu fenleixiala">
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" >请选择</a></li>
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="one" title="一级分类">一级分类</a></li>
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="two" title="一级分类">二级分类</a></li>
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="three" title="一级分类">三级分类</a></li>
+                                    </ul>
+                                </span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="sui-row">
+                    <div class="span4">
+                        <div class="input-prepend">
+                            <span class="add-on">上级名称</span>
+                            <span class="sui-dropdown dropdown-bordered select h22">
+                                <span class="dropdown-inner">
+                                    <a role="button" data-toggle="dropdown" href="#" class="dropdown-toggle">
+                                        <i class="caret"></i>
+                                        <span>请选择</span>
+                                    </a>
+                                    <ul role="menu" aria-labelledby="drop12" class="sui-dropdown-menu fenleiul">
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="" title="分类属性01">上级名称01</a></li>
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="" title="分类属性02">上级名称02</a></li>
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="" title="分类属性03">上级名称03</a></li>
+                                    </ul>
+                                </span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="add_clear"></div>
+                <div class="sui-row">
+                    <button class="sui-btn btn-primary add_btnlef">保存</button>
+                    <input type="button" class="sui-btn btn-primary btn-reset tdquxiao" value="取消"/>
+                </div>
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td>汽车用品</td>
+        <td>汽车内饰用品</td>
+        <td>脚垫</td>
+        <td>材质</td>
+        <td>2016-11-29</td>
+        <td class="hdMore_btns">
+            <span class="sui-btn btn-small chakan" title="查看" >查看</span>
+            <div class="add_chakan">
+                <img src="/static/images/add/add_xsjicon.png" class="chak_xlxsjicon" />
+                <div class="add_lm">类目名称：</div>
+                <div class="add_dm">
+                    <ul>
+                        <li>一级类目</li>
+                        <li>二级类目</li>
+                        <li>三级类目</li>
+                    </ul>
+                    <ul>
+                        <li>汽车用品</li>
+                        <li>汽车装饰</li>
+                        <li>汽车坐垫</li>
+                    </ul>
+                </div>
+                <div class="add_clear"></div>
+                <div class="add_lm add_tabmart">三级类目属性：</div>
+                <div class="add_dm add_tabmart">
+                    <table class="sui-table table-bordered">
+                        <thead>
+                        <th width="30">属性</th>
+                        <th>属性值</th>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>材质</td>
+                            <td>
+                                <span>人造革</span>
+                                <span>冰丝</span>
+                                <span>合成纤维</span>
+                                <span>亚麻</span>
+                                <span>真皮</span>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="add_clear"></div>
+                <div><input class="sui-btn btn-small add_clbtn" value="关闭" type="button"></div>
+            </div>
+            <span class="sui-btn btn-small upbtn" title="修改" >修改</span>
+            <div class="add_fenleixla sui-form add_upfenlei" >
+                <img src="/static/images/add/add_xsjicon.png" class="upd_xlxsjicon" />
+                <div class="sui-row">
+                    <div class="span4">
+                        <div class="input-prepend">
+                            <span class="add-on">分类名称</span>
+                            <input type="text" class="input h22" name="goodsItemNo" value="" />
+                        </div>
+                    </div>
+                </div>
+                <div class="sui-row">
+                    <div class="span4">
+                        <div class="input-prepend">
+                            <span class="add-on">分类级别</span>
+                            <span class="sui-dropdown dropdown-bordered select h22">
+                                <span class="dropdown-inner">
+                                    <a role="button" data-toggle="dropdown" href="#" class="dropdown-toggle">
+                                        <i class="caret"></i>
+                                        <span>请选择</span>
+                                    </a>
+                                    <ul role="menu" aria-labelledby="drop12" class="sui-dropdown-menu fenleixiala">
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" >请选择</a></li>
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="one" title="一级分类">一级分类</a></li>
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="two" title="一级分类">二级分类</a></li>
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="three" title="一级分类">三级分类</a></li>
+                                    </ul>
+                                </span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="sui-row">
+                    <div class="span4">
+                        <div class="input-prepend">
+                            <span class="add-on">上级名称</span>
+                            <span class="sui-dropdown dropdown-bordered select h22">
+                                <span class="dropdown-inner">
+                                    <a role="button" data-toggle="dropdown" href="#" class="dropdown-toggle">
+                                        <i class="caret"></i>
+                                        <span>请选择</span>
+                                    </a>
+                                    <ul role="menu" aria-labelledby="drop12" class="sui-dropdown-menu fenleiul">
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="" title="分类属性01">上级名称01</a></li>
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="" title="分类属性02">上级名称02</a></li>
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="" title="分类属性03">上级名称03</a></li>
+                                    </ul>
+                                </span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="add_clear"></div>
+                <div class="sui-row">
+                    <button class="sui-btn btn-primary add_btnlef">保存</button>
+                    <input type="button" class="sui-btn btn-primary btn-reset tdquxiao" value="取消"/>
+                </div>
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td>汽车用品</td>
+        <td>汽车内饰用品</td>
+        <td>脚垫</td>
+        <td>材质</td>
+        <td>2016-11-29</td>
+        <td class="hdMore_btns">
+            <span class="sui-btn btn-small chakan" title="查看" >查看</span>
+            <div class="add_chakan">
+                <img src="/static/images/add/add_xsjicon.png" class="chak_xlxsjicon" />
+                <div class="add_lm">类目名称：</div>
+                <div class="add_dm">
+                    <ul>
+                        <li>一级类目</li>
+                        <li>二级类目</li>
+                        <li>三级类目</li>
+                    </ul>
+                    <ul>
+                        <li>汽车用品</li>
+                        <li>汽车装饰</li>
+                        <li>汽车坐垫</li>
+                    </ul>
+                </div>
+                <div class="add_clear"></div>
+                <div class="add_lm add_tabmart">三级类目属性：</div>
+                <div class="add_dm add_tabmart">
+                    <table class="sui-table table-bordered">
+                        <thead>
+                        <th width="30">属性</th>
+                        <th>属性值</th>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>材质</td>
+                            <td>
+                                <span>人造革</span>
+                                <span>冰丝</span>
+                                <span>合成纤维</span>
+                                <span>亚麻</span>
+                                <span>真皮</span>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="add_clear"></div>
+                <div><input class="sui-btn btn-small add_clbtn" value="关闭" type="button"></div>
+            </div>
+            <span class="sui-btn btn-small upbtn" title="修改" >修改</span>
+            <div class="add_fenleixla sui-form add_upfenlei" >
+                <img src="/static/images/add/add_xsjicon.png" class="upd_xlxsjicon" />
+                <div class="sui-row">
+                    <div class="span4">
+                        <div class="input-prepend">
+                            <span class="add-on">分类名称</span>
+                            <input type="text" class="input h22" name="goodsItemNo" value="" />
+                        </div>
+                    </div>
+                </div>
+                <div class="sui-row">
+                    <div class="span4">
+                        <div class="input-prepend">
+                            <span class="add-on">分类级别</span>
+                            <span class="sui-dropdown dropdown-bordered select h22">
+                                <span class="dropdown-inner">
+                                    <a role="button" data-toggle="dropdown" href="#" class="dropdown-toggle">
+                                        <i class="caret"></i>
+                                        <span>请选择</span>
+                                    </a>
+                                    <ul role="menu" aria-labelledby="drop12" class="sui-dropdown-menu fenleixiala">
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" >请选择</a></li>
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="one" title="一级分类">一级分类</a></li>
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="two" title="一级分类">二级分类</a></li>
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="three" title="一级分类">三级分类</a></li>
+                                    </ul>
+                                </span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="sui-row">
+                    <div class="span4">
+                        <div class="input-prepend">
+                            <span class="add-on">上级名称</span>
+                            <span class="sui-dropdown dropdown-bordered select h22">
+                                <span class="dropdown-inner">
+                                    <a role="button" data-toggle="dropdown" href="#" class="dropdown-toggle">
+                                        <i class="caret"></i>
+                                        <span>请选择</span>
+                                    </a>
+                                    <ul role="menu" aria-labelledby="drop12" class="sui-dropdown-menu fenleiul">
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="" title="分类属性01">上级名称01</a></li>
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="" title="分类属性02">上级名称02</a></li>
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="" title="分类属性03">上级名称03</a></li>
+                                    </ul>
+                                </span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="add_clear"></div>
+                <div class="sui-row">
+                    <button class="sui-btn btn-primary add_btnlef">保存</button>
+                    <input type="button" class="sui-btn btn-primary btn-reset tdquxiao" value="取消"/>
+                </div>
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td>汽车用品</td>
+        <td>汽车内饰用品</td>
+        <td>脚垫</td>
+        <td>材质</td>
+        <td>2016-11-29</td>
+        <td class="hdMore_btns">
+            <span class="sui-btn btn-small chakan" title="查看" >查看</span>
+            <div class="add_chakan">
+                <img src="/static/images/add/add_xsjicon.png" class="chak_xlxsjicon" />
+                <div class="add_lm">类目名称：</div>
+                <div class="add_dm">
+                    <ul>
+                        <li>一级类目</li>
+                        <li>二级类目</li>
+                        <li>三级类目</li>
+                    </ul>
+                    <ul>
+                        <li>汽车用品</li>
+                        <li>汽车装饰</li>
+                        <li>汽车坐垫</li>
+                    </ul>
+                </div>
+                <div class="add_clear"></div>
+                <div class="add_lm add_tabmart">三级类目属性：</div>
+                <div class="add_dm add_tabmart">
+                    <table class="sui-table table-bordered">
+                        <thead>
+                        <th width="30">属性</th>
+                        <th>属性值</th>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>材质</td>
+                            <td>
+                                <span>人造革</span>
+                                <span>冰丝</span>
+                                <span>合成纤维</span>
+                                <span>亚麻</span>
+                                <span>真皮</span>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="add_clear"></div>
+                <div><input class="sui-btn btn-small add_clbtn" value="关闭" type="button"></div>
+            </div>
+            <span class="sui-btn btn-small upbtn" title="修改" >修改</span>
+            <div class="add_fenleixla sui-form add_upfenlei" >
+                <img src="/static/images/add/add_xsjicon.png" class="upd_xlxsjicon" />
+                <div class="sui-row">
+                    <div class="span4">
+                        <div class="input-prepend">
+                            <span class="add-on">分类名称</span>
+                            <input type="text" class="input h22" name="goodsItemNo" value="" />
+                        </div>
+                    </div>
+                </div>
+                <div class="sui-row">
+                    <div class="span4">
+                        <div class="input-prepend">
+                            <span class="add-on">分类级别</span>
+                            <span class="sui-dropdown dropdown-bordered select h22">
+                                <span class="dropdown-inner">
+                                    <a role="button" data-toggle="dropdown" href="#" class="dropdown-toggle">
+                                        <i class="caret"></i>
+                                        <span>请选择</span>
+                                    </a>
+                                    <ul role="menu" aria-labelledby="drop12" class="sui-dropdown-menu fenleixiala">
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" >请选择</a></li>
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="one" title="一级分类">一级分类</a></li>
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="two" title="一级分类">二级分类</a></li>
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="three" title="一级分类">三级分类</a></li>
+                                    </ul>
+                                </span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="sui-row">
+                    <div class="span4">
+                        <div class="input-prepend">
+                            <span class="add-on">上级名称</span>
+                            <span class="sui-dropdown dropdown-bordered select h22">
+                                <span class="dropdown-inner">
+                                    <a role="button" data-toggle="dropdown" href="#" class="dropdown-toggle">
+                                        <i class="caret"></i>
+                                        <span>请选择</span>
+                                    </a>
+                                    <ul role="menu" aria-labelledby="drop12" class="sui-dropdown-menu fenleiul">
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="" title="分类属性01">上级名称01</a></li>
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="" title="分类属性02">上级名称02</a></li>
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="" title="分类属性03">上级名称03</a></li>
+                                    </ul>
+                                </span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="add_clear"></div>
+                <div class="sui-row">
+                    <button class="sui-btn btn-primary add_btnlef">保存</button>
+                    <input type="button" class="sui-btn btn-primary btn-reset tdquxiao" value="取消"/>
+                </div>
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td>汽车用品</td>
+        <td>汽车内饰用品</td>
+        <td>脚垫</td>
+        <td>材质</td>
+        <td>2016-11-29</td>
+        <td class="hdMore_btns">
+            <span class="sui-btn btn-small chakan" title="查看" >查看</span>
+            <div class="add_chakan">
+                <img src="/static/images/add/add_xsjicon.png" class="chak_xlxsjicon" />
+                <div class="add_lm">类目名称：</div>
+                <div class="add_dm">
+                    <ul>
+                        <li>一级类目</li>
+                        <li>二级类目</li>
+                        <li>三级类目</li>
+                    </ul>
+                    <ul>
+                        <li>汽车用品</li>
+                        <li>汽车装饰</li>
+                        <li>汽车坐垫</li>
+                    </ul>
+                </div>
+                <div class="add_clear"></div>
+                <div class="add_lm add_tabmart">三级类目属性：</div>
+                <div class="add_dm add_tabmart">
+                    <table class="sui-table table-bordered">
+                        <thead>
+                        <th width="30">属性</th>
+                        <th>属性值</th>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>材质</td>
+                            <td>
+                                <span>人造革</span>
+                                <span>冰丝</span>
+                                <span>合成纤维</span>
+                                <span>亚麻</span>
+                                <span>真皮</span>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="add_clear"></div>
+                <div><input class="sui-btn btn-small add_clbtn" value="关闭" type="button"></div>
+            </div>
+            <span class="sui-btn btn-small upbtn" title="修改" >修改</span>
+            <div class="add_fenleixla sui-form add_upfenlei" >
+                <img src="/static/images/add/add_xsjicon.png" class="upd_xlxsjicon" />
+                <div class="sui-row">
+                    <div class="span4">
+                        <div class="input-prepend">
+                            <span class="add-on">分类名称</span>
+                            <input type="text" class="input h22" name="goodsItemNo" value="" />
+                        </div>
+                    </div>
+                </div>
+                <div class="sui-row">
+                    <div class="span4">
+                        <div class="input-prepend">
+                            <span class="add-on">分类级别</span>
+                            <span class="sui-dropdown dropdown-bordered select h22">
+                                <span class="dropdown-inner">
+                                    <a role="button" data-toggle="dropdown" href="#" class="dropdown-toggle">
+                                        <i class="caret"></i>
+                                        <span>请选择</span>
+                                    </a>
+                                    <ul role="menu" aria-labelledby="drop12" class="sui-dropdown-menu fenleixiala">
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" >请选择</a></li>
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="one" title="一级分类">一级分类</a></li>
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="two" title="一级分类">二级分类</a></li>
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="three" title="一级分类">三级分类</a></li>
+                                    </ul>
+                                </span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="sui-row">
+                    <div class="span4">
+                        <div class="input-prepend">
+                            <span class="add-on">上级名称</span>
+                            <span class="sui-dropdown dropdown-bordered select h22">
+                                <span class="dropdown-inner">
+                                    <a role="button" data-toggle="dropdown" href="#" class="dropdown-toggle">
+                                        <i class="caret"></i>
+                                        <span>请选择</span>
+                                    </a>
+                                    <ul role="menu" aria-labelledby="drop12" class="sui-dropdown-menu fenleiul">
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="" title="分类属性01">上级名称01</a></li>
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="" title="分类属性02">上级名称02</a></li>
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="" title="分类属性03">上级名称03</a></li>
+                                    </ul>
+                                </span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="add_clear"></div>
+                <div class="sui-row">
+                    <button class="sui-btn btn-primary add_btnlef">保存</button>
+                    <input type="button" class="sui-btn btn-primary btn-reset tdquxiao" value="取消"/>
+                </div>
+            </div>
+        </td>
+    </tr>
+    <!--表格无数据样式 start-->
+    <!--<tr>-->
+    <!--<td colspan="6" class="zanWuShuju"><p>没有数据</p></td>-->
+    <!--</tr>-->
+    <!--表格无数据样式 end-->
+    </tbody>
+</table>
+<!--页码 start-->
+<div class="sui-pagination pagination-large">
+    <ul>
+        <li class="first disabled">
+            <a style="padding: 4px 5px">
+                <i class="sui-icon icon-pc-prev"></i>
+            </a>
+        </li>
+        <li class="prev disabled">
+            <a style="padding: 4px 5px">
+                <i class="sui-icon icon-pc-chevron-left"></i>
+            </a>
+        </li>
+        <li class="active">
+            <a>1</a>
+        </li>
+        <li>
+            <a>2</a>
+        </li>
+        <li>
+            <a>3</a>
+        </li>
+        <li>
+            <a>4</a>
+        </li>
+        <li>
+            <a>5</a>
+        </li>
+        <li class="next ">
+            <a style="padding: 4px 5px">
+                <i class="sui-icon icon-pc-chevron-right"></i>
+            </a>
+        </li>
+        <li class="last ">
+            <a style="padding: 4px 5px">
+                <i class="sui-icon icon-pc-next"></i>
+            </a>
+        </li>
+    </ul>
+    <div>
+        <span>共9页85条</span>
+        <span>
+            到
+            <input class="page-num" name="curNo" value="1" type="text">
+            <input class="page-confirm" value="确定" type="button">
+            页
+        </span>
+        <span>
+            每页条数
+            <input class="page-num" name="perSize" value="10" type="text">
+            <input class="page-confirm" value="确定" type="button">
+        </span>
+    </div>
+</div>
+<!--页码 end-->
+<%}%>
+</body>
+</html>

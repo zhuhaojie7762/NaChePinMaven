@@ -1,0 +1,96 @@
+<!--   个人中心及帮助用   -->
+<link rel="stylesheet" type="text/css" href="${ctx}/static/css/web/zx_style.css?v=${v}">
+<script>
+    $(document).ready(function(){
+        $("#zx_rbar .zx_con ul li.zx_weixin a").mouseover(function(){
+            $(".zx_weixinCon").css("display","block");
+        });
+        $("#zx_rbar .zx_con ul li.zx_weixin a").mouseout(function(){
+            $(".zx_weixinCon").css("display","none");
+        });
+
+        /*返回顶部*/
+        $(".zx_fantop").click(function()
+        {
+            $("html, body").animate({
+                "scroll-top":0
+            },"fast");
+        });
+    });
+</script>
+<div id="zx_rbar">
+    <div class="zx_con">
+        <ul>
+            <li class="zx_gou">
+                <a href="${ctx}/shoppingCart.html" target="_blank" title="购物车">
+                    <%if(isNotEmpty(session.curCustomer)){%>
+                    <%if(session.curCustomer.shoppingCartSize > 9){%>
+                    <span class="zx_num">9+</span>
+                    &nbsp;
+                    <%}else{%>
+                    <span class="zx_num">${session.curCustomer.shoppingCartSize!0}</span>
+                    &nbsp;
+                    <%}%>
+                    <%}else{%>
+                    <span class="zx_num">0</span>
+                    &nbsp;
+                    <%}%>
+                </a>
+            </li>
+            <%if(isEmpty(session.curCustomer)){%>
+                <li class="zx_login">
+                    <a href="${ctx}/login.html" target="_blank" title="登录入口">登录</a>
+                </li>
+            <%}%>
+            <li class="zx_qq" title="QQ咨询">
+                <a href="http://wpa.qq.com/msgrd?v=3&uin=3385232114&site=纳车品供销平台&menu=yes" target="_blank" title="QQ咨询">咨询</a>
+            </li>
+            <li class="zx_wang">
+                <a href="http://amos.alicdn.com/msg.aw?v=2&uid=%E5%A4%A9%E5%8F%B0%E7%BA%B3%E8%BD%A6%E5%93%81&site=cnalichn&s=12&charset=UTF-8" target="_blank" title="旺旺咨询">旺旺</a>
+            </li>
+            <li class="zx_weixin">
+                <a href="" target="_blank" title="官方微信">微信</a>
+                <div class="zx_weixinCon"></div>
+            </li>
+            <li class="zx_fantop">
+                <a href="#zx_allbar" target="_self" title="返回顶部">&nbsp;</a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<div id="zx_allbar">
+    <div class="zx_topmain">
+        <ul class="zx_topleft">
+            <li class="first"><a href="${ctx}/index.html" target="_blank" title="纳车品首页">纳车品首页</a></li>
+            <li>欢迎来纳车品</li>
+            <%if(isEmpty(session.curCustomer)){%>
+            <li class="Second"><a href="${ctx}/login.html" target="_blank" title="登录">登录</a></li>
+            <li><a hrer="${ctx}/register.html" target="_blank" title="注册">注册</a></li>
+            <%}%>
+        </ul>
+        <ul class="zx_topright">
+            <li><a href="${ctx}/help/zaixiankefu.html" target="_blank" title="帮助中心">帮助中心</a></li>
+            <%if(!isEmpty(session.curCustomer)){%>
+            <li class="Second"><a href="${ctx}/member/follow.html" target="_blank" title="收藏夹">收藏夹</a></li>
+            <li><a href="${ctx}/shoppingCart.html" target="_blank" title="购物车">购物车</a></li>
+            <li class="Second"><a href="${ctx}/member/${session.curCustomer.type.val == 1?'buyOrder':'sellOrder'}/list.html" target="_blank" title="我的订单">我的订单</a></li>
+            <li><a href="${ctx}/member/index.html" target="_blank" title="我的纳车品" class="float_l">我的纳车品</a><a href="/logout" class="zx_zhuxiao">注销</a></li>
+            <%}%>
+        </ul>
+    </div>
+</div>
+
+<div class="tt_menuCon">
+    <div class="tt_menuConter">
+        <a href="${ctx}/index.html"><img src="${ctx}/static/images/web/tt_logo.png" class="tt_menuCtImg" width="160" /></a>
+        <span class="nc_pageTitle">关于纳车品</span>
+        <ul class="float_r ty_rerelative">
+            <li><a href="${ctx}/index.html" title="首页">首页</a></li>
+            <span class="ncmum_jg01">|</span>
+            <li class="${strutil.startWith(actionKey,'/goods')?'tt_indxZ':''}" ><a href="/goods/list.html" target="_blank" title="货源商城">货源商城</a></li>
+            <span class="ncmum_jg02">|</span>
+            <li class="${strutil.startWith(actionKey,'/help')?'tt_indxZ':''}"><a href="/help/zaixiankefu.html" title="帮助中心">帮助中心</a></li>
+        </ul>
+    </div>
+</div>

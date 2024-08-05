@@ -1,0 +1,65 @@
+<%layout("../layout/header_layout.html"){%>
+<title>供货商待结算账单(打款)</title>
+<script type="text/javascript">
+    $(function(){
+        /**
+         * 重置
+         */
+        $("input.btn-reset").click(function () {
+            Common.reset("form.query-form");
+        });
+    });
+</script>
+<%}%>
+<%layout("../layout/body_layout.html"){%>
+<div id="searchL" class="query-zone">
+    <form id="query-form" class="sui-form form-horizontal query-form">
+        <div id="jiesuanFangs" class="sui-row">
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on"> 对账单名称 </span>
+                    <input class="input h22" type="text" value="${parameter.code!}" name="code">
+                </div>
+                <div class="span4">
+                    <div class="input-prepend input-inner">
+                    <span class="add-on chuangJian_timeju">
+                        &nbsp;&nbsp;&nbsp;订单生成时间
+                    </span>
+                        <input type="text" class="input-date h22" name="startTime" data-toggle="datepicker" value="${parameter.startTime!}">
+                        <span class="add-on2">-</span>
+                        <input type="text" class="input-date h22" name="endTime" data-toggle="datepicker" value="${parameter.endTime!}">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="sui-row" style="margin:15px 0 0 2px;">
+            <button class="sui-btn btn-primary">查询</button>
+            <input class="sui-btn btn-primary btn-reset" type="button" value="重置">
+        </div>
+    </form>
+</div>
+<table class="sui-table table-bordered" id="yueJieTab">
+    <thead>
+    <tr>
+        <th>本次结算期间</th>
+        <th>对账单名称</th>
+        <th>订单生成时间</th>
+        <th>操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    <%for(item in data){%>
+        <tr>
+            <td>${dts.d2d(item.startTime)} - ${dts.d2d(item.endTime)}</td>
+            <td>${item.code}</td>
+            <td>${dts.d2d(item.created)}</td>
+            <td><a href="/admin/settlement/pay/toPay?code=${item.code}">结算</a></td>
+        </tr>
+    <%}elsefor{%>
+    <tr>
+        <td colspan="4" class="zanWuShuju"><p>没有数据</p></td>
+    </tr>
+    <%}%>
+    </tbody>
+</table>
+<%}%>

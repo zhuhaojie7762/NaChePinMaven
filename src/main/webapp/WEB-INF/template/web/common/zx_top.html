@@ -1,0 +1,165 @@
+<!--  前台用  -->
+<script>
+    $(document).ready(function(){
+        $("#zx_rbar .zx_con ul li.zx_weixin a").mouseover(function(){
+            $(".zx_weixinCon").css("display","block");
+        });
+        $("#zx_rbar .zx_con ul li.zx_weixin a").mouseout(function(){
+            $(".zx_weixinCon").css("display","none");
+        });
+        /*返回顶部*/
+        $(".zx_fantop").click(function()
+        {
+            $("html, body").animate({
+                "scroll-top":0
+            },"fast");
+        });
+    });
+</script>
+<div id="zx_rbar">
+    <div class="zx_con">
+        <ul>
+            <li class="zx_gou">
+                <a href="/shoppingCart.html" target="_blank" title="购物车">
+                    <%if(isNotEmpty(session.curCustomer)){%>
+                        <%if(session.curCustomer.shoppingCartSize > 9){%>
+                            <span class="zx_num">9+</span>
+                            &nbsp;
+                        <%}else{%>
+                            <span class="zx_num">${session.curCustomer.shoppingCartSize!0}</span>
+                            &nbsp;
+                        <%}%>
+                    <%}else{%>
+                        <span class="zx_num">0</span>
+                        &nbsp;
+                    <%}%>
+                </a>
+            </li>
+            <%if(isEmpty(session.curCustomer)){%>
+                <li class="zx_login">
+                    <a href="${ctx}/login.html" target="_blank" title="登录入口">登录</a>
+                </li>
+            <%}%>
+            <li class="zx_qq" title="QQ咨询">
+                <a href="http://wpa.qq.com/msgrd?v=3&uin=3385232114&site=纳车品供销平台&menu=yes" target="_blank" title="QQ咨询">咨询</a>
+            </li>
+            <li class="zx_wang">
+                <a href="http://amos.alicdn.com/msg.aw?v=2&uid=%E5%A4%A9%E5%8F%B0%E7%BA%B3%E8%BD%A6%E5%93%81&site=cnalichn&s=12&charset=UTF-8" target="_blank" title="旺旺咨询">旺旺</a>
+            </li>
+            <li class="zx_weixin">
+                <a href="" target="_blank" title="官方微信">微信</a>
+                <div class="zx_weixinCon"></div>
+            </li>
+            <li class="zx_fantop">
+                <a href="#zx_allbar" target="_self" title="返回顶部">&nbsp;</a>
+            </li>
+        </ul>
+    </div>
+</div>
+<!--右边浮动导航 end-->
+<div id="zx_allbar">
+    <div class="zx_topmain">
+        <ul class="zx_topleft">
+            <li class="first"><a href="${ctx}/index.html" target="_blank" title="纳车品首页">纳车品首页</a></li>
+            <li>欢迎来纳车品</li>
+            <%if(isEmpty(session.curCustomer)){%>
+            <li class="Second"><a href="${ctx}/login.html" target="_blank" title="登录">登录</a></li>
+            <li><a href="${ctx}/register.html" target="_blank" title="注册">注册</a></li>
+            <%}%>
+        </ul>
+        <ul class="zx_topright">
+            <!--选中效果 start-->
+            <!--<li><a href="" title="帮助中心" class="hover">帮助中心</a></li>-->
+            <!--选中效果 end-->
+            <li><a href="${ctx}/help/zaixiankefu.html" target="_blank" title="帮助中心">帮助中心</a></li>
+            <%if(!isEmpty(session.curCustomer)){%>
+            <li class="Second"><a href="${ctx}/member/follow.html" target="_blank" title="收藏夹">收藏夹</a></li>
+            <li><a href="${ctx}/shoppingCart.html" target="_blank" title="购物车">购物车</a></li>
+            <li class="Second"><a href="/member/${session.curCustomer.type.val == 1?'buyOrder':'sellOrder'}/list.html" target="_blank" title="我的订单">我的订单</a></li>
+            <li><a href="${ctx}/member/index.html" target="_blank" title="我的纳车品" class="float_l">我的纳车品</a><a href="/logout" class="zx_zhuxiao">注销</a></li>
+            <%}%>
+        </ul>
+    </div>
+</div>
+<!--top end-->
+<!--搜索 start-->
+<div id="zx_search" class="ty_gyClear">
+    <div class="zx_srchmain">
+        <div class="zx_sleft">
+            <a href="${ctx}/index.html" target="_blank"><img src="${ctx}/static/images/zuixin/zx_logo.png" /></a>
+        </div>
+        <div class="zx_zjmain">
+            <form action="${ctx}/goods/list.html" method="get">
+                <input type="text" placeholder="输入你想搜索的关键词" name="wd" value="${parameter.wd!}" />
+                <input type="submit" class="zx_sousubtn btn-search" title="搜索" value="搜索" />
+            </form>
+            <!--<script type="text/javascript">
+                $(".btn-search").unbind("click").bind("click", function () {
+                    window.location.href = "/goods/list.html?wd=" + $(this).siblings("input[name=wd]").val();
+                });
+            </script>-->
+<!--            <ul>
+                <li><a href="" class="hover">坐垫</a></li>
+                <li><a href="">座套</a></li>
+                <li><a href="">脚垫</a></li>
+                <li><a href="">方向盘套</a></li>
+                <li><a href="">头枕腰靠</a></li>
+                <li><a href="">安全座椅</a></li>
+            </ul>-->
+        </div>
+        <div class="zx_sright">
+            <span class="zx_xxdown"></span>
+            <span class="zx_gouwucar" title="购物车">
+                <img src="${ctx}/static/images/zuixin/zx_addcar.png" />
+                <span>购物车</span>
+            </span>
+            <div class="zx_gouwucarChua">
+                <% if(session.curCustomer.shoppingCartSize!0 == 0){%>
+                <p>您购物车里没有任何宝贝</p>
+                <%}%>
+                <span class="zx_chakanbtn" title="查看我的购物车" onclick="javascript:window.location.href='${ctx}/shoppingCart.html'">查看我的购物车</span>
+            </div>
+        </div>
+    </div>
+    <!--搜索 send-->
+    <!--全部导航 start-->
+    <div class="zx_lanren">
+        <div id="nav-2015">
+            <div id="category-2015" onMouseOver="this.className='on'" onmouseleave="this.className=''">
+                <div class="ld">
+                    <h2>全部分类<b></b></h2>
+                </div>
+                <div id="allsort">
+                    <%for(class in session.AllGoodsClass){%>
+                    <div class="item" onMouseOver="this.className='item on'" onmouseleave="this.className='item'">
+                        <span><h3><a href="${ctx}/goods/class/${class.id}.html">${class.name}</a></h3></span>
+                        <div class="i-mc">
+                            <%for(attr in class.children){%>
+                            <dl>
+                                <dt><a href="javascript:void(0);">${attr.name}</a></dt>
+                                <!--选中样式 start-->
+                                <!--<dd><a href="" class="hover">人造革</a></dd>-->
+                                <!--选中样式 end-->
+                                <%for(item in attr.children){%>
+                                <dd><a href="${ctx}/goods/class/${class.id}.html?attr=${attr.id}_${item.id}">${item.name}</a></dd>
+                                <%}%>
+                            </dl>
+                            <%}%>
+                        </div>
+                    </div>
+                    <%}%>
+                </div>
+            </div>
+            <div id="navitems-2015">
+                <li><a href="${ctx}/" class="${decode((actionKey!''),'/index.html','hover','/','hover','')} zx_indMarLef">首页</a></li>
+                <li><a href="${ctx}/goods/list.html" class="${strutil.startWith((actionKey!''),'/goods')? 'hover':''}">货源商城</a></li>
+                <li><a href="${ctx}/brand/brand.html" class="${strutil.startWith((actionKey!''),'/brand')? 'hover':''}">品牌专区</a></li>
+                <li><a href="${ctx}/seek/seekList.html" class="${strutil.startWith((actionKey!''),'/seek/seek')? 'hover':''}">批量定制</a></li>
+                <li><a href="${ctx}/seek/tailGoodsList.html" class="${strutil.startWith((actionKey!''),'/seek/tailGoods')? 'hover':''}">尾货处理</a></li>
+                <li><a href="${ctx}/offLog.html" class="${strutil.startWith((actionKey!''),'/offLog.html')? 'hover':''}">下架日志</a></li>
+            </div>
+        </div>
+    </div>
+</div>
+<!--全部导航 end-->
+

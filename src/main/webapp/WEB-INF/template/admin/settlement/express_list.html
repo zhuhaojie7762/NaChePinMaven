@@ -1,0 +1,75 @@
+<%layout("../layout/header_layout.html"){%>
+<title>快递结算统计</title>
+<script type="text/javascript">
+    $(function(){
+        /**
+         * 重置
+         */
+        $("input.btn-reset").click(function () {
+            Common.reset("form.query-form");
+        });
+    });
+</script>
+<%}%>
+<%layout("../layout/body_layout.html"){%>
+<div class="query-zone" id="searchL">
+    <form class="sui-form form-horizontal query-form" id="query-form">
+        <div class="sui-row" id="jiesuanFangs">
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        快递公司名称
+                    </span>
+                    <input type="text" class="input h22" name="expressName" value="${parameter.expressName!}"/>
+                </div>
+            </div>
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        结算时间
+                    </span>
+                    <input type="text" class="input-date h22" name="startTime" data-toggle="datepicker"
+                           value="${parameter.startTime!}">
+                    <span class="add-on2">-</span>
+                    <input type="text" class="input-date h22" name="endTime" data-toggle="datepicker"
+                           value="${parameter.endTime!}">
+                </div>
+            </div>
+        </div>
+        <div class="sui-row" style="margin:15px 0 0 2px;">
+            <button class="sui-btn btn-primary">查询</button>
+            <input type="button" class="sui-btn btn-primary btn-reset" value="重置"/>
+        </div>
+    </form>
+</div>
+<table class="sui-table table-bordered" id="yueJieTab">
+    <thead>
+    <tr>
+        <th width="160">结算期间</th>
+        <th width="160">快递公司名称</th>
+        <th width="80">物流单数</th>
+        <th width="100">货品重量</th>
+        <th width="100">订单实际称重</th>
+        <th width="90">代收订单运费</th>
+        <th>操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    <%for(item in data){%>
+    <tr>
+        <td>${parameter.startTime!}至${parameter.endTime!}</td>
+        <td>${item.expressName}</td>
+        <td>${item.quantity}</td>
+        <td>${nums.g2k(item.weight)}</td>
+        <td>${nums.g2k(item.realityWeight)}</td>
+        <td>${nums.yuan(item.freight)}</td>
+        <td><a target="_blank" href="/admin/settlement/express/detail?id=${item.expressId}&startTime=${parameter.startTime!}&endTime=${parameter.endTime!}">明细</a></td>
+    </tr>
+    <%}elsefor{%>
+    <tr>
+        <td colspan="6" class="zanWuShuju"><p>没有数据</p></td>
+    </tr>
+    <%}%>
+    </tbody>
+</table>
+<%}%>

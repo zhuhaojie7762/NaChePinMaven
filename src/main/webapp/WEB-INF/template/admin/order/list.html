@@ -1,0 +1,362 @@
+<%layout("../layout/header_layout.html"){%>
+<title>订单列表</title>
+<style>
+    .sui-layout .content {border: 1px solid #ddd;margin-left: 200px;margin-top: 15px;margin-right: 10px;margin-bottom: 20px;}
+    .content{min-height: 300px;}
+    .sui-dropup .caret::before, .sui-dropdown .caret::before{ content: "";}
+    .sui-dropup.dropdown-bordered .dropdown-inner a, .sui-dropdown.dropdown-bordered .dropdown-inner a{min-width: 116px;}
+    #confirm_Con .dropdown-inner {background: rgba(0, 0, 0, 0) url("/static/images/web/xialabg.png") no-repeat scroll 135px center;width: 158px;}
+    .sui-dropup.dropdown-bordered .dropdown-inner > .sui-dropdown-menu, .sui-dropdown.dropdown-bordered .dropdown-inner > .sui-dropdown-menu {margin: 0 0 0 0; min-width: 100%;}
+    .sui-dropup .caret::before, .sui-dropdown .caret::before{ content: "";}
+    .sui-dropup.dropdown-bordered .dropdown-inner a, .sui-dropdown.dropdown-bordered .dropdown-inner a{min-width: 116px;}
+    .dropdown-inner {background: rgba(0, 0, 0, 0) url("/static/images/web/xialabg.png") no-repeat scroll 108px center;}
+    .sui-dropup.dropdown-bordered .dropdown-inner > .sui-dropdown-menu, .sui-dropdown.dropdown-bordered .dropdown-inner > .sui-dropdown-menu {margin: 0 0 0 0; min-width: 100%;}
+</style>
+<script src="/static/js/web/hd_zixie.js?v=${v}"></script>
+<script type="text/javascript">
+    $(function () {
+        //翻页设置
+        Pagination.init();
+        //重置
+        $("input.btn-reset").click(function () {
+            Common.reset("form.query-form");
+        });
+        //点击管理员备注确定
+        $(" .btn-save").click(function(){
+            if(!confirm("确认要修改备注内容吗？")){
+                return;
+            }
+            var text = $(this).siblings().find("textarea").val();
+            var id = $(this).siblings().find("textarea").attr("data-id");
+            Common.post("/admin/order/editManagerComment", {tradeId:id,comment:text}, function (json) {
+                if (json.code == Common.SUCC) {
+                    Msg.success(json.message);
+                    $(this).parent().hide();
+                } else {
+                    Msg.danger(json.message);
+                }
+            });
+        });
+        //当日，最近1周，最近1个月
+        dateFunc.init($("#btn-today"),"today", $("input[name=createdFrom]"), $("input[name=createdEnd]"));
+        dateFunc.init($("#btn-lastWeek"),"lastWeek", $("input[name=createdFrom]"), $("input[name=createdEnd]"));
+        dateFunc.init($("#btn-lastMonth"),"lastMonth", $("input[name=createdFrom]"), $("input[name=createdEnd]"));
+
+        //点击修改价格
+        $(".add_update").click(function(){
+            $("#tradeId").val($(this).attr("data-id"));
+            $(this).next("button").click();
+        });
+
+        $("#J_edit_price_modal").on('show', function(){
+            var tradeId = $("#tradeId").val();
+            $("#J_edit_price_modal .modal-body").html("");
+            Common.post("/admin/order/edit", {tradeId:tradeId}, function (json) {
+                if(json.code == Common.SUCC){
+                    $("#J_edit_price_modal .modal-body").html(json.data);
+                }else{
+                    Msg.danger(json.message);
+                }
+            });
+        });
+    });
+</script>
+<%}%>
+<%layout("../layout/body_layout.html"){%>
+<div class="query-zone" id="confirm_Con">
+    <form class="sui-form form-horizontal query-form" id="query-form">
+        <div class="sui-row">
+            <div class="span4">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        &nbsp;&nbsp;&nbsp;货品货号
+                    </span>
+                    <input type="text" class="input h22" name="goodsItemNo" value="${params.goodsItemNo!}" />
+                </div>
+            </div>
+            <div class="span4">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        &nbsp;&nbsp;&nbsp;货品名称
+                    </span>
+                    <input type="text" class="input h22" name="goodsName" value="${params.goodsName!}" />
+                </div>
+            </div>
+            <div class="span4">
+                <div class="input-prepend">
+                    <span class="add-on">
+                         &nbsp;&nbsp;&nbsp;总订单编号
+                    </span>
+                    <input type="text" class="input h22" name="tradeCode" value="${params.tradeCode!}" />
+                </div>
+            </div>
+            <div class="span4">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        子订单编号
+                    </span>
+                    <input type="text" class="input h22" name="orderCode" value="${params.orderCode!}" />
+                </div>
+            </div>
+        </div>
+        <div class="sui-row">
+            <div class="span4">
+                <div class="input-prepend">
+                    <span class="add-on">进货商名称</span>
+                    <input type="text" class="input h22" name="purchaseName" value="${params.purchaseName!}" />
+                </div>
+            </div>
+            <div class="span4">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        供货商名称
+                    </span>
+                    <input type="text" class="input h22" name="supplierName" value="${params.supplierName!}" />
+                </div>
+            </div>
+            <div class="span4">
+                <div class="input-prepend">
+                    <span class="add-on">
+                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;物流公司
+                    </span>
+                    <span class="sui-dropdown dropdown-bordered select h22">
+                        <span class="dropdown-inner">
+                            <a role="button" data-toggle="dropdown" href="#" class="dropdown-toggle">
+                                <input value="${parameter.expressId}" name="expressId" type="hidden" />
+                                <i class="caret"></i>
+                                <span>
+                                    <%
+                                    if(isEmpty(params.expressId)){
+                                        print('请选择');
+                                    }else{
+                                        for (item in express) {
+                                            if(item.id == parseInt(params.expressId)){
+                                                print(item.name);
+                                            }
+                                        }
+                                    }%>
+                                </span>
+                            </a>
+                            <ul role="menu" aria-labelledby="drop12" class="sui-dropdown-menu">
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" >请选择</a></li>
+                                <%for (item in express) {%>
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="${item.id}" title="${item.name}">${item.name}</a></li>
+                                <%}%>
+                            </ul>
+                        </span>
+                    </span>
+                </div>
+            </div>
+             <div class="span4">
+                <div class="input-prepend">
+                    <span class="add-on">物流单号</span>
+                    <input type="text" class="input h22 w150" name="expressCode" value="${params.expressCode!}" />
+                </div>
+            </div>
+        </div>
+        <div class="sui-row">
+            <div class="span4">
+                <div class="input-prepend">
+                    <span class="add-on">管理员备注</span>
+                    <input type="text" class="input h22 w150" name="managerComment" value="${params.managerComment!}" />
+                </div>
+            </div>
+            <div class="span4">
+                <div class="input-prepend input-inner">
+                    <span class="add-on">&nbsp;&nbsp;&nbsp;交易时间</span>
+                    <input type="text" class="input-date h22" name="createdFrom" data-toggle="datepicker" placeholder="时间范围起始" value="${params.createdFrom!}">
+                    <span class="add-on2">-</span>
+                    <input type="text" class="input-date h22" name="createdEnd" data-toggle="datepicker" placeholder="时间范围结束" value="${params.createdEnd!}">
+                </div>
+            </div>
+            <div class="span4">
+                <div class="input-prepend">
+                    <span class="add-on" id="more_times">
+                        <span class="zhongKuoHao">【</span>
+                        <a href="javascript:void(0);" class="btn-today" id="btn-today"><span>当日</span></a>
+                        <a href="javascript:void(0);" class="btn-week" id="btn-lastWeek"><span class="more_duanJianGe">最近1周</span></a>
+                        <a href="javascript:void(0);" class="btn-month" id="btn-lastMonth"><span class="more_duanJianGe">最近1个月</span></a>
+                        <span class="zhongKuoHao">】</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="sui-row" style="margin-top:10px;">
+            <div class="span4">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        货品品牌
+                    </span>
+                    <input type="text" class="input h22 w150" name="brand" value="${params.brand!}" />
+                </div>
+            </div>
+            <div class="span4">
+                <div class="input-prepend">
+                    <span class="add-on">交易状态</span>
+                    <span class="sui-dropdown dropdown-bordered select h22">
+                        <span class="dropdown-inner">
+                            <a role="button" data-toggle="dropdown" href="#" class="dropdown-toggle">
+                                <input name="status" value="${params.status!}" type="hidden">
+                                <i class="caret"></i>
+                                <span>${decode(params.status,'10','待付款','20','交易关闭','30','待拣货','35','拣货中','50','待收',
+                            '70','退货申请','80','退货发回','90','退货完成','100','退货协商','105','退款申请','116','退款完成','200','完成','请选择')}</span>
+                            </a>
+                            <ul role="menu" aria-labelledby="drop12" class="sui-dropdown-menu">
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" >请选择</a></li>
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="10" title="未付款">待付款</a></li>
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="20" title="交易关闭">交易关闭</a></li>
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="30" title="待拣货">待拣货</a></li>
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="35" title="拣货中">拣货中</a></li>
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="50" title="待收">待收</a></li>
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="70" title="退货申请">退货申请</a></li>
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="80" title="退货发回">退货发回</a></li>
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="90" title="退货完成">退货完成</a></li>
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="100" title="退货协商">退货协商</a></li>
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="105" title="退款申请">退款申请</a></li>
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="116" title="退款完成">退款完成</a></li>
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="200" title="完成">完成</a></li>
+                            </ul>
+                        </span>
+                    </span>
+                </div>
+            </div>
+            <button class="sui-btn btn-primary" style="margin-left:20px;">查询</button>
+            <input type="button" class="sui-btn btn-primary btn-reset" value="重置"/>
+            <div class="sui-btn-group">
+            </div>
+        </div>
+    </form>
+</div>
+<style>
+    .dialog-win{margin-left:-278px;margin-top:-200px;}
+    .sui-form{max-height: 460px;/*overflow-y: auto;*/}
+</style>
+<table class="sui-table table-bordered" id="zongzi_dingdan">
+    <thead>
+    <th width="360">货品详情</th>
+    <th width="60">单价</th>
+    <th width="60">数量</th>
+    <th width="80">状态</th>
+    <th width="70">优惠</th>
+    <th width="82">实付款</th>
+    <th width="90">操作</th>
+    </thead>
+    <tbody>
+    <%for(trade in pager.data!){%>
+    <tr>
+        <td colspan="7" class="add_bgColor">
+            <span>订单号：${trade.code}</span>
+            <span class="add_xiadantime">下单时间：${trade.created, "yyyy-MM-dd HH:mm:ss"}</span>
+            <span class="add_rightshiji">订单实际重量：
+                <strong>
+                <%if(nvl(trade.realityWeight,0)>0){%>
+                ${nums.g2k(trade.realityWeight)}KG
+                <%}%>
+                </strong>
+            </span>
+        </td>
+    </tr>
+    <tr>
+        <%for(item in trade.orders!){%>
+        <td>
+            <div class="add_zidingdan">${item.code}</div>
+            <div class="add_leftfd">
+                <!--<p class="huohao02">供货商信息</p>-->
+                <p class="add_pinfont">${item.brand}</p>
+            </div>
+            <div>
+                <a href="/goods/${item.goodsCode}.html" target="_blank">
+                    <div class="add_imgTop"><img src="${img_url.getS(item.headImg!)}" width="70" /></div>
+                    <div class="add_ptop">
+                            <p class="title">${item.goodsName}</p>
+                            <p class="huohao">商品货号：${item.goodsItemNo}</p>
+                            <p class="huohao">${item.specPropValue}</p>
+                    </div>
+                </a>
+            </div>
+        </td>
+        <td>${nums.yuan(item.price)}</td>
+        <td>${item.quantity}</td>
+        <td>${item.status.name}</td>
+        <%if(itemLP.isFirst){%>
+        <td <% if(itemLP.size > 1) {%>
+        rowspan="${itemLP.size}" class="add_tdaddborder"
+        <%} %>
+        >
+        <% if(trade.couponFee > 0){%>
+        优惠券(${trade.useType! == 'PAYMENT'? '抵货款' : '抵运费'} 抵运费)${nums.yuan(trade.couponFee)}元
+        <%} %>
+        <%if(trade.packSubsidy > 0){%>
+        打包袋优惠${nums.yuan(trade.packSubsidy)}元
+        <%}%>
+        </td>
+        <td <% if(itemLP.size > 1) {%>
+        rowspan="${itemLP.size}" class="add_tdaddborder"
+        <%} %>>
+            <%if(trade.oldPayment!0 == 0){%>
+            <span class="add_yuan">${nums.yuan(trade.payment)}元</span>
+            <%}else{%>
+            <span class="add_gaiarea">
+                <span class="add_yigaiyuanjia">${nums.yuan(trade.oldPayment)}元</span>
+                <span><strong>${nums.yuan(trade.payment)}元</strong></span>
+                <span class="add_gaizi">改</span>
+            </span>
+            <%}%>
+            <br/>(含运费<%if(trade.useType! == 'POST_FEE'){%>
+                        ${nums.yuan(trade.postFee - trade.couponFee)}
+                        <%}else{%>
+                        ${nums.yuan(trade.postFee)}
+                        <%}%>元)
+        </td>
+        <td <% if(itemLP.size > 1) {%>
+        rowspan="${itemLP.size}" class="ncguanzhu_chaK02 hd_jddwei add_tdnoborder"
+        <%}else{%>
+        class="hd_jddwei ncguanzhu_chaK02"
+        <%}%>
+        >
+            <span class="beiZhu_wai" title="管理员备注">
+            <span class="sui-btn btn-small">管理员备注</span>
+                <p class="header_la">
+                    <span><textarea class="beiZhuQuYu" rows="6" data-id="${trade.id}" placeholder="请填写备注内容（50字以内）。">${trade.managerComment!}</textarea></span>
+                    <button class="sui-btn btn-small dingsave btn-remark btn-save" data-code="">保存</button>
+                    <button class="sui-btn btn-small dingbot btn-remark" data-code="">取消</button>
+                </p>
+            </span>
+            <div class="add_clear"></div>
+            <a href="/admin/order/detail?id=${trade.id}" target="_blank" class="sui-btn btn-small">订单详情</a>
+            <%if(trade.status == 'CREATED'){%>
+            <div class="add_clear"></div>
+            <a href="javascript:void(0);" class="sui-btn btn-small btn-singlePick add_update" data-id="${trade.id}" >修改价格</a>
+            <button data-width="large" data-toggle="modal" data-target="#J_edit_price_modal" class="sui-btn btn-small hidden">&nbsp;&nbsp;修改价格&nbsp;&nbsp;</button>
+            <%}%>
+        </td>
+        <%}%>
+    </tr>
+    <%}%>
+    <tr>
+        <td colspan="7" class="add_bottomSpan">
+            <span>货品总量：<strong>${trade.quantity}</strong>个</span>
+            <span>总重量：<strong>${nums.g2k(trade.weight)}</strong>KG</span>
+            <span>实付总额：<strong>${nums.yuan(trade.payment)}</strong>元</span>
+            <span>运费：<strong><%if(trade.useType! == 'POST_FEE'){%>
+                ${nums.yuan(trade.postFee - trade.couponFee)}
+                <%}else{%>
+                ${nums.yuan(trade.postFee)}
+                <%}%></strong>元</span>
+        </td>
+    </tr>
+    <%}elsefor{%>
+    <!--表格无数据样式 start-->
+    <tr>
+        <td colspan="7" class="zanWuShuju"><p>没有数据</p></td>
+    </tr>
+    <!--表格无数据样式 end-->
+    <%}%>
+    </tbody>
+</table>
+<input type="hidden" id="tradeId" value="" />
+<#page val="${pager.page!}" size="large" params="${parameter.map!}"/>
+<!--修改价格弹窗 start-->
+<%include("/admin/modal/edit_price_modal.html"){};%>
+<!--修改价格弹窗 end-->
+<%}%>

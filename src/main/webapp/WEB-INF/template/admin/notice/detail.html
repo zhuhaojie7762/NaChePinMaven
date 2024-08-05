@@ -1,0 +1,25 @@
+<%layout("../layout/header_layout.html"){%>
+<title>公告详情</title>
+<%}%>
+<%layout("../layout/body_layout.html"){%>
+<div id="toDay_Con" class="query-zone">
+    <div class="add_ggxiangq">
+        <p class="add_title">${notice.title}</p>
+        <p class="add_time">
+            时间：${dts.d2s(notice.created)}
+        </p>
+        <p class="add_fenlei">文章分类：<strong>${notice.type.value}</strong></p>
+        <p class="add_text">
+            ${notice.content}
+        </p>
+        <div class="down_fujian" style="display: ${isEmpty(notice.attachment)?'none':'block'}">
+            <a id="downdate_fujian" title="下载附件" href="${img_url.fullPath(notice.attachment)}" target="_blank">
+                <img src="/static/images/zuixin/down_fujian.png" width="50">
+            </a>
+            <a class="fujian_name" title="附件下载" href="${img_url.fullPath(notice.attachment)}" target="_blank">附件下载</a>
+        </div>
+    </div>
+    <%}%>
+</div>
+</body>
+</html>

@@ -1,0 +1,144 @@
+<%layout("/web/layout/header_layout2.html"){%>
+<script>
+    $(document).ready(function(){
+        $("#zx_allgs ul.zx_goodsList li").css("margin-right","18px");
+    });
+</script>
+<%}%>
+<%layout("/web/layout/body_layout2.html"){%>
+<style>
+    .sui-pagination{padding:0;}
+    .sui-pagination div{position: relative;top:-15px;}
+    .sui-pagination div .page-num{height: 32px!important;}
+    .pagination-small div .page-num + .page-confirm{margin-top:5px;}
+    .sui-pagination div .page-num + .page-confirm{height: 32px!important;}
+</style>
+<div id="zx_pinpai">
+    <div class="zx_ppjieshao">
+        <div class="zx_ppleft">
+            <p class="zx_titys">
+                <span class="zx_chakan"><a href="javascript:;" target="_blank">查看</a></span>
+                <span> &nbsp; </span>
+                <span><a href="javascript:;" target="_blank">品牌名</a></span>
+                <span> &nbsp; </span>
+                <span><a href="javascript:;" target="_blank">全部分类</a></span>
+            </p>
+            <ul>
+                <%for(clazz in brandClazz){%>
+                    <li><a href="/goods/class/${clazz.classId!}.html">${clazz.classContent!}</a></li>
+                <%}%>
+            </ul>
+        </div>
+        <div class="zx_ppright">
+            <dl>
+                <dt>
+                    <!--<img src="${img_url.getL(brand.logo)}" />-->
+                    <div class="new_ppxqLogo">
+                        <p class="new_bigFont">${brand.name!}</p>
+                    </div>
+                </dt>
+                <dd>
+                    <p>
+                        ${brand.comment!}
+                    </p>
+                </dd>
+            </dl>
+        </div>
+    </div>
+
+    <div class="zx_newgoods">
+        <div class="zx_goodsLeft">
+            <p>新品上市</p>
+            <ul class="top">
+                <%for(goods in newGoods){%>
+                <li>
+                    <a href="/goods/${goods.code!}.html" target="_blank">
+                        <img src="${img_url.getL(goods.headImgUrl1)}" />
+                        <p><em>${goods.brand!}</em> ${goods.name!}</p>
+                        <p class="price">￥${goods.wholesalePrice/100, "#0.00"}</p>
+                    </a>
+                </li>
+                <%}%>
+            </ul>
+            <p>热门推荐</p>
+            <ul class="top">
+                <%for(goods in hotGoods){%>
+                <li>
+                    <a href="/goods/${goods.code!}.html" target="_blank">
+                        <img src="${img_url.getL(goods.headImgUrl1)}" />
+                        <p><em>${goods.brand!}</em> ${goods.name!}</p>
+                        <p class="price">￥${goods.wholesalePrice/100, "#0.00"}</p>
+                    </a>
+                </li>
+                <%}%>
+            </ul>
+        </div>
+        <div class="zx_goodsRight">
+            <div id="zx_allgs">
+                <div style="width: 945px;height: 45px;background: #fff;margin-left:15px;float:right;border-bottom: 2px solid #fd7009;">
+                    <span class="allgoods">全部产品</span>
+                    <div class="zx_shanshiR">
+                        <ul>
+                            <li class="<%if(isNotEmpty(field) && isNotEmpty(sort)){%><%if(field == 'onlineTime'){%>${sort == 'asc'? 'up':'down'}<%}%><%}%>" data-field="onlineTime">上架</li>
+                            <li class="<%if(isNotEmpty(field) && isNotEmpty(sort)){%><%if(field == 'wholesalePrice'){%>${sort == 'asc'? 'up':'down'}<%}%><%}%>" data-field="wholesalePrice">价格</li>
+                            <li class="<%if(isNotEmpty(field) && isNotEmpty(sort)){%><%if(field == 'totalCount'){%>${sort == 'asc'? 'up':'down'}<%}%><%}%>" data-field="totalCount">销量</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="ty_gyClear"></div>
+                <ul class="zx_goodsList">
+                    <%for(goods in pageGoods.data!){%>
+                        <li>
+                            <a href="/goods/${goods.code!}.html" target="_blank">
+                                <img src="${img_url.getM(goods.headImgUrl1)}" />
+                                <p><em>${goods.brand!}</em>${goods.name!}</p>
+                                <p><b>￥${nums.yuan(goods.wholesalePrice)}</b></p>
+                            </a>
+                        </li>
+                    <%}elsefor{%>
+                        <div class="zx_youha">
+                            暂无货品
+                        </div>
+                    <%}%>
+                </ul>
+            </div>
+        </div>
+        <div class="ty_gyClear"></div>
+        <!--页码 start-->
+        <div class="zx_page">
+            <div class="zx_pageMain">
+                <#webPagePlus val='${pageGoods.page}' size='small' params = '${params!}' showNum = 'show' />
+            </div>
+        </div>
+        <!--页码 end-->
+    </div>
+</div>
+<div class="zx_fuwuCon">
+    <div class="zx_fuwuMain">
+        <img src="/static/images/zuixin/zx_fuwu.png" />
+    </div>
+</div>
+<script>
+    Pagination.init();
+
+    $('.zx_shanshiR li').click(function() {
+        var sort;
+        var field = $(this).data('field');
+        if ($(this).is('.up')) {
+            $(this).removeClass('up');
+            $(this).addClass('down').siblings('li').removeClass('up').removeClass('down');
+            sort = 'desc';
+        } else if ($(this).is('.down')) {
+            $(this).removeClass('down');
+            $(this).addClass('up').siblings('li').removeClass('up').removeClass('down');
+            sort = 'asc';
+        } else {
+            $(this).removeClass('up');
+            $(this).removeClass('down');
+            $(this).addClass('up').siblings('li').removeClass('up').removeClass('down');
+            sort = 'asc';
+        }
+        location.href = "/brand/brandDetail.html?brandId=${brand.id!}&field=" + field + "&sort=" + sort;
+    });
+</script>
+<%}%>

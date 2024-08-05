@@ -1,0 +1,54 @@
+<form>
+    <p class="ncpth_til">定制商品详情</p>
+    <div class="dingZhiDQuYuL">
+        <img width="120" src="${img_url.fullPath(seek.imgUrl)}" />
+    </div>
+    <div class="dingZhiDQuYuR">
+        <p>
+            <span class="dzdqyl01">商品名称：</span>
+            <span>${seek.goodsName}</span>
+        </p>
+        <div class="ty_gyClear"></div>
+        <p>
+            <span class="dzdqyl01">商品材质：</span>
+            <span>${seek.material}</span>
+        </p>
+        <div class="ty_gyClear"></div>
+        <p>
+            <span class="dzdqyl01">商品报价：</span>
+            <span>${seek.price}</span>
+        </p>
+        <div class="ty_gyClear"></div>
+        <p>
+            <span class="dzdqyl01">需求数量：</span>
+            <span>${seek.quantity}</span>
+        </p>
+        <div class="ty_gyClear"></div>
+        <p>
+            <span class="dzdqyl01">要货时间：</span>
+            <span>${seek.needTime, "yyyy-MM-dd"}</span>
+        </p>
+        <div class="ty_gyClear"></div>
+        <p>
+            <span class="dzdqyl01">联系人：</span>
+            <span>${seek.contacts}</span>
+        </p>
+        <div class="ty_gyClear"></div>
+        <p>
+            <span class="dzdqyl01">联系电话：</span>
+            <span>${seek.phone}</span>
+        </p>
+    </div>
+    <div class="ty_gyClear"></div>
+    <div class="shopXXSM">
+        <p>
+            <span class="miaoshu01">商品详情说明：</span>
+            <span class="miaoshu02">${seek.remark}</span>
+        </p>
+        <div class="ty_gyClear"></div>
+        <p class="xiangQClose">
+            <span class="ncp_closeBtnDZ" title="关闭页面" data-dismiss="modal" aria-hidden="true">关闭页面</span>
+        </p>
+    </div>
+    <div class="ty_gyClear"></div>
+</form>

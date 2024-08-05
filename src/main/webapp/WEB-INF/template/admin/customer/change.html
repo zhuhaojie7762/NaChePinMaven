@@ -1,0 +1,179 @@
+<%layout("../layout/header_layout.html"){%>
+<title>修改结算方式</title>
+<style>
+    .query-zone {height: 78px;}
+    .w200 {width: 160px !important;}
+    .w300 {width: 207px !important;}
+    #demo2 .add-on{margin-left:10px;}
+    .sui-table tr td:first-child{text-align: center;}
+</style>
+<script type="text/javascript">
+    $(function () {
+        Pagination.init();
+        $("input.btn-reset").click(function () {
+            Common.reset("form.query-form");
+        });
+
+        $('#demo2.date').datepicker({});
+        $('#demo3.date').datepicker({});
+
+        /**
+         * 修改结算方式
+         */
+        Common.ajaxForm($("form.changeForm"), null, null);
+
+        /**
+         * 打开修改结算方式
+         */
+        $(".btn-bottomnum").click(function(){
+            $(this).next(".jiesuanCon").show(300);
+        });
+        /**
+         * 关闭修改结算方式
+         */
+        $(".js_close").click(function(){
+            $(this).parent().parent().hide(300);
+        });
+    });
+</script>
+<%}%>
+<%layout("../layout/body_layout.html"){%>
+<div class="query-zone" style="height: 116px;">
+    <form class="sui-form form-horizontal query-form" id="query-form">
+        <input type="hidden" name="perSize" value="${page.perSize!10}">
+        <div class="sui-row">
+            <div class="span3">
+                <div class="input-prepend">
+                    <span class="add-on">客户姓名</span>
+                    <input id="prependedInput2" type="text" name="name" value="${parameter.name!''}"
+                           placeholder="客户姓名"
+                           class="input-fat h18 w100">
+                </div>
+            </div>
+            &nbsp;&nbsp;
+            <div class="span3">
+                <div class="input-prepend">
+                    <span class="add-on">联系人手机号</span>
+                    <input type="text" name="phone" value="${parameter.phone!''}"
+                           placeholder="联系人手机号"
+                           class="input-fat h18 w100">
+                </div>
+            </div>
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        结算方式
+                    </span>
+                    <span class="sui-dropdown dropdown-bordered select">
+                        <span class="dropdown-inner">
+                            <a role="button" href="javascript:void(0);" data-toggle="dropdown"
+                               class="dropdown-toggle h22">
+                                <input value="" name="settlementMethod" type="hidden" class="typeName">
+                                <i class="caret"></i>
+                                <span>
+                                   ${decode(parameter.settlementMethod, 'weekly', '周结', 'monthly', '月结','daily', '现结',
+                                    '请选择')}
+                                </span>
+                            </a>
+                            <ul role="menu" aria-labelledby="drop4" class="sui-dropdown-menu">
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="">请选择</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="weekly">周结</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="monthly">月结</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="daily">现结</a>
+                                </li>
+                            </ul>
+                        </span>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <!--zdj update start-->
+        <div style="clear: both"></div>
+        <div class="sui-row">
+            <div id="demo2" class="input-prepend date"><span class="add-on">创建时间从</span>
+                <input type="text" class="span2 input-fat" value="${params.startTime!}" name="startTime">
+            </div>
+
+            <div id="demo3" class="input-prepend date"><span class="add-on">至</span>
+                <input type="text" class="span2 input-fat" value="${params.endTime!}" name="endTime">
+            </div>
+
+        </div>
+        <!--zdj update end-->
+        <div class="sui-row">
+            <button class="sui-btn btn-primary">查询</button>
+            <input type="button" class="sui-btn btn-primary btn-reset" value="重置"/>
+            <div class="sui-btn-group">
+            </div>
+        </div>
+    </form>
+</div>
+<table class="sui-table table-bordered">
+    <thead>
+        <th width="56">客户编号</th>
+        <th>客户姓名</th>
+        <th>客户帐号</th>
+        <th>手机号码</th>
+        <th width="56">客户类型</th>
+        <th>邮箱</th>
+        <th width="28">状态</th>
+        <th width="70">结算方式</th>
+        <th>操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    <%for(item in pager.data){%>
+    <tr>
+        <td>${item.code}</td>
+        <td>${item.name}</td>
+        <td>${item.username}</td>
+        <td>${item.phone}</td>
+        <td>${item.type.name}</td>
+        <td>${item.email}</td>
+        <td>${item.state.name}</td>
+        <td>${item.settlementMethod.name!}</td>
+        <td>
+            <div class="tianxiedh">
+                <span class="sui-btn btn-small btn-takeOrder tianxiedhsj btn-bottomnum" >修改结算方式</span>
+                <div class="jiesuanCon">
+                    <form class="changeForm" method="post" action="/admin/customer/changeSettlementMethod">
+                        <input type="hidden" name="customerId" value="${item.id}">
+                        <span class="jiesuang_hdSpan">结算方式：</span>
+                        <span class="sui-dropdown dropdown-bordered select h22" style="margin:26px 0 0 0;">
+                            <span class="dropdown-inner">
+                                <a id="select" role="button" href="javascript:void(0);" data-toggle="dropdown" class="dropdown-toggle">
+                                    <input type="hidden" name="settlementMethod" value="${item.settlementMethod!}" />
+                                    <i class="caret"></i>
+                                    <span>${item.settlementMethod.name!}</span>
+                                </a>
+                                <ul role="menu" aria-labelledby="drop12" class="sui-dropdown-menu">
+                                    <li role="presentation"><a role="menuitem" tabindex="" href="javascript:void(0);" value="" >请选择</a></li>
+                                    <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="weekly">周结</a></li>
+                                    <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="monthly">月结</a></li>
+                                    <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="daily">现结</a></li>
+                                </ul>
+                            </span>
+                        </span>
+                        <a class="sui-btn js_close">关闭</a>
+                        <button class="sui-btn js_saveBtn">保存</button>
+                    </form>
+                </div>
+            </div>
+        </td>
+    </tr>
+    <%}elsefor{%>
+    <tr>
+        <td colspan="9" class="zanWuShuju">没有数据</td>
+    </tr>
+    <%}%>
+    </tbody>
+</table>
+<#page val="${pager.page!}" size="large" params="${parameter.map!}"/>
+<%}%>

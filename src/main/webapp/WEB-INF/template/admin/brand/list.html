@@ -1,0 +1,123 @@
+<%layout("../layout/header_layout.html"){%>
+<script src="/static/js/web/zixie.js"></script>
+<title>品牌列表</title>
+<script type="text/javascript">
+    $(function() {
+        /**
+         * 改页设置
+         */
+        Pagination.init();
+
+        /**
+         * 重置
+         */
+        $("input.btn-reset").click(function () {
+            Common.reset("form.query-form");
+        });
+
+        /**
+         * 删除
+         */
+        $(".btn-del").click(function () {
+            if (!confirm("确定要删除吗")) {
+                return;
+            }
+            var id = $(this).attr("data-id");
+            Common.post("/admin/brand/delBrand", {brandId: id}, function (json) {
+                if (Common.SUCC == json.code) {
+                    Msg.success(json.message, function () {
+                        Common.refresh();
+                    })
+                } else {
+                    Msg.danger(json.message);
+                }
+            })
+        });
+    });
+</script>
+<%}%>
+<%layout("../layout/body_layout.html"){%>
+<style>
+    .sui-dropup.dropdown-bordered .dropdown-inner, .sui-dropdown.dropdown-bordered .dropdown-inner {border-radius: 0;width: 142px;}
+</style>
+<div class="query-zone" >
+    <form class="sui-form form-horizontal query-form" id="query-form">
+        <div class="sui-row">
+            <div class="span4">
+                <div class="input-prepend">
+                    <span class="add-on">品牌名称</span>
+                    <input type="text" class="input h22" name="brandName" value="${parameter.brandName!}" />
+                </div>
+            </div>
+            <div class="span4">
+                <div class="input-prepend input-inner">
+                    <span class="add-on">创建时间</span>
+                    <input type="text" class="input-date h22" name="createdFrom" data-toggle="datepicker" placeholder="时间范围起始" value="${parameter.createdFrom!}">
+                    <span class="add-on2">-</span>
+                    <input type="text" class="input-date h22" name="createdEnd" data-toggle="datepicker" placeholder="时间范围结束" value="${parameter.createdEnd!}">
+                </div>
+            </div>
+        </div>
+        <div class="sui-row">
+            <button class="sui-btn btn-primary add_btnlef ml10">查询</button>
+            <input type="button" class="sui-btn btn-primary btn-reset" value="重置"/>
+        </div>
+        <div class="add_clear"></div>
+    </form>
+</div>
+<!--<div class="add_newzengcon">-->
+    <!--<span class="add_newaddBtn" title="新增品牌" onclick="window.location.href='/admin/brand/add'">新增品牌</span>-->
+<!--</div>-->
+<!--图片预览弹出框 start-->
+<div id="bgDiv"></div>
+<div id="sqsImgBig">
+    <div class="casewinright">
+        <div class="sqsCdel">
+            <a onclick = "document.getElementById('sqsImgBig').style.display='none';document.getElementById('bgDiv').style.display='none';">
+                <img src="/static/images/web/close.png" width="35" height="35"/>
+            </a>
+        </div>
+        <div class="winright">
+            <img src="" width="120%"/>
+        </div>
+    </div>
+</div>
+<!--图片预览弹出框 end-->
+<table class="sui-table table-bordered" id="pinpaimgs">
+    <thead>
+    <th width="120">品牌名称</th>
+    <th width="60">拼音</th>
+    <th width="58">LOGO</th>
+    <th>供货商名称</th>
+    <th>供货商公司名称</th>
+    <th>介绍</th>
+    <th width="100">创建时间</th>
+    <th width="160">操作</th>
+    </thead>
+    <tbody>
+    <%for(item in pager.data){%>
+    <tr>
+        <td>${item.name}</td>
+        <td>${item.pinyin}</td>
+        <td class="jianbiaofont">
+            <!--<img src="${img_url.getM(item.logo)}" onclick="bigImg(this)" />-->
+            <p class="new_bigFont">${item.name}</p>
+        </td>
+        <td>${item.customer.name!}</td>
+        <td>${item.customer.supplierCompany!}</td>
+        <td>${item.comment}</td>
+        <td>${dts.d2s(item.created)}</td>
+        <td><a href="/admin/brand/detail?id=${item.id}" class="sui-btn btn-small" title="查看详情" >查看详情</a><br/>
+            <a href="/admin/brand/edit?id=${item.id}" class="sui-btn btn-small" title="修改" >修改</a><br/>
+            <a href="javascript:void(0);" class="sui-btn btn-small btn-del" data-id="${item.id}" title="删除" >删除</a>
+        </td>
+    </tr>
+    <%}elsefor{%>
+    <tr>
+    <td colspan="9" class="zanWuShuju"><p>没有数据</p></td>
+    </tr>
+    <%}%>
+    </tbody>
+</table>
+<#page val="${pager.page!}" size="large" params="${parameter.map!}"/>
+<%}%>

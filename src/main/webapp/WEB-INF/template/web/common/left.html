@@ -1,0 +1,76 @@
+<script>
+    /*个人中心 start*/
+    $(document).ready(function(){
+        //页面中的DOM已经装载完成时，执行的代码
+        $(".ncnum_L > p").click(function(){
+            var ulNode = $(this).next("ul");
+            ulNode.slideToggle();
+            zxchangeIcon($(this));
+        });
+    });
+    function zxchangeIcon(mainNode) {
+        if (mainNode) {
+            if (mainNode.css("background-image").indexOf("/static/images/zuixin/zx_downS.png") >= 0) {
+                mainNode.css("background-image","url('/static/images/zuixin/zx_right.png')");
+            } else {
+                mainNode.css("background-image","url('/static/images/zuixin/zx_downS.png')");
+            }
+        }
+    }
+    /*个人中心 end*/
+</script>
+<div class="ncnum_L">
+    <p class="ncnum_lTitle02">用户信息</p>
+    <ul>
+        <a href="/member/index.html" title="用户信息"><li class="ncnum_zi${decode(actionKey,'/member/index.html','02','')}">用户信息</li></a>
+        <a href="/member/follow.html" title="关注列表"><li class="ncnum_zi${decode(actionKey,'/member/follow.html','02','')}">关注列表</li></a>
+        <%if(session.curCustomer.type.val < 1){%>
+            <%if(session.curCustomer.purchaseState.val < 1){%>
+        <a href="/member/purchase.html" title="申请进货商认证"><li class="ncnum_zi${decode(actionKey,'/member/purchase.html','02','')}">申请进货商认证</li></a>
+            <%}%>
+            <%if(session.curCustomer.purchaseState.val == 2){%>
+        <a href="/member/purchaseResult.html" title="进货商认证结果"><li class="ncnum_zi${decode(actionKey,'/member/purchaseResult.html','02','')}">进货商认证结果</li></a>
+            <%}%>
+        <%}%>
+        <%if(session.curCustomer.type.val < 2){%>
+            <%if(session.curCustomer.supplierState.val < 1){%>
+            <a href="/member/supplier.html" title="申请供货商认证"><li class="ncnum_zi${decode(actionKey,'/member/supplier.html','02','')}">申请供货商认证</li></a>
+            <%}%>
+            <%if(session.curCustomer.supplierState.val == 2){%>
+            <a href="/member/supplierResult.html" title="供货商认证结果"><li class="ncnum_zi${decode(actionKey,'/member/supplierResult.html','02','')}">供货商认证结果</li></a>
+            <%}%>
+        <%}%>
+    </ul>
+    <%if(session.curCustomer.type.val == 2){%>
+    <!--<p class="ncnum_lTitle04">供货商中心</p>-->
+    <p class="ncnum_lTitle03">供货商中心</p>
+    <ul>
+        <a href="/member/accountPayee.html" title="收款帐户设置"><li class="ncnum_zi${strutil.startWith(actionKey, '/member/accountPayee.html')?'02':''}">收款帐户设置</li></a>
+        <a href="/member/bill/bill.html" title="供货商账单"><li id="" class="ncnum_zi${strutil.startWith(actionKey, '/member/bill')?'02':''}">供货商账单</li></a>
+        <a href="/member/sellOrder/list.html" title="订单管理"><li id="ddMeange" class="ncnum_zi${strutil.startWith(actionKey, '/member/sellOrder')?'02':''}">订单管理</li></a>
+        <li id="shangPinCon">
+            <div class="subNavBox">
+                <div class="subNav currentDd currentDt" title="商品管理">商品管理</div>
+                <ul class="navContent" style="display:block">
+                    <a href="/member/online/list.html" class="sjsp${strutil.startWith(actionKey, '/member/online')?'02':'01'}" title="上架商品"><li class="shangjia_a">已上架商品</li></a>
+                    <a href="/member/offline/list.html" class="sjsp${strutil.startWith(actionKey, '/member/offline')?'02':'01'}" title="下架商品"><li>已下架商品</li></a>
+                    <a href="/member/waitCheck/list.html" class="sjsp${strutil.startWith(actionKey, '/member/waitCheck')?'02':'01'}" title="待审核商品"><li>待审核商品</li></a>
+                    <a href="/member/backGoods/list.html" class="sjsp${strutil.startWith(actionKey, '/member/backGoods')?'02':'01'}" title="退回商品"><li>退回商品</li></a>
+                    <a href="/member/newGoods/add/v2" class="sjsp${strutil.startWith(actionKey, '/member/newGoods')?'02':'01'}" title="新增商品"><li>新增商品</li></a>
+                </ul>
+            </div>
+        </li>
+        <div class="ty_gyClear"></div>
+        <a href="/member/tailGoods/list.html" title="尾货处理申请"><li class="ncnum_zi${strutil.startWith(actionKey, '/member/tailGoods')?'02':''}">尾货处理申请</li></a>
+    </ul>
+    <%}%>
+    <%if(session.curCustomer.type.val > 0){%>
+    <p class="ncnum_lTitle03">进货商中心</p>
+    <ul>
+        <a href="/member/buyOrder/list.html" title="我的订单"><li class="ncnum_bor ncnum_zi${strutil.startWith(actionKey,'/member/buyOrder')?'02':''}">我的订单</li></a>
+        <a href="/member/buyerDispute/buyerDisputeList.html" title="我的退款退货"><li class="ncnum_zi${strutil.startWith(actionKey, '/member/buyerDispute')?'02':''}">我的退款退货</li></a>
+        <a href="/member/seek/list.html" title="我要定制"><li class="ncnum_zi${strutil.startWith(actionKey, '/member/seek')?'02':''}">我要定制</li></a>
+        <a href="/member/coupon/list.html" title="我的优惠券"><li class="ncnum_zi${strutil.startWith(actionKey, '/member/coupon')?'02':''}">我的优惠券</li></a>
+    </ul>
+    <%}%>
+</div>

@@ -1,0 +1,168 @@
+<%layout("../layout/header_layout.html"){%>
+<title>账单名称</title>
+<script type="text/javascript">
+    $(function () {
+        /**
+         * 选择/取消 全部
+         */
+        $("input[name=ckAll]").click(function () {
+            var checkFlag = $(this).prop("checked");
+            $("input[name=items]:checkbox").prop("checked", checkFlag);
+        });
+
+        /**
+         *  选择/取消 单个
+         */
+        $("input[name=items]:checkbox").click(function () {
+            if ($("input[name=items]:checkbox:checked").length == $("input[name=items]:checkbox").length) {
+                $("input[name=ckAll]:checkbox").prop("checked", 'true');
+            } else {
+                $("input[name=ckAll]:checkbox").removeAttr("checked");
+            }
+        });
+
+        /**
+         * 重置
+         */
+        $("input.btn-reset").click(function () {
+            $("input[name=supplierName]").val("");
+            $("input[name=settlementMoney]").val("");
+            $("form.query-form").submit();
+        });
+
+        /**
+         * 重新发起
+         */
+        $(".btn-restart").click(function(){
+            var code = $(this).attr("data-code");
+            Common.post("/admin/settlement/order/restart",{code:code}, function(json){
+                if(json.code == Common.SUCC){
+                    Common.go("/admin/settlement/order/back");
+                }else{
+                    Msg.danger(json.message);
+                }
+            });
+        });
+    });
+</script>
+<%}%>
+<%layout("../layout/body_layout.html"){%>
+<div class="query-zone" id="searchL">
+    <form class="sui-form form-horizontal query-form" id="query-form">
+        <input type="hidden" name="code" value="${parameter.code!}">
+        <div class="sui-row" id="jiesuanFangs">
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        供货商名称
+                    </span>
+                    <input type="text" class="input h22" name="supplierName" value="${parameter.supplierName!}"/>
+                </div>
+            </div>
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        应结算金额大于&nbsp;&nbsp;&nbsp;
+                    </span>
+                    <input type="text" class="input h22" name="settlementMoney" value="${parameter.settlementMoney!}" onkeyup="if(isNaN(value))execCommand('undo')" onafterpaste="if(isNaN(value))execCommand('undo')"/>
+                </div>
+            </div>
+        </div>
+        <div class="sui-row" style="margin:15px 0 0 2px;">
+            <button class="sui-btn btn-primary">查询</button>
+            <input type="button" class="sui-btn btn-primary btn-reset" value="重置"/>
+            <!--<input type="button" class="sui-btn btn-primary" value="导出供货商账单明细"/>&nbsp;-->
+            <!--<input type="button" class="sui-btn btn-primary" value="导出结算汇总"/>-->
+        </div>
+    </form>
+</div>
+<table class="sui-table table-bordered" id="yueJieTab">
+    <thead>
+    <tr>
+        <th width="70"><input type="checkbox" value="" id="zhuanshuAll">&nbsp;全选/反选</th>
+        <th width="80">上次结算期间</th>
+        <th width="80">本次结算期间</th>
+        <th width="146">供货商名称</th>
+        <th width="60">需结算金额</th>
+        <th width="60">退款金额</th>
+        <th width="80">应结算金额</th>
+        <th width="100">收款信息</th>
+        <th width="80">结算状态</th>
+        <th width="50">结算方式</th>
+        <th width="36">操作</th>
+        <th>备注</th>
+    </tr>
+    </thead>
+    <tbody>
+    <%
+    var sumSaleMoney = 0;
+    var sumBackMoney = 0;
+    %>
+    <%for(item in data){%>
+    <tr>
+        <td><input type="checkbox" /></td>
+        <td>${dts.d2d(item.startTime)}</td>
+        <td>${dts.d2d(item.endTime)}</td>
+        <td>${item.supplierCompany}</td>
+        <td>${nums.yuan(item.saleMoney)}</td>
+        <td>${nums.yuan(item.backMoney)}</td>
+        <td>${nums.yuan(item.saleMoney - item.backMoney)}</td>
+        <td>${item.alipayName}&nbsp;&nbsp;&nbsp;${item.alipayCode}</td>
+        <td>${item.status.name}</td>
+        <td>${item.settlementMethod.name}</td>
+        <td><a href="/admin/settlement/pay/detail?code=${item.code}">明细</a></td>
+        <td>${item.remark}</td>
+    </tr>
+    <%
+    sumSaleMoney = sumSaleMoney + item.saleMoney;
+    sumBackMoney = sumBackMoney + item.backMoney;
+    %>
+    <%}elsefor{%>
+    <tr>
+        <td colspan="12" class="zanWuShuju"><p>没有数据</p></td>
+    </tr>
+    <%}%>
+    </tbody>
+    <tfoot id="yunyingftoot">
+    <tr>
+        <td colspan="12">
+            <span>销售总金额：<strong>${nums.yuan(sumSaleMoney)}</strong>元</span>
+            <span>退款总金额：<strong>${nums.yuan(sumBackMoney)}</strong>元</span>
+            <span>应结算总金额：<strong>${nums.yuan(sumSaleMoney - sumBackMoney)}</strong>元</span>
+        </td>
+    </tr>
+    </tfoot>
+</table>
+<div class="tuihuiYuanyin">
+    <p><strong>审批流程及意见：</strong></p>
+    <%for(item in checkLog){%>
+        <%if(item.status == 'return_check_first'){%>
+        <p>账单于${dts.d2s(item.createdTime)}被运营主管退回，退回原因：${item.remark}</p>
+        <%}else if(item.status == 'wait_check_first'){%>
+        <p>账单于${dts.d2s(item.createdTime)}被运营专员，发起</p>
+        <%}else if(item.status == 'return_check_second'){%>
+        <p>账单于${dts.d2s(item.createdTime)}被财务主管退回，退回原因：${item.remark}</p>
+        <%}else if(item.status == 'wait_check_second'){%>
+        <p>账单于${dts.d2s(item.createdTime)}被运营主管，审核通过</p>
+        <%}else if(item.status == 'return_check_thirdly'){%>
+        <p>账单于${dts.d2s(item.createdTime)}被部门经理退回，退回原因：${item.remark}</p>
+        <%}else if(item.status == 'wait_check_thirdly'){%>
+        <p>账单于${dts.d2s(item.createdTime)}被财务主管，审核通过</p>
+        <%}else if(item.status == 'wait_pay'){%>
+        <p>账单于${dts.d2s(item.createdTime)}被部门经理，审核通过</p>
+        <%}else if(item.status == 'finish'){%>
+        <p>账单于${dts.d2s(item.createdTime)}被财务，付款</p>
+        <%}%>
+    <%}%>
+</div>
+<div class="hdMore_btns hd_botomDiv">
+    <%
+    select(totalOrder.status){
+    case 'return_check_first', 'return_check_second', 'return_check_thirdly':
+    %>
+    <a class="sui-btn btn-primary btn-piliang btn-restart" href="javascript:void(0);" data-code="${parameter.code!}">重新发起</a>
+    <%
+    default:
+    }%>
+</div>
+<%}%>

@@ -1,0 +1,67 @@
+<%layout("../layout/header_layout.html"){%>
+<title>品牌详情</title>
+<%}%>
+<%layout("../layout/body_layout.html"){%>
+<form class="sui-form form-horizontal detail-form save-form sui-validate" method="POST">
+    <div class="info-group pinpaixqInfo">
+        <div class="control-group">
+            <div class="span3">
+                <div class="input-prepend">
+                    <span class="add-on">品牌名称</span>
+                    <span class="add-text h18">${brand.name}</span>
+                </div>
+            </div>
+            <div class="span3">
+                <div class="input-prepend">
+                    <span class="add-on">品牌名称拼音首字母</span>
+                    <span class="add-text h18">${brand.pinyin}</span>
+                </div>
+            </div>
+        </div>
+        <div class="control-group">
+            <div class="span3">
+                <div class="input-prepend hdMore_btns">
+                    <span class="add-on">品牌图片</span>
+                    <img src="${img_url.getM(brand.logo)}" width="220" id="youborder" />
+                </div>
+            </div>
+        </div>
+        <div class="control-group">
+            <div class="span3">
+                <div class="input-prepend">
+                    <span class="add-on">创建时间</span>
+                    <span class="add-text h18"> ${dts.d2s(brand.created)} </span>
+                </div>
+            </div>
+        </div>
+        <div class="control-group">
+            <div class="span3">
+                <div class="input-prepend">
+                    <span class="add-on">品牌介绍</span>
+                    <textarea class="add-text h20 w600"> ${brand.comment} </textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <table class="sui-table table-bordered">
+        <thead>
+        <th>分类ID</th>
+        <th>分类名称</th>
+        </thead>
+        <tbody>
+        <%for(item in class){%>
+        <tr>
+            <td>${item.id}</td>
+            <td>${item.name}</td>
+        </tr>
+        <%}elsefor{%>
+        <tr>
+            <td colspan="5" class="zanWuShuju"><p>没有数据</p></td>
+        </tr>
+        <%}%>
+        </tbody>
+    </table>
+    <input type="button" class="sui-btn btn-primary btn-close" onclick="javascript:history.back(-1);" value="返回"/>
+</form>
+<%}%>

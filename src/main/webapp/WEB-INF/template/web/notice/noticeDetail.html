@@ -1,0 +1,23 @@
+<%layout("/web/layout/header_layout2.html"){%><%}%>
+<%layout("/web/layout/body_layout2.html"){%>
+<div id="zx_gonggao">
+    <div class="main">
+        <div class="zx_ggbTil">${notice.title!}</div>
+        <div class="zx_ggfTil"><span>时间：${notice.created}</span>
+        </div>
+        <div class="down_fujian" style="display: ${isEmpty(notice.attachment)?'none':'block'}">
+            <a id="downdate_fujian" title="下载附件" href="${img_url.fullPath(notice.attachment!)}" target="_blank"><img src="/static/images/zuixin/down_fujian.png" width="50" /></a>
+            <a href="${img_url.fullPath(notice.attachment)}" target="_blank" title="附件下载" class="fujian_add">附件下载</a>
+        </div>
+        <div class="add_textClass">文章类型：<strong>${notice.type.value}</strong></div>
+        <div class="zx_ggbText">
+            ${notice.content!}
+        </div>
+    </div>
+</div>
+<div class="zx_fuwuCon zx_bortop">
+    <div class="zx_fuwuMain">
+        <img src="/static/images/zuixin/zx_fuwu.png" />
+    </div>
+</div>
+<%}%>

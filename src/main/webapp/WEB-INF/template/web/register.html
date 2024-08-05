@@ -1,0 +1,125 @@
+<%layout("/web/layout/header_layout2.html"){%>
+    <script type="text/javascript">
+        $(function(){
+            bindSendCode($("#HuoQuYzm"));
+            /*bindSendCode($(".send_code"));*/
+            Common.ajaxForm($("form.form-register"),"regSuccess.html", null);
+        });
+        var countdown = 60;
+        function bindSendCode(btn){
+            $(btn).unbind("click").bind("click", function () {
+                var form = $("form.form-register");
+                var phone = form.find("input[name='phone']").val();
+                if (!Common.Rules.mobile.test(phone)) {
+                    form.validate("showError", "phone", "请输入正确的手机号", "myerror");
+                    return;
+                }
+                form.validate("hideError", "phone", "myerror");
+                var checkCode = form.find("input[name='code']").val();
+                if(checkCode + "" == ""){
+                    form.validate("showError", "code", "验证码必填", "myerror");
+                    return;
+                }
+                form.validate("hideError", "code", "myerror");
+                Common.post("${ctx}/sendCode", {phone: phone, checkCode: checkCode}, function (json) {
+                    if (json.code == Common.SUCC) {
+                        $(btn).unbind("click");
+                        setTime(btn);
+                    } else {
+                        Msg.danger(json.message, top);
+                    }
+                });
+            });
+        }
+        function setTime(btn) {
+            if (countdown == 0) {
+                btn.val("获取验证码");
+                bindSendCode(btn);
+                countdown = 60;
+            } else {
+                btn.val("重新发送(" + countdown + ")");
+                countdown--;
+                setTimeout(function () {
+                    setTime(btn)
+                }, 1000)
+            }
+        }
+    </script>
+<%}%>
+<%layout("/web/layout/body_layout2.html"){%>
+<!-- 注册信息 start -->
+<div class="ttlog_main">
+    <div class="ttreg_conter">
+        <form action="addCustomer" class="sui-form form-horizontal sui-validate form-register" method="post">
+            <div class="ttreg_l">
+                <p>
+                    <span class="ttreg_sjhao">手机号</span>
+                    <span><input type="text" class="ttreg_input01" name="phone" maxlength="11" data-rules="required|mobile" data-empty-msg="手机号必填" data-error-msg="手机号不正确" placeholder="请输入11位手机号" onfocus="javascript:this.className='redborder'" onblur="javascript:this.className='ttreg_input01'"/></span>
+                </p>
+                <div class="ty_gyClear"></div>
+                <p>
+                    <span class="ttreg_sjhao">验证码</span>
+                    <span>
+                        <input type="text" class="ttreg_input02" name="code" maxlength="4" data-rules="required" data-empty-msg="验证码必填" placeholder="图片验证码" onfocus="javascript:this.className='redborder04'" onblur="javascript:this.className='ttreg_input02'" />
+                        <img src="${ctx}/captcha" style="float:left;margin-left: 7px;" title="看不清？点击换一张" width="125" height="36" onclick="this.src='/captcha?'+Math.random()" />
+                    </span>
+                </p>
+                <div class="ty_gyClear"></div>
+                <p>
+                    <span class="ttreg_sjhao">短信验证码</span>
+                    <span>
+                        <input type="text" class="ttreg_input03" name="smsCode" maxlength="4" data-rules="required" data-empty-msg="短信验证码必填" placeholder="短信验证码" onfocus="javascript:this.className='redborder05'" onblur="javascript:this.className='ttreg_input03'" />
+                        <input type="button" style="float:left;" value="获取验证码" class="ttDT_pifaBtn send_code" id="HuoQuYzm" />
+                    </span>
+                </p>
+                <div class="ty_gyClear"></div>
+                <p>
+                    <span class="ttreg_sjhao">设置密码</span>
+                    <span><input type="password" class="ttreg_input04" maxlength="20" name="password" data-rules="required" data-empty-msg="密码必填" placeholder="设置密码" onfocus="javascript:this.className='redborder06'" onblur="javascript:this.className='ttreg_input04'" /></span>
+                </p>
+                <div class="ty_gyClear"></div>
+                <p>
+                    <span class="ttreg_sjhao">重复密码</span>
+                    <span><input type="password" class="ttreg_input04" maxlength="20" name="repassword" data-rules="required|match=password" data-empty-msg="密码必填" data-error-msg="2次输入密码不一致" placeholder="重复密码" onfocus="javascript:this.className='redborder06'" onblur="javascript:this.className='ttreg_input04'" /></span>
+                </p>
+                <div class="ty_gyClear"></div>
+                <p>
+                    <span class="ttreg_sjhao">用户帐号</span>
+                    <span><input type="text" class="ttreg_input05" maxlength="20" name="username" data-rules="required" data-empty-msg="用户账号必填" placeholder="用户帐号" maxlength="15" onfocus="javascript:this.className='redborder07'" onblur="javascript:this.className='ttreg_input05'" /></span>
+                </p>
+                <div class="ty_gyClear"></div>
+                <p>
+                    <span class="ttreg_sjhao">用户姓名</span>
+                    <span><input type="text" class="ttreg_input05" maxlength="20" name="name" data-rules="required" data-empty-msg="用户姓名必填" placeholder="用户姓名" onfocus="javascript:this.className='redborder07'" onblur="javascript:this.className='ttreg_input05'" /></span>
+                </p>
+                <div class="ty_gyClear"></div>
+                <p>
+                    <span class="ttreg_sjhao">邮箱</span>
+                    <span><input type="text" class="ttreg_input15" maxlength="25" name="email" data-rules="required|email" data-empty-msg="邮箱必填" data-error-msg="邮箱格式有误" placeholder="邮箱" onfocus="javascript:this.className='redborder17'" onblur="javascript:this.className='ttreg_input15'" /></span>
+                </p>
+                <div class="ty_gyClear"></div>
+                <p class="ttreg_xieyi">
+                    <input name="chk_agree" class="checkbox" type="checkbox" checked onclick="asd();">
+                    <a id="agreement" target="_blank" href="${ctx}/agreement.html" title="天台注册协议">阅读并同意《纳车品供销服务平台用户服务协议》</a>
+                </p>
+                <div class="ty_gyClear"></div>
+                <p>
+                    <input type="submit" title="提交注册" value="提交注册" id="submit" class="ttreg_tijiBtn01" />
+                </p>
+            </div>
+        </form>
+        <div class="ttreg_r">
+            <p class="ttreg_yiyou">已有纳车品会员账号?</p>
+            <p class="ttreg_yytext">登录纳车品供销服务平台，马上享受多项会员专属权益。</p>
+            <!--<p><a href="login.html" title="登录" class="ttreg_logBtn">登录</a></p>-->
+            <p><a href="login.html" title="登录" class="ttDT_pifaBtn loginBtnTL">登录</a></p>
+            <p class="ttreg_yiyou">有任何问题请联系客服</p>
+            <p>
+                <span class="ttreg_kefuImg"><img src="${ctx}/static/images/web/ttreg_kefutel.png" width="32"/></span>
+                <span class="ttreg_kefuText">0576-81300105</span>
+            </p>
+        </div>
+    </div>
+</div>
+<!-- 注册信息 end -->
+<%}%>

@@ -1,0 +1,79 @@
+<%layout("layout/header_layout.html"){%>
+<title>纳车品-管理员登录</title>
+<link rel="stylesheet" type="text/css" href="/static/css/pintuer.css?v=${v}">
+<style>
+    /*zdj add start*/
+    .container {
+        width: 1190px;
+    }
+    body {
+        min-width: 1190px;
+    }
+    /*zdj add end*/
+    .panel-body{background: #fff;}
+    .panel-head {background:-moz-linear-gradient(top, #e5e5e9, #fbfbfc);background:-o-linear-gradient(top, #e5e5e9, #fbfbfc);background:-webkit-gradient(linear, 0 0, 0 bottom, from(#e5e5e9), to(#fbfbfc));border-bottom: 1px solid #f0f0f0;border-radius: 5px 5px 0 0;border-top: 1px solid #fff;color: #707083;font-size: 1em;margin-bottom: 0;margin-top: 0;padding: 1em;text-shadow: 1px 1px 0 #ffffff;}
+    .panel-foot{background: #fff;border-top:1px solid #f0f0f0;}
+    .panel-head{padding:8px 15px;}
+    .bg-main{background:url("/static/images/add/add_logbtnsbg.png");border:0;}
+    .bg-main:hover,.bg-main:focus{background:-moz-linear-gradient(top, #f0c090, #f09c48);background:-o-linear-gradient(top,#f0c090, #f09c48);background:-webkit-gradient(linear, 0 0, 0 bottom, from(#f0c090), to(#f09c48));border:0;}
+    .button.bg-main:hover,.bg-main:focus,.button.bg-main:active{background-color: #ed8e2f;}
+    [class*="icon-"]::before {opacity: 0.7;}
+    .button-block {font-size: 14px;margin-left: 14px;width: 335px;border-radius: 0;}
+    .input{border-radius: 0;box-shadow:0 0px 0px rgba(0, 0, 0, 0) inset;padding-left:12px;color:rgba(0,0,0,.6);}
+    .input:focus {border-color: #ed7700;transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1) 0s;}
+    .input-help ul{padding-left:0;}
+    body{background: url('/static/images/web/adminBg.jpg');}
+    .input-help ul li{ background: #fff2f2 url("/static/images/web/ttreg_error.png") no-repeat scroll 5px center;border: 1px solid #ffe3e0;color: rgba(85,85,85,.7);margin:6px auto 0 auto;padding:5px 10px 5px 30px;list-style: none;font-size: 11px;background-size: 17px;}
+</style>
+<script src="/static/js/pintuer.js?v=${v}"></script>
+<%}%>
+<body>
+<div class="container">
+    <div class="line">
+        <div class="xs6 xm4 xs3-move xm4-move">
+            <br/><br/>
+
+            <div class="media media-y">
+                <!--<a href="#" target="_blank"><img src="/static/images/logo.png" class="radius" alt="后台管理系统"/></a>-->
+            </div>
+            <br/><br/>
+
+            <form action="/admin/login" method="post">
+                <div class="panel">
+                    <div class="panel-head"><strong><img src="/static/images/web/ncp_logo.ico" width="25"><span style="font-size: 15px;color:rgba(0,0,0,.6);padding-left:5px;">登录纳车品后台管理系统</span></strong></div>
+                    <div class="panel-body" style="padding:30px 30px 20px 30px;">
+                        <span style="color: red;font-size: 14px;">${message! }</span>
+
+                        <div class="form-group">
+                            <div class="field field-icon-right">
+                                <input type="text" class="input" name="username" placeholder="登录账号"
+                                       data-validate="required:请填写账号,length#>=1:账号长度不符合要求"/>
+                                <span class="icon icon-user"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="field field-icon-right">
+                                <input type="password" class="input" name="password" placeholder="登录密码"
+                                       data-validate="required:请填写密码,length#>=1:密码长度不符合要求"/>
+                                <span class="icon icon-key"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="field">
+                                <input type="text" class="input" name="passcode" placeholder="填写右侧的验证码"
+                                       data-validate="required:请填写右侧的验证码"/>
+                                <img src="${ctx}/admin/captcha" width="80" style="cursor: pointer;"
+                                     onclick="this.src='${ctx}/admin/captcha?'+Math.random()" height="32" class="passcode"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-foot text-center">
+                        <button class="button button-block bg-main text-big">立即登录后台</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>

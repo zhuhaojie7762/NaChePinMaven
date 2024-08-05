@@ -1,0 +1,88 @@
+<body>
+<style>
+    body {min-width: 1190px;}
+    .sui-pagination div .page-num{width: 30px;}
+    .sui-layout .content{border-radius: 5px;}
+    a{color: #229ccb;}
+    .pagination-large div span:first-child{margin:0 10px;}
+    .pagination-large div span:nth-child(2) input:first-child{margin: 0 0 0 5px;}
+    .pagination-large div span:nth-child(2) input:nth-child(2){margin: 0 5px 0 0;}
+    .pagination-large div span:nth-child(3) input:first-child{margin: 0 0 0 5px;}
+    .sui-pagination ul > .active > a, .sui-pagination ul > .active > span {background:url("/static/images/add/add_logbtnsbg.png");border:1px solid #f09235;color: #fff;}
+    .sui-pagination ul > li > a:hover, .sui-pagination ul > li > a:focus {background:-moz-linear-gradient(top, #ef7700, #f0b478);background:-o-linear-gradient(top, #ef7700, #f0b478);background:-webkit-gradient(linear, 0 0, 0 bottom, from(#ef7700), to(#f0b478));border:1px solid #f09235;color: #fff;}
+    .sui-pagination ul > .active > a:hover, .sui-pagination ul > .active > span:hover, .sui-pagination ul > .active > a:focus, .sui-pagination ul > .active > span:focus {background-color: #ed8e2f;border-color: #ed8e2f;color: #fff;}
+    .sui-pagination ul > li > a, .sui-pagination ul > li > span {background-color: #fff;border: 1px solid #e0e9ee;color: #ed7700;float: left;line-height: 18px;margin-left: -1px;padding: 2px 7px;position: relative;text-decoration: none;}
+    .sui-pagination ul > li > a, .sui-pagination ul > li > span {background-color: #fff;border: 1px solid #e0e9ee;color: #ed7700;float: left;line-height: 18px;margin-left: -1px;padding: 4px 7px;position: relative;text-decoration: none;}
+    .pagination-large div .page-num + .page-confirm {background:url("/static/images/add/add_logbtnsbg.png");border:1px solid #f09235;font-size: 12px;padding: 2px 14px;}
+    .page-confirm{color: #fff;}
+    .sui-breadcrumb{border-bottom: 1px solid #e0e0e0;margin: 5px 5px 15px;padding-bottom: 5px;font-size: 12px;}
+    .sui-form input[type="button"], .sui-form input[type="submit"]{border: 1px solid #f49b58 !important;}
+    .sui-pagination div .page-num:hover,.sui-pagination div .page-num:focus{border:1px solid #f09030;}
+    .sui-form input[type="button"].btn-save{border:1px solid #f09030 !important;margin-right:8px;}
+    .btn-save{margin-right: 4px;}
+    .sui-form input[type="button"].btn-reset{margin-left: 4px;margin-right: 4px;}
+    .sui-dropdown-menu > .active a, .sui-dropdown-menu > .active a, .sui-dropdown-menu > .active a {background: #f09030;}
+    .sui-label.label-danger{background:#229ccb;}
+    .pagination-large div .page-num + .page-confirm:hover, .pagination-large div .page-num + .page-confirm:focus {background:-moz-linear-gradient(top, #f0c090, #f09c48);background:-o-linear-gradient(top,#f0c090, #f09c48);background:-webkit-gradient(linear, 0 0, 0 bottom, from(#f0c090), to(#f09c48));border:1px solid #f09235;}
+    .btn-primary,.dialog .button.dialog-ok{background:url("/static/images/add/add_logbtnsbg.png");border:1px solid #f09235;}
+    .sui-form input[name="ckAll2"]{color: #fff;}
+    .dialog .button.dialog-ok,.dialog .button.dialog-close{border:0;padding:3px 12px;border-radius: 2px;font-size: 12px;}
+    .dialog .button.dialog-ok:hover,.dialog .button.dialog-ok:focus{border:0;}
+    .btn-primary:hover, .btn-primary:focus,.dialog .button.dialog-ok:hover,.dialog .button.dialog-ok:focus{background:-moz-linear-gradient(top, #f0c090, #f09c48);background:-o-linear-gradient(top,#f0c090, #f09c48);background:-webkit-gradient(linear, 0 0, 0 bottom, from(#f0c090), to(#f09c48));}
+    .btn-primary:hover, .btn-primary:focus{border:1px solid #f09235;}
+    .sui-row input[type='reset']{color: #333;}
+    .sui-row input[type='reset']:hover,.sui-row input[type='reset']:active{color: rgba(0,0,0,.3);}
+    .sui-form input[type="button"].btn-reset,.sui-form input[name="ckAll2"],.sui-form input[name="ckInv2"],.sui-form input[type="button"].btn-close,.btn-small,.sui-form input[type="button"].btn-cancel,.dialog .button.dialog-close,.btn-close,.m_saveBtn{color: #333 !important;border:1px solid #d4d4d4 !important;}
+    .sui-form input[type="button"].btn-export,.sui-form input[type="button"].page-confirm,.sui-form input[type="button"].btn-resetPass,.sui-form input[type="button"].btn-ok,.sui-form input.btn-resetPickCode{border: 1px solid #f09c48 !important;}
+    .sui-form input[type="button"]:hover, .sui-form input[type="submit"]:focus{opacity: .6;}
+    .query-zone {margin: 2px 3px 13px 3px;border:1px solid #cfcfd6;}
+    .sui-table {max-width: 99.5%;margin-left:3px;font-size: 13px;color: rgba(0,0,0,.72);}
+    .sui-pagination {margin: 18px 0 18px 5px;}
+    .zanWuShuju{height: 300px;line-height: 300px;font-size: 20px;color:rgba(0,0,0,.36);background: url('/static/images/web/No_search.png') no-repeat 44.6% center;background-size: 30px;}
+    .zanWuShuju p{text-align: left; margin-left:45.8%;}
+    .info-group::after {color: #ed7700;}
+    .sui-form {margin: 5px 0 0 3px;}
+    #yueJieTab th, #yueJieTab td,#yueJieSTab th,#yueJieSTab td,#yueJieHisTab th,#yueJieHisTab td{font-size: 12px;}
+    .checkbox-pretty.checked > span::before, .radio-pretty.checked > span::before {color: #ed7700;}
+    .dialog .dialog-head strong {color: #ed7700;font-size: 14px;}
+
+    .sui-table th {
+         background:-moz-linear-gradient(top,#fcfcfc,#e6e6e7);background:-o-linear-gradient(top,#fcfcfc,#e6e6e7);background:-webkit-gradient(linear, 0 0, 0 bottom, from(#fcfcfc), to(#e6e6e7));
+        box-shadow: 1px 0 0 #f6f6f7 inset;
+        color: #707083;
+        font-size: 1em;
+        font-weight: normal;
+        text-shadow: 1px 1px 0 #ffffff;
+        vertical-align: middle;
+        padding: 8px 10px;
+    }
+    .sui-table tr:hover,.sui-table:focus{background:-moz-linear-gradient(top,#fff,#fafafb);background:-o-linear-gradient(top,#fff,#fafafb);background:-webkit-gradient(linear, 0 0, 0 bottom, from(#fff), to(#fafafb));}
+    .btn-reset,.btn-edit,.btn-stop,.sui-form input[name="ckAll2"],.sui-form input[name="ckInv2"],.sui-form input[type="button"].btn-close,.btn-small,.sui-form input[type="button"].btn-cancel,.dialog .button.dialog-close,.btn-close,.m_saveBtn{
+        background:url("/static/images/web/ncpHuiSe_Btn.png");border: 1px solid #b6b6c1;}
+    .btn-edit,.btn-stop,.btn-small{padding:3px 10px;color:#585868;}
+    .btn-reset:hover,.btn-reset:focus,.btn-edit:hover,.btn-edit:focus,.btn-stop:hover,.btn-stop:focus,.btn-small:hover,.btn-small:focus,.sui-form input[type="button"].btn-cancel:hover,.sui-form input[type="button"].btn-cancel:focus,.dialog .button.dialog-close:hover,.dialog .button.dialog-close:focus,.btn-close:hover,.btn-close:focus,.m_saveBtn:hover,.m_saveBtn:focus{
+        background:-moz-linear-gradient(top, #fff, #fbfbfb);background:-o-linear-gradient(top, #fff, #fbfbfb);background:-webkit-gradient(linear, 0 0, 0 bottom, from(#fff), to(#fbfbfb));border: 1px solid #b6b6c1;}
+    .btn-export,.btn-export:hover,.btn-export:focus{color: #fff;}
+    .sui-nav.nav-tabs > .active > a, .sui-nav.nav-tabs > li > a:hover,.sui-modal .modal-header .modal-title {color: #ef7700;}
+    .sui-form .input-append .add-on, .sui-form .input-prepend .add-on{padding:4px 12px;}
+    .img-thumbnail{margin-left:10px;}
+    .btn-close{margin-left:4px;margin-right: 4px;}
+    .sui-form .span4 .input-prepend{white-space: initial;}
+    .sui-table.table-bordered thead:first-child tr:first-child > th:first-child, .sui-table.table-bordered tbody:first-child tr:first-child > th:first-child{ border-top-left-radius: 5px;}
+    .sui-table.table-bordered thead:first-child tr:first-child > th:last-child, .sui-table.table-bordered tbody:first-child tr:first-child > td:last-child, .sui-table.table-bordered tbody:first-child tr:first-child > th:last-child {border-top-right-radius: 5px;}
+    .sui-table.table-bordered tr td:first-child,.sui-table.table-bordered th:first-child{border-left: 0;}
+    .sui-table.table-bordered{border-radius: 5px;border:1px solid #cfcfd6;}
+    .sui-form input, .sui-form select, .sui-form textarea {background-color: #fff7f7 !important;}
+    .sui-form input[name="ckAll"],.sui-form input[name="ckInv"]{background: url("/static/images/web/ncpHuiSe_Btn.png");border:1px solid #ddd!important;color:#666!important;}
+</style>
+<div style="min-width: 1024px; /*overflow-x: auto;*/">
+    <%include("../common/top.html"){}%>
+    <div class="sui-layout" style="min-width: 1024px;">
+        <%include("../common/left.html"){}%>
+        <div class="content padding10" style="min-width: 850px; min-height: 627px; overflow-x: auto;padding-bottom: 30px;">
+            ${layoutContent}
+        </div>
+    </div>
+</div>
+</body>
+</html>

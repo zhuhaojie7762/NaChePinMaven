@@ -1,0 +1,26 @@
+<%layout("/web/layout/header_layout2.html"){%>
+<script type="text/javascript">
+    $(function(){
+        $(".zhifu_chenggong").unbind("click").bind("click", function(){
+            Common.post2({
+                url: "/trade/payCall",
+                param: {t: '${parameter.t}', alipayNo: '2016070114161000000000000000', result: true},
+                success: function(json) {
+                    Common.go("/trade/paySuccess.html")
+                }
+            })
+        });
+        $(".zhifu_shibai").unbind("click").bind("click", function(){
+            Common.go("/trade/payFail.html")
+        });
+    });
+</script>
+<%}%>
+<%layout("/web/layout/body_layout2.html"){%>
+<div class="ncp_zhifucsPage">
+    <p>
+        <span class="zhifu_chenggong" title="支付成功"></span>
+        <span class="zhifu_shibai" title="支付失败"></span>
+    </p>
+</div>
+<%}%>

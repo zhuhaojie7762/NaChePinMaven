@@ -1,0 +1,330 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head>
+    <meta http-equiv="carlist_content-Type" carlist_content="text/html; charset=utf-8" />
+    <meta name="viewport" carlist_content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>订单管理</title>
+    <link href="/static/images/web/ncp_logo.ico" rel="icon" type="image/x-icon"/>
+    <link href="/static/images/web/ncp_logo.ico" rel="shortcut icon" type="image/x-icon"/>
+    <link rel="stylesheet" type="text/css" href="/static/css/web/common.css?v=${v}">
+    <link rel="stylesheet" type="text/css" href="/static/css/web/style.css?v=${v}">
+    <script type="text/javascript" src="/static/js/web/jquery-1.9.1.min.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/web/zixie.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/web/baidu.js?v=${v}"></script>
+    <script type="text/javascript" src="http://g.alicdn.com/sj/lib/jquery/dist/jquery.min.js?v=${v}"></script>
+    <script type="text/javascript" src="http://g.alicdn.com/sj/dpl/1.5.1/js/sui.min.js?v=${v}"></script>
+    <link rel="stylesheet" type="text/css" href="/static/css/web/sui.min.css?v=${v}">
+    <link rel="stylesheet" type="text/css" href="/static/css/web/sui-append.css?v=${v}">
+    <script type="text/javascript" src="/static/js/common.js?v=${v}"></script>
+    <script type="text/javascript">
+        $(function(){
+            $(".subNav").click(function(){
+                $(this).toggleClass("currentDd").siblings(".subNav").removeClass("currentDd")
+                $(this).toggleClass("currentDt").siblings(".subNav").removeClass("currentDt")
+                $(this).next(".navContent").slideToggle(500).siblings(".navContent").slideUp(500);
+            });
+            Pagination.init();
+            dateFunc.init($("#btn-today"),"today", $("input[name=startTime]"), $("input[name=endTime]"));
+            dateFunc.init($("#btn-lastWeek"),"lastWeek", $("input[name=startTime]"), $("input[name=endTime]"));
+            dateFunc.init($("#btn-lastMonth"),"lastMonth", $("input[name=startTime]"), $("input[name=endTime]"));
+
+            //打开供货商备注
+            $('#zongzi_dingdan td .add_ghsbeizhu').click(function(){
+                var eNode=$(this).children("p");
+                eNode.slideDown();
+            });
+
+            //鼠标移开时自动关闭供货商备注
+            $('.hd_jddwei').mouseleave(function(){
+                $('.header_la').hide();
+            });
+
+            //关闭供货商备注
+            $(" .add_beizhuQbtn").click(function(){
+                $(this).parent().hide();
+            });
+
+            //点击供货商备注保存
+            $(" .add_beizhuBtn").click(function(){
+                if(!confirm("确认要修改备注内容吗？")){
+                    return;
+                }
+                var text = $(this).siblings().find("textarea").val();
+                var id = $(this).siblings().find("textarea").attr("data-id");
+                Common.post("/member/sellOrder/editSupplierComment", {tradeId:id,comment:text}, function (json) {
+                    if (json.code == Common.SUCC) {
+                        Msg.success(json.message);
+                        $(this).parent().hide();
+                    } else {
+                        Msg.danger(json.message);
+                    }
+                });
+            });
+        });
+        $('#demo2.date').datepicker({});
+        $('#demo.date').datepicker({});
+        function resetForm(){
+            $("input.ttlog_input").val('');
+        };
+    </script>
+</head>
+<%layout("../../layout/body_layout.html"){%>
+<style>
+    .sui-dropup .caret::before, .sui-dropdown .caret::before{ content: "";}
+    .sui-dropup.dropdown-bordered .dropdown-inner a, .sui-dropdown.dropdown-bordered .dropdown-inner a{min-width: 116px;}
+    .dropdown-inner {
+        background: rgba(0, 0, 0, 0) url("/static/images/web/xialabg.png") no-repeat scroll 108px center;
+    }
+    .sui-dropup.dropdown-bordered .dropdown-inner > .sui-dropdown-menu, .sui-dropdown.dropdown-bordered .dropdown-inner > .sui-dropdown-menu {
+        margin: 0 0 0 65px;
+        min-width: 68%;
+    }
+    .ttlog_search{padding-top:1px;}
+    .sui-dropup.dropdown-bordered .dropdown-inner, .sui-dropdown.dropdown-bordered .dropdown-inner {
+        border-radius: 0;
+        border:1px solid #ededed;
+        min-width: 140px;
+    }
+    .sui-dropup.dropdown-bordered, .sui-dropdown.dropdown-bordered{line-height: 19px;}
+    .chaxunquyu{position: absolute;top:209px;left:253px;}
+    #chaxun .add_shouxing,#chaxun .daycha{cursor: pointer;color:#169bd5;}
+    #chaxun .daycha{margin:0 12px;}
+    #ddmlF{height: 190px;width: 947px;}
+    .zx_grzxUser{margin: 28px 13px 0;}
+    .ttlog_input, .ttlog_input02{width: 110px;}
+    .ncnum_userMain p.ncnum_p1 span, .ncjhs_p001 span, .ncnum_userMain p.ncp_cityA span, .sui-dropdown.dropdown-bordered .dropdown-inner a, .ncnum_userMain p.ncp_cityA textarea{color:#444;}
+</style>
+<div class="zx_type">
+    <div class="zx_arrow"></div>
+    订单管理
+</div>
+<p class="zx_grzxUser"><span class="indTitleTao"></span>订单管理</p>
+<fieldset id="ddmlF">
+    <legend>查询信息</legend>
+<form action="" method="post">
+    <p id="" class="ttlog_search">
+        <span>货品品牌：</span>
+        <span>
+            <input type="text" class="ttlog_input" onblur="javascript:this.className='ttlog_input'" onfocus="javascript:this.className='ttlog_input02'" value="${params.brand!}" name="brand" />
+        </span>
+        <span>总订单编号：</span>
+        <span>
+            <input type="text" class="ttlog_input" onblur="javascript:this.className='ttlog_input'" onfocus="javascript:this.className='ttlog_input02'" value="${params.tradeCode!}" name="tradeCode" />
+        </span>
+        <span>子订单编号：</span>
+        <span>
+            <input type="text" class="ttlog_input" onblur="javascript:this.className='ttlog_input'" onfocus="javascript:this.className='ttlog_input02'" value="${params.orderCode!}" name="orderCode" />
+        </span>
+        <span>供货商备注：</span>
+        <span>
+            <input type="text" class="ttlog_input" onblur="javascript:this.className='ttlog_input'" onfocus="javascript:this.className='ttlog_input02'" value="${params.supplierComment!}" name="supplierComment" />
+        </span>
+    </p>
+    <div class="ty_gyClear"></div>
+    <p class="ttlog_search">
+        <span>货品货号：</span>
+        <span>
+            <input type="text" class="ttlog_input" onblur="javascript:this.className='ttlog_input'" onfocus="javascript:this.className='ttlog_input02'" value="${params.goodsItemNo!}" name="goodsItemNo" />
+        </span>
+        <div style="position: absolute;top:46px;left:263px;">
+            <div class="ty_gyClear"></div>
+                <span class="sui-dropdown dropdown-bordered select">
+                                <span style="display: block;float: left;margin-top:100px;margin-right:5px;color:#666;">物流公司：</span>
+                    <span class="dropdown-inner" style="padding-top:2px;padding-bottom:2px;margin-top:95px;margin-left:3px;">
+                        <a id="wuliu" role="button" data-toggle="dropdown" href="#" class="dropdown-toggle">
+                            <input name="express" value="${params.express!}" type="hidden"><i class="caret"></i>
+                            <span>
+                            <%
+                            if(isEmpty(params.express)){
+                                print('请选择');
+                            }else{
+                                for (item in express) {
+                                    if(item.id == parseInt(params.express)){
+                                        print(item.name);
+                                    }
+                                }
+                            }%>
+                            </span>
+                        </a>
+                        <ul id="wuliuCon" role="menu" aria-labelledby="wuliu" class="sui-dropdown-menu">
+                            <%for (item in express) {%>
+                            <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="${item.id}" title="${item.name}">${item.name}</a></li>
+                            <%}%>
+                            <li role="presentation" class="divider"></li>
+                            <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" title="请选择">请选择</a></li>
+                        </ul>
+                    </span>
+                </span>
+        </div>
+        <div class="ttlog_search" style="position: absolute;top:130px;left:489px;">
+            <span>&nbsp;&nbsp;&nbsp;货品名称：</span>
+                <span>
+                    <input type="text" class="ttlog_input" onblur="javascript:this.className='ttlog_input'" onfocus="javascript:this.className='ttlog_input02'" value="${params.goodsName!}" name="goodsName" />
+                </span>
+            <span>进货商名称：</span>
+            <span>
+                <input type="text" class="ttlog_input" onblur="javascript:this.className='ttlog_input'" onfocus="javascript:this.className='ttlog_input02'" value="${params.receiveName!}" name="receiveName" />
+            </span>
+        </div>
+    </p>
+    <div class="ty_gyClear"></div>
+    <p id="chaxun" class="ttlog_search">
+        <span>快递单号：</span>
+        <span>
+            <input type="text" class="ttlog_input" onblur="javascript:this.className='ttlog_input'" onfocus="javascript:this.className='ttlog_input02'" value="${params.expressCode!}" name="expressCode" />
+        </span>
+        <span style="margin-left:9px;">下单时间：</span>
+        <span id="demo2" class="date float_l">
+            <span class="add-on">&nbsp;</span>
+            <input type="text" name="startTime" value="${params.startTime!}" style="width: 110px;" class="ttlog_input" onfocus="javascript:this.className='ttlog_input02'" onblur="javascript:this.className='ttlog_input'">
+        </span>
+        <script type="text/javascript">
+            $('#demo2.date').datepicker({});
+        </script>
+        <span id="demo" class="date float_l">
+            <span class="add-on">至</span>
+            <input type="text" name="endTime" value="${params.endTime!}" style="width: 110px;"  class="ttlog_input" onfocus="javascript:this.className='ttlog_input02'" onblur="javascript:this.className='ttlog_input'">
+        </span>
+        <script type="text/javascript">
+            $('#demo.date').datepicker({});
+        </script>
+        <span class="add_shouxing" id="btn-today" title="当日">当日</span>
+        <span class="daycha" id="btn-lastWeek" title="最近7天">最近7天</span>
+        <span class="add_shouxing" id="btn-lastMonth" title="最近30天">最近30天</span>
+    </p>
+    <div class="ty_gyClear"></div>
+        <div style="position: absolute;top:170px;left:28px;">
+            <div class="ty_gyClear"></div>
+            <style>
+                .sui-dropup .caret::before, .sui-dropdown .caret::before{ content: "";}
+            </style>
+                <span class="sui-dropdown dropdown-bordered select">
+                                <span style="display: block;float: left;margin-top:60px;margin-right:5px;color: #333;">交易状态：</span>
+                    <span class="dropdown-inner" style="padding-top:2px;padding-bottom:2px;margin-top:55px;">
+                        <a id="drop12" role="button" data-toggle="dropdown" href="#" class="dropdown-toggle">
+                            <input name="status" value="${params.status!}" type="hidden"><i class="caret"></i>
+                            <span>${decode(params.status,'10','待付款','20','交易关闭','30','待拣货','31','取消订单审核中','33','取消订单完成','40','待发货','50','待收',
+                                '70','退货申请','80','退货发回','90','退货完成','100','退货协商','105','退款申请','116','退款完成','200','完成','请选择')}</span>
+                        </a>
+                        <ul id="menu12" role="menu" aria-labelledby="drop12" class="sui-dropdown-menu">
+                            <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="10" title="未付款">待付款</a></li>
+                            <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="20" title="交易关闭">交易关闭</a></li>
+                            <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="30" title="待拣货">待拣货</a></li>
+                            <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="35" title="拣货中">拣货中</a></li>
+                            <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="50" title="待收">待收</a></li>
+                            <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="70" title="退货申请">退货申请</a></li>
+                            <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="80" title="退货发回">退货发回</a></li>
+                            <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="90" title="退货完成">退货完成</a></li>
+                            <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="100" title="退货协商">退货协商</a></li>
+                            <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="105" title="退款申请">退款申请</a></li>
+                            <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="116" title="退款完成">退款完成</a></li>
+                            <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="200" title="完成">完成</a></li>
+                            <li role="presentation" class="divider"></li>
+                            <li role="presentation" class="active"><a role="menuitem" tabindex="-1" href="javascript:void(0);" title="请选择">请选择</a></li>
+                        </ul>
+                    </span>
+                </span>
+        </div>
+        <div class="chaxunquyu">
+            <span><input type="submit" class="ttLog_chaXun" title="查询" value="&nbsp;&nbsp;查询&nbsp;&nbsp;" /> </span>
+            <span><input type="button" class="ttLog_chongzhi" onclick="resetForm()" value="&nbsp;&nbsp;重置&nbsp;&nbsp;"/></span>
+        </div>
+    </form>
+</fieldset>
+<div class="ty_gyClear"></div>
+<table class="sui-table table-bordered" id="zongzi_dingdan">
+    <thead>
+        <th>货品详情</th>
+        <th width="60">单价</th>
+        <th width="60">数量</th>
+        <th width="80">状态</th>
+        <th width="70">优惠</th>
+        <th width="82">实付款</th>
+        <th width="86">操作</th>
+    </thead>
+    <tbody>
+    <%for(trade in pager.data!){%>
+    <tr>
+        <td colspan="7">
+            <span>总订单号：${trade.code}</span>
+            <span class="add_xiadantime">下单时间：${trade.created, "yyyy-MM-dd HH:mm:ss"}</span>
+        </td>
+    </tr>
+    <%for(item in trade.orders!){%>
+    <tr>
+        <td>
+            <div class="add_zidingdan">${item.code}</div>
+            <div class="add_shopxqing">
+                <a href="/goods/${item.goodsCode}.html" target="_blank">
+                    <dl>
+                        <dt><img src="${img_url.getS(item.headImg!)}" width="70" /></dt>
+                        <dd class="title">${item.goodsName}</dd>
+                        <dd class="huohao">商品货号：${item.goodsItemNo}</dd>
+                        <dd class="huohao">${item.specPropValue}</dd>
+                    </dl>
+                </a>
+            </div>
+        </td>
+        <td>${nums.yuan(item.price)}</td>
+        <td>${item.quantity}</td>
+        <td>${item.status.name}</td>
+        <%if(itemLP.isFirst){%>
+        <td <% if(itemLP.size > 1) {%>
+        rowspan="${itemLP.size}"
+        <%}else{%>
+        class="add_tdnoborder"
+        <%} %>
+        >
+        <% if(trade.couponFee > 0){%>
+        优惠券(${trade.useType! == 'PAYMENT'? '抵货款' : '抵运费'} 抵运费)${nums.yuan(trade.couponFee)}元
+        <%} %>
+        <%if(trade.packSubsidy > 0){%>
+        打包袋优惠${nums.yuan(trade.packSubsidy)}元
+        <%}%>
+        </td>
+        <td <% if(itemLP.size > 1) {%>
+        rowspan="${itemLP.size}"
+        <%}else{%>
+        class="add_tdnoborder"
+        <%} %>
+        >
+            ${nums.yuan(trade.payment)}元(含运费
+            <%if(trade.useType! == 'POST_FEE'){%>
+            ${nums.yuan(trade.postFee - trade.couponFee)}
+            <%}else{%>
+            ${nums.yuan(trade.postFee)}
+            <%}%>元)
+        </td>
+
+        <td <% if(itemLP.size > 1) {%>
+        rowspan="${itemLP.size}" class="hd_jddwei ncguanzhu_chaK02"
+        <%}else{%>
+        class="hd_jddwei ncguanzhu_chaK02 add_tdnoborder"
+        <%}%>
+        >
+            <span class="add_ghsbeizhu">
+                供货商备注
+                <p class="header_la">
+                    <span>
+                        <textarea class="beiZhuQuYu" rows="6" data-id="${trade.id}" placeholder="请填写备注内容（50字以内）。">${trade.supplierComment!}</textarea>
+                    </span>
+                    <span class="add_beizhuBtn">确定</span>
+                    <span class="add_beizhuQbtn">取消</span>
+                </p>
+            </span>
+            <div class="ty_gyClear"></div>
+            <br />
+            <a href="${trade.id}.html" target="_blank">订单详情</a>
+        </td>
+        <%}%>
+    </tr>
+    <%}%>
+    <%}elsefor{%>
+    <tr>
+        <td colspan="7" class="zanWuShuju"><p>暂无数据</p></td>
+    </tr>
+    <%}%>
+    </tbody>
+</table>
+<#webPage val='${pager.page}' size='large' params = '${params!}' showNum = 'hide' />
+<%}%>
+</html>

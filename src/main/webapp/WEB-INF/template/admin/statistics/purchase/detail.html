@@ -1,0 +1,90 @@
+<%layout("../../layout/header_layout.html"){%>
+<title>进货商明细统计</title>
+<style>
+    #confirm_Con .sui-btn{margin:1px 5px 0 0;}
+    #confirm_Con .sui-row:last-child{margin-top:8px;}
+    .ncp_addspanys span{display: block;float: left;color:#999;font-size: 13px;padding:10px 15px 10px 0;}
+    #jinhuostj_tab td:nth-child(21),#jinhuostj_tab td:nth-child(18){word-wrap: break-word;word-break: normal;word-break:break-all;}
+    #jinhuostj_tab td.add_rightbor{border-right:1px solid #f0f0f0;}
+</style>
+<%}%>
+<%layout("../../layout/body_layout.html"){%>
+<div class="ncpTable_Con">
+    <p class="addjuzhong">（${parameter.startTime!} ~ ${parameter.endTime!}）订单明细统计</p>
+</div>
+<div class="ncp_addspanys">
+        <span>进货商账号：${buyer.username}</span>
+        <span>进货商名称：${buyer.name}</span>
+        <span>进货商电话：${buyer.phone}</span>
+</div>
+<table class="sui-table table-bordered" id="jinhuostj_tab">
+    <thead>
+    <tr>
+        <th width="70">总订单编号</th>
+        <th width="70">子订单编号</th>
+        <th width="60">商品货号</th>
+        <th width="120">商品名称</th>
+        <th width="70">商品单价</th>
+        <th width="100">商品规格</th>
+        <th width="60">商品数量</th>
+        <th width="70">商品总金额</th>
+        <th width="70">交易状态</th>
+        <th width="100" title="使用优惠劵类别">优惠劵类别</th>
+        <th width="70" title="使用优惠金额">优惠金额</th>
+        <th width="70">打包袋金额</th>
+        <th width="70">打包袋优惠金额</th>
+        <th width="70">商品重量</th>
+        <th width="70">订单运费</th>
+        <th width="80">下单时间</th>
+        <th width="80">付款时间</th>
+        <th width="80">发货时间</th>
+        <th width="100" title="快递公司名称">快递公司</th>
+        <th width="50">快递单号</th>
+        <th width="80" title="收货人信息">收货人</th>
+        <th width="90">买家备注</th>
+        <th width="70">支付宝交易号</th>
+        <th width="70">支付金额</th>
+    </tr>
+    </thead>
+    <tbody>
+    <%for(trade in trades){%>
+    <%for(order in trade.orders){%>
+    <tr>
+        <%if(orderLP.isFirst){%>
+        <td rowspan="${orderLP.size}" class="add_rightbor">${trade.code}</td>
+        <%}%>
+        <td style="border-left:none;">${order.code}</td>
+        <td>${order.goodsItemNo}</td>
+        <td>${order.goodsName}</td>
+        <td>${nums.yuan(order.price)}</td>
+        <td>${order.specPropValue2}</td>
+        <td>${order.quantity}</td>
+        <td>${nums.yuan(order.money)}</td>
+        <td>${order.status.name}</td>
+        <%if(orderLP.isFirst){%>
+        <td rowspan="${orderLP.size}">${decode(trade.useType,'POST_FEE','抵运费','PAYMENT','抵货款','')}</td>
+        <td rowspan="${orderLP.size}">${nums.yuan(trade.couponFee)}</td>
+        <td rowspan="${orderLP.size}">${nums.yuan(trade.packFee)}</td>
+        <td rowspan="${orderLP.size}">${nums.yuan(trade.packSubsidy)}</td>
+        <td rowspan="${orderLP.size}">${nums.g2k(trade.weight)}KG</td>
+        <td rowspan="${orderLP.size}">${nums.yuan(trade.postFee)}</td>
+        <td rowspan="${orderLP.size}">${trade.created}</td>
+        <td rowspan="${orderLP.size}">${trade.payTime}</td>
+        <td rowspan="${orderLP.size}">${trade.consignTime}</td>
+        <td rowspan="${orderLP.size}">${trade.expressName}</td>
+        <td rowspan="${orderLP.size}">${trade.expressCode}</td>
+        <td rowspan="${orderLP.size}">${trade.receiveName}</td>
+        <td rowspan="${orderLP.size}">${order.buyerMessage}</td>
+        <td rowspan="${orderLP.size}">${trade.alipayNo}</td>
+        <td rowspan="${orderLP.size}">${nums.yuan(trade.payment)}</td>
+        <%}%>
+    </tr>
+    <%}%>
+    <%}elsefor{%>
+    <tr>
+        <td colspan="23" class="zanWuShuju"><p>没有数据</p></td>
+    </tr>
+    <%}%>
+    </tbody>
+</table>
+<%}%>

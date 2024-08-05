@@ -1,0 +1,67 @@
+<%layout("/web/layout/header_layout.html"){%>
+<script type="text/javascript">
+    $(function(){
+        $(".subNav").click(function(){
+            $(this).toggleClass("currentDd").siblings(".subNav").removeClass("currentDd")
+            $(this).toggleClass("currentDt").siblings(".subNav").removeClass("currentDt")
+            $(this).next(".navContent").slideToggle(500).siblings(".navContent").slideUp(500);
+        });
+        Pagination.init();
+        $(".btn-delFollow").unbind("click").bind("click", function(){
+            var id = $(this).siblings("input").val();
+            Common.post("/member/deleteFollow", {id:id}, function (json) {
+                if (json.code == Common.SUCC) {
+                    Msg.success("取消关注成功", function(){
+                        Common.refresh();
+                    });
+                } else {
+                    Msg.danger(json.message);
+                }
+            });
+        })
+    })
+</script>
+<%}%>
+<%layout("../layout/body_layout.html"){%>
+<!--主体 start-->
+<div class="zx_type">
+    <div class="zx_arrow"></div>
+    关注列表
+</div>
+<p class="zx_grzxUser"><span class="indTitleTao"></span>关注列表</p>
+    <table class="sui-table table-bordered" id="guanZhList">
+        <thead>
+        <tr>
+            <th width="52">商品编号</th>
+            <th width="200">商品名称</th>
+            <th width="56">商品图片</th>
+            <th width="50">商品单价</th>
+            <th width="76">是否特殊商品</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <%for(item in pager.data!){%>
+        <tr>
+            <td><a title="${item.code}" href="/goods/${item.code}.html" target="_blank">${item.code!}</a></td>
+            <td>${item.name!}</td>
+            <td><img width="48" src="${img_url.getS(item.headImgUrl1)}"></td>
+            <td>${item.wholesalePrice/100, "#0.00"}</td>
+            <td>${item.isSpecial!false ? '是':'否'}</td>
+            <td>
+                <span class="ncguanzhu_chaK"><a href="/goods/${item.code}.html" target="_blank" title="查看">查看</a></span>
+                <span class="ncguanzhu_chaK02 btn-delFollow"><a href="javascript:void(0);" title="取消关注">取消关注</a></span>
+                <input type="hidden" value="${item.followId}">
+            </td>
+        </tr>
+        <%}elsefor{%>
+        <tr>
+            <td colspan="6" class="zanWuShuju"><p>暂无数据</p></td>
+        </tr>
+        <%}%>
+        </tbody>
+    </table>
+        <#webPage val='${pager.page}' size='large' params = '${params!}' showNum = 'hide' />
+        <div class="jiangeDiv"></div>
+<%}%>
+</html>

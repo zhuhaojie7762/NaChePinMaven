@@ -1,0 +1,136 @@
+<%layout("/web/layout/header_layout2.html"){%>
+<script type="text/javascript" src="${ctx}/static/js/zuixin/lazyload.js"></script>
+<script>
+    $(document).ready(function(){
+        $("#demoOne li:nth-child(1),#demoOne li:nth-child(2),#demoOne li:nth-child(3),#demoOne li:nth-child(4),#demoOne li:nth-child(5),#demoOne li:nth-child(7),#demoOne li:nth-child(8),#demoOne li:nth-child(9),#demoOne li:nth-child(10),#demoOne li:nth-child(11),#demoOne li:nth-child(13),#demoOne li:nth-child(14),#demoOne li:nth-child(15),#demoOne li:nth-child(16),#demoOne li:nth-child(17),#demoOne li:nth-child(19),#demoOne li:nth-child(20),#demoOne li:nth-child(21),#demoOne li:nth-child(22),#demoOne li:nth-child(23),#demoOne li:nth-child(25),#demoOne li:nth-child(26),#demoOne li:nth-child(27),#demoOne li:nth-child(28),#demoOne li:nth-child(29),#demoOne li:nth-child(31),#demoOne li:nth-child(32),#demoOne li:nth-child(33),#demoOne li:nth-child(34),#demoOne li:nth-child(35)").css("margin-right","22px");
+        var isload = false;
+        $(window).bind("scroll", function () {
+            if ($(document).scrollTop() + $(window).height() > $(document).height() - 100 && !isload) {
+                isload = true;
+                var request = $.ajax({
+                    url: '/brand/brandLoad',
+                    data: {'pageFlag' : $('#pageValue').val()},
+                    dataType: 'json'
+                });
+
+                request.done(function(result) {
+                    var html = '';
+                    var brand = result.data.data;
+                    $('#pageValue').val(result.data.page.curNo + 1);
+                    if (brand.length == 0) {
+                        isload = true;
+                        return;
+                    }
+
+                    html = brandCell(html, brand);
+                    $('#demoOne').append(html);
+                    isload = false;
+                });
+            }
+        });
+
+        $('.ln-letters a').click(function() {
+            isload = true;
+            $('#demoOne').html("");
+            $(this).addClass('ln-selected').siblings('a').removeClass('ln-selected');
+            var request = $.ajax({
+                url: '/brand/brand.html',
+                data: {'flag':$(this).attr('values')},
+                dataType: 'json'
+            });
+
+            request.done(function(result) {
+                var html = '';
+                var brand = result.data.data;
+                if (brand.length == 0)
+                    html += '<p>暂无品牌</p>';
+
+                html = brandCell(html, brand);
+                $('#demoOne').html(html);
+            });
+        });
+
+        var brandCell = function(html, brand) {
+            $.each(brand, function(i, val) {
+                html += (i + 1)%6 == 0? '<li>' : '<li style="margin-right: 22px;">';
+                html += '<a href="/brand/brandDetail.html?brandId=' + val.id + '" title="' + val.name + '" >';
+                html += '<span>' + val.id + '</span>';
+                html += '<div class="new_pinpaiListdiv">' + val.name + '</div>';
+                html += '<div class="zx_pinpaiFu">' + val.name + '</div>';
+                html += '</a></li>';
+            });
+            return html;
+        }
+    });
+    <!--图片加载 start-->
+    var lazyload =$.noConflict();
+    lazyload(function(){
+        lazyload("#demoOne li a img").lazyload({
+            placeholder : "/static/images/zuixin/zx_jiazai.gif",
+            effect :"fadeIn"
+        });
+    });
+    <!--图片加载 end-->
+</script>
+<style>
+    #demoOne-nav{background: #f5f5f5;margin:0 auto;padding-top:20px;}
+</style>
+<%}%>
+<%layout("/web/layout/body_layout2.html"){%>
+<div id="demoOne-nav" class="listNav">
+    <div class="ln-letters">
+        <p>汽车用品大全</p>
+        <a class="all ln-selected" href="${ctx}/brand/brand.html">ALL</a>
+        <a class="a" href="javascript:;" values="A">A</a>
+        <a class="b" href="javascript:;" values="B">B</a>
+        <a class="c" href="javascript:;" values="C">C</a>
+        <a class="d" href="javascript:;" values="D">D</a>
+        <a class="e" href="javascript:;" values="E">E</a>
+        <a class="f" href="javascript:;" values="F">F</a>
+        <a class="g" href="javascript:;" values="G">G</a>
+        <a class="h" href="javascript:;" values="H">H</a>
+        <a class="i" href="javascript:;" values="I">I</a>
+        <a class="j" href="javascript:;" values="J">J</a>
+        <a class="k" href="javascript:;" values="K">K</a>
+        <a class="l" href="javascript:;" values="L">L</a>
+        <a class="m" href="javascript:;" values="M">M</a>
+        <a class="n" href="javascript:;" values="N">N</a>
+        <a class="o" href="javascript:;" values="O">O</a>
+        <a class="p" href="javascript:;" values="P">P</a>
+        <a class="q" href="javascript:;" values="Q">Q</a>
+        <a class="r" href="javascript:;" values="R">R</a>
+        <a class="s" href="javascript:;" values="S">S</a>
+        <a class="t" href="javascript:;" values="T">T</a>
+        <a class="u" href="javascript:;" values="U">U</a>
+        <a class="v" href="javascript:;" values="V">V</a>
+        <a class="w" href="javascript:;" values="W">W</a>
+        <a class="x" href="javascript:;" values="X">X</a>
+        <a class="y" href="javascript:;" values="Y">Y</a>
+        <a class="z ln-last" href="javascript:;" values="Z">Z</a>
+    </div>
+</div>
+<div id="main_content_wrap" class="outer">
+    <section id="main_content" class="inner">
+        <div class="ty_gyClear"></div>
+        <ul id="demoOne" class="demo">
+            <%for(brand in brands.data){%>
+                <li>
+                    <a href="/brand/brandDetail.html?brandId=${brand.id!}" title="${brand.name!}">
+                        <span>${brand.id!}</span>
+                        <div class="new_pinpaiListdiv">${brand.name!}</div>
+                        <div class="zx_pinpaiFu">${brand.name!}</div>
+                    </a>
+                </li>
+            <%}elsefor{%>
+                <p class="zx_nogoodsM">暂无品牌</p>
+            <%}%>
+        </ul>
+    </section>
+    <input type="hidden" id="pageValue" value="4" />
+</div>
+<div class="zx_fuwuCon">
+    <div class="zx_fuwuMain">
+        <img src="${ctx}/static/images/zuixin/zx_fuwu.png" />
+    </div>
+</div>
+<%}%>

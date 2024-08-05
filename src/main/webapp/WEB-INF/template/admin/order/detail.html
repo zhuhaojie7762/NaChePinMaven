@@ -1,0 +1,289 @@
+<%layout("../layout/header_layout.html"){%>
+<title>订单详情</title>
+<link rel="stylesheet" type="text/css" href="/static/css/web/peisongwuliu.css">
+<script type="text/javascript">
+    $(function () {
+        $(".btn-close").unbind("click").bind("click", function () {
+            window.opener=null;
+            window.open('','_self');
+            window.close();
+        });
+    });
+</script>
+<style>
+    .orderInfo:after {
+        content: "子订单详情";
+    }
+    .expressInfo:after {
+        content: "物流信息";
+    }
+    .wuliugenzongInfo:after {
+        content: "物流跟踪";
+    }
+    #xiuxqCon .add_marling{margin-bottom: 0;}
+    .sui-row:last-child{padding-left:0;}
+    .sui-row{margin-top:5px;}
+</style>
+<%}%>
+<%layout("../layout/body_layout.html"){%>
+<div class="query-zone" id="xiuxqCon">
+    <form class="sui-form form-horizontal detail-form" novalidate="novalidate" method="POST">
+        <div class="info-group zongddInfo">
+            <div class="control-group add_marling">
+                <div class="sui-row">
+                    <div class="span3">
+                        <div class="input-prepend">
+                            <span class="add-on">总订单编号</span>
+                            <span class="add-text h18">
+                               ${trade.code}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="sui-row">
+                    <div class="span3">
+                        <div class="input-prepend">
+                            <span class="add-on">进货商信息</span>
+                            <span class="add-text h18">
+                               ${buyCustomer.name}&nbsp;${buyCustomer.phone}&nbsp;${buyCustomer.province}${buyCustomer.city}${buyCustomer.area}${buyCustomer.address}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="add_clear"></div>
+                <div class="sui-row">
+                    <div class="span3">
+                        <div class="input-prepend">
+                            <span class="add-on">管理员备注</span>
+                            <span class="add-text h18">
+                               ${trade.managerComment}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <%for(order in orders){%>
+        <div class="info-group orderInfo">
+            <div class="control-group">
+                <div class="sui-row">
+                    <div class="span3">
+                        <div class="input-prepend">
+                            <span class="add-on">子订单编号</span>
+                            <span class="add-text h18">
+                               ${order.code}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="add_clear"></div>
+                <div class="sui-row">
+                    <div class="span3">
+                        <div class="input-prepend">
+                            <span class="add-on">是否特殊商品</span>
+                            <span class="add-text h18">
+                               ${order.isSpecial?'是':'否'}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="add_clear"></div>
+                <div class="sui-row">
+                    <div class="span3">
+                        <div class="input-prepend">
+                            <span class="add-on">供货商地址</span>
+                            <span class="add-text h18">
+                               ${order.sellerName!}&nbsp;${order.sellerPhone!}&nbsp;${order.sellerAddress!}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <table class="sui-table table-bordered" id="zongzi_xiangq">
+                <thead>
+                <th width="200">货品详情</th>
+                <th width="180">规格属性</th>
+                <th width="100">单价</th>
+                <th width="100">数量</th>
+                <th width="100">货品总价(元)</th>
+                <th width="82">状态</th>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>
+                        <div class="add_shopxqing add_shijiwidth">
+                            <a href="/goods/${order.code}.html" target="_blank">
+                                <dl style="float:left;">
+                                    <dt><img src="${img_url.getS(order.headImg!)}" width="70" /></dt>
+                                    <dd class="title">${order.goodsName}</dd>
+                                </dl>
+                            </a>
+                        </div>
+                    </td>
+                    <td>${order.specPropValue}</td>
+                    <td>${nums.yuan(order.price)}</td>
+                    <td>${order.quantity}</td>
+                    <td>${nums.yuan(order.money)}</td>
+                    <td>${order.status.name}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <%}%>
+        <div class="info-group expressInfo">
+            <div class="control-group">
+                <div class="sui-row">
+                    <div class="span3">
+                        <div class="input-prepend">
+                            <span class="add-on">订单总重量</span>
+                            <span class="add-text h18">
+                                ${nums.g2k(trade.weight)}KG
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="sui-row">
+                    <div class="span3">
+                        <div class="input-prepend">
+                            <span class="add-on">订单运费</span>
+                            <span class="add-text h18">
+                                <%if(trade.useType! == 'POST_FEE'){%>
+                                ${nums.yuan(trade.postFee - trade.couponFee)}
+                                <%}else{%>
+                                ${nums.yuan(trade.postFee)}
+                                <%}%>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <%for(order in orders){%>
+                <div class="sui-row">
+                    <div class="span3">
+                        <div class="input-prepend">
+                            <span class="add-on">子订单(${order.code})状态</span>
+                            <span class="add-text h18">
+                                ${order.status.name}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <%}%>
+                <div class="sui-row">
+                    <div class="span3">
+                        <div class="input-prepend">
+                            <span class="add-on">收货人信息</span>
+                            <span class="add-text h18">
+                                ${trade.receivePhone}&nbsp;${trade.receiveName}&nbsp;${county.provinceName!''}${county.cityName!''}${county.name!''}${trade.receiveAddress}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="sui-row">
+                    <div class="span3">
+                        <div class="input-prepend">
+                            <span class="add-on">物流公司</span>
+                            <span class="add-text h18">
+                               ${sendOrder.expressName!}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="sui-row">
+                    <div class="span3">
+                        <div class="input-prepend">
+                            <span class="add-on">物流单号</span>
+                            <span class="add-text h18">
+                                ${sendOrder.expressCode!}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="sui-row">
+                    <div class="span3">
+                        <div class="input-prepend">
+                            <span class="add-on">买家留言</span>
+                            <span class="add-text h18">
+                                ${orders[0].buyerMessage}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="info-group wuliugenzongInfo">
+            <div data-mohe-type="kuaidi_new" class="g-mohe " id="mohe-kuaidi_new">
+                <div id="mohe-kuaidi_new_nucom">
+                    <div class="mohe-wrap mh-wrap">
+                        <div class="mh-cont mh-list-wrap mh-unfold">
+                            <div class="mh-list">
+                                <ul>
+                                    <%if(!has(expressJson)){%>
+                                    <div class="kuaiDi_wuYs">
+                                        <p>啊~~哦！暂无快递信息。</p>
+                                    </div>
+                                    <%}else if(expressJson.status == '2'){%>
+                                    ${expressJson.message!}
+                                    <%}else {%>
+                                    <%for(express in expressJson.data!){%>
+                                    <%if(expressLP.last){%>
+                                    <li>
+                                        <img class="lasteZui" src="/static/images/web/wuLiu_ok.png" width="18" />
+                                        <p>${express.time!}</p>
+                                        <p>${express.context!}</p>
+                                        <span class="after"></span>
+                                    </li>
+                                    <%}else if(expressLP.first){%>
+                                    <li class="first">
+                                        <img class="firstZui" src="/static/images/web/wuLiu_yuan02.png" width="16" />
+                                        <p>${express.time!}</p>
+                                        <p>${express.context!}</p>
+                                        <span class="beforeLv"></span><span class="after"></span>
+                                    </li>
+                                    <%}else{%>
+                                    <li>
+                                        <img class="huiImg" src="/static/images/web/wuLiu_yuan02.png" width="16" />
+                                        <p>${express.time!}</p>
+                                        <p>${express.context!}</p>
+                                        <span class="before"></span><span class="after"></span>
+                                    </li>
+                                    <%}%>
+                                    <%}%>
+                                    <%}%>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--<div class="info-group jiageInfo">-->
+            <!--<table class="sui-table table-bordered" id="xiujiaxq" >-->
+                <!--<thead>-->
+                    <!--<th width="80">子订单编号</th>-->
+                    <!--<th width="130">货品名称</th>-->
+                    <!--<th width="100">原价</th>-->
+                    <!--<th width="100">数量</th>-->
+                    <!--<th width="100">修改后货品价</th>-->
+                    <!--<th width="100">修改后物流运费</th>-->
+                    <!--<th width="">修改理由</th>-->
+                <!--</thead>-->
+                <!--<tbody>-->
+                    <!--<tr>-->
+                        <!--<td>-->
+                            <!--ZD000100-->
+                        <!--</td>-->
+                        <!--<td>卡通羽绒坐垫</td>-->
+                        <!--<td>60.00</td>-->
+                        <!--<td>10</td>-->
+                        <!--<td>55.00</td>-->
+                        <!--<td>8.00</td>-->
+                        <!--<td>双11降价</td>-->
+                    <!--</tr>-->
+                <!--</tbody>-->
+            <!--</table>-->
+        <!--</div>-->
+        <input type="button" class="sui-btn btn-primary btn-close" value="关闭"/>
+    </form>
+</div>
+<%include("../common/dialog.html"){}%>
+<%}%>

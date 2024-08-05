@@ -1,0 +1,255 @@
+<%layout("../layout/header_layout.html"){%>
+<title>发布文章</title>
+<link rel="stylesheet" type="text/css" href="/static/css/web/webuploader.css?v=${v}">
+<script type="text/javascript" src="/static/js/web/webuploader.js?v=${v}"></script>
+<script type="text/javascript">
+    $(function(){
+        /**
+         * 预览
+         */
+        $(".btn-preview").click(function(){
+            $("form.query-form").attr("target","_blank");
+            $("form.query-form").attr("action","/admin/notice/preview");
+            $("form.query-form").submit();
+        });
+
+        /**
+         * 发布文章
+         */
+        $(".btn-save").click(function(){
+            $("form.query-form").attr("target","_self");
+            $("form.query-form").attr("action","/admin/notice/save");
+            $("form.query-form").submit();
+        });
+
+        /**
+         * 添加附件
+         */
+        var  filePolicy = "${imagePolicy.policy!}";
+        var signature = "${imagePolicy.signature!}";
+        var $list = $('#thelist'),
+//                $btn = $('#filePicker'),
+                state = 'pending',
+                uploader;
+
+        uploader = WebUploader.create({
+
+            // 选完文件后，是否自动上传。
+            auto: true,
+
+            // 不压缩image
+            resize: false,
+
+            // swf文件路径
+            swf:'/static/js/Uploader.swf',
+
+            // 文件接收服务端。
+            server: 'http://v0.api.upyun.com/nachepin-storage',
+
+            // 选择文件的按钮。可选。
+            // 内部根据当前运行是创建，可能是input元素，也可能是flash.
+            //zdj 修改
+            pick: '#filePicker',
+
+            fileNumLimit: 1,
+            fileSizeLimit: 100 * 1024 * 1024,    // 100 M
+            fileSingleSizeLimit: 100 * 1024 * 1024,    // 100 M
+
+            formData:{'policy':filePolicy,
+                'signature':signature}
+        });
+
+
+        // 当有文件添加进来的时候
+        uploader.on( 'fileQueued', function( file ) {
+            $list.find("label").hide();
+            $list.find(".item").remove();
+            $list.append( '<div id="' + file.id + '" class="item shangChuanJar">' +
+                    '<span class="info zhidingYS-info" >' + file.name + '</span>' +
+                    '<span class="state zhidingYS-state">等待上传...</span>' +
+                    '</div>' );
+            $("#uploading1").val("上传中");
+        });
+
+        // 文件上传过程中创建进度条实时显示。
+        uploader.on( 'uploadProgress', function( file, percentage ) {
+            var $li = $( '#'+file.id ),
+                    $percent = $li.find('.progress .progress-bar');
+
+            // 避免重复创建
+            if ( !$percent.length ) {
+                $percent = $('<div class="progress progress-striped active" >' +
+                        '<div class="progress-bar" role="progressbar" style="width: 0%">' +
+                        '</div>' +
+                        '</div>').appendTo( $li ).find('.progress-bar');
+            }
+
+            $li.find('span.state').text('上传中');
+
+            $percent.css( 'width', percentage * 100 + '%' );
+        });
+
+        uploader.on( 'uploadSuccess', function( file, json ) {
+            var $file = $('#' + file.id);
+            $file.find('span.state').text('已上传');
+            if (json.code == "200") {
+                $file.siblings("input:hidden").val(json.url);
+                $("#uploading1").val("");
+                uploader.reset();
+            }
+        });
+
+        uploader.on( 'uploadError', function( file ) {
+            var $file = $('#' + file.id);
+            $file.find('span.state').text('上传出错，请重新上传');
+
+            $file.siblings("input:hidden").val("");
+            $("#uploading1").val("");
+            uploader.reset();
+        });
+
+        uploader.onError = function( code ) {
+            var msg = "";
+            if(code == "Q_EXCEED_NUM_LIMIT"){
+                msg = "添加的文件数量过多";
+            }else if(code == "Q_EXCEED_SIZE_LIMIT"){
+                msg = "添加的文件过大";
+            }else if(code == "Q_TYPE_DENIED"){
+                msg = "添加的文件类型不正确";
+            }else{
+                msg = code;
+            }
+            MsgBox.danger($list, 'Error: ' + msg);
+        };
+
+        uploader.on( 'uploadComplete', function( file ) {
+            $( '#'+file.id ).find('.progress').fadeOut();
+        });
+
+        uploader.on( 'all', function( type ) {
+            if ( type === 'startUpload' ) {
+                state = 'uploading';
+            } else if ( type === 'stopUpload' ) {
+                state = 'paused';
+            } else if ( type === 'uploadFinished' ) {
+                state = 'done';
+            }
+        });
+
+    });
+</script>
+<%}%>
+<%layout("../layout/body_layout.html"){%>
+<form class="sui-form form-horizontal query-form sui-validate" method="post" target="_self" action="/admin/notice/save" >
+    <input type="hidden" name="id" value="${notice.id!}">
+    <div class="query-zone" id="confirm_Con">
+        <div class="control-group fabutopwez" >
+            <div class="span3">
+                <div class="input-prepend">
+                    <span class="add-on">文章标题：</span>
+                    <input type="text" class="input-fat h18 w300" placeholder="请输入文章标题" name="title" value="${notice.title!}" data-rules="required">
+                </div>
+            </div>
+        </div>
+        <div id="jiesuanFangs" class="control-group fabutopwez">
+            <div class="span4">
+                <div class="input-prepend">
+                    <span class="add-on">文章分类：</span>
+                </div>
+                <div class="fuxuankuangz">
+                    <label>
+                        <input name="type" value="notice" type="radio" ${notice.type!'notice' == 'notice' ? 'checked'}>
+                        平台公告
+                    </label>
+                    <label>
+                        <input name="type" value="dynamics" type="radio" ${notice.type!'' == 'dynamics' ? 'checked'}>
+                        行业动态
+                    </label>
+                    <label>
+                        <input name="type" value="news" type="radio" ${notice.type!'' == 'news' ? 'checked'}>
+                        新闻资讯
+                    </label>
+                    <label>
+                        <input name="type" value="offline" type="radio" ${notice.type!'' == 'offline' ? 'checked'}>
+                        下架信息
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="control-group">
+            <!--<div class="span3">-->
+                <!--<div class="input-prepend">-->
+                    <!--<span class="add-on" id="add_fujian">添加附件 <strong>(1GB)</strong>：</span>-->
+                    <!--<span id="update_fujian" title="添加附件"><input type="file" name="contractFileName" title="添加附件" onchange="fileChange(this);" /><img src="/static/images/zuixin/up_fujian.png" /></span>-->
+                <!--</div>-->
+            <!--</div>-->
+            <div id="uploader_d2" class="uploader_d1 wu-example">
+                <!--用来存放文件信息-->
+                <div class="btns float_l">
+                    <div id="filePicker" class="filePicker" style="float:left;" title="添加附件">添加附件</div>
+                </div>
+                <div id="thelist" class="uploader-list" style="float:left;">
+                    <input type="hidden" name="attachment" value="" />
+                </div>
+            </div>
+            <input type="hidden" id="uploading1" value=""/>
+        </div>
+        <div class="control-group">
+            <script id="container" name="content" type="text/plain">
+                ${notice.content!}
+            </script>
+            <!-- 配置文件 -->
+            <script type="text/javascript" src="/static/ue/ueditor.config.js?v=${v}"></script>
+            <!-- 编辑器源码文件 -->
+            <script type="text/javascript" src="/static/ue/ueditor.all.js?v=${v}"></script>
+            <!-- 实例化编辑器 -->
+            <script type="text/javascript">
+                var ue = UE.getEditor('container', {
+                    toolbars: [[
+                        'source',  //html
+                        'undo', //撤销
+                        'redo', //重做
+                        'forecolor', //字体颜色
+                        'bold', //加粗
+                        'italic', //斜体
+                        'blockquote', //引用
+                        'fontfamily', //字体
+                        'fontsize', //字号
+                            'paragraph',//段落格式
+                            'link', //超链接
+    //                        'simpleupload', //单图上传
+                            'insertimage', //多图上传
+                            'insertvideo',//插入视频
+                            'justifyleft', //居左对齐
+                            'justifyright', //居右对齐
+                            'justifycenter', //居中对齐
+                            'justifyjustify', //两端对齐
+                            'insertorderedlist', //有序列表
+                            'insertunorderedlist', //无序列表
+                            'rowspacingtop', //段前距
+                            'rowspacingbottom', //段后距
+                            'lineheight', //行间距
+                            'imagenone', //默认
+                            'imageleft', //左浮动
+                            'imageright', //右浮动
+                            'indent', //首行缩进
+                            'removeformat',
+                            'underline'//下划线
+                        ]],
+                        initialFrameWidth: 880,
+                        initialFrameHeight: 850
+                    });
+                </script>
+            </div>
+    </div>
+    <div class="add_clear"></div>
+    <div class="control-group" style="margin-top:20px;">
+        <div class="span3">
+            <div class="input-prepend">
+                <input type="button" class="sui-btn btn-primary btn-preview" value="预览"/>
+                <input type="button" class="sui-btn btn-primary btn-save" style="margin-left:10px;" value="发布文章"/>
+            </div>
+        </div>
+    </div>
+</form>
+<%}%>

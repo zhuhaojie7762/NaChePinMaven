@@ -1,0 +1,177 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="carlist_content-Type" carlist_content="text/html; charset=utf-8" />
+    <meta name="viewport" carlist_content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>订单详情页</title>
+    <link href="/static/images/web/ncp_logo.ico" rel="icon" type="image/x-icon"/>
+    <link href="/static/images/web/ncp_logo.ico" rel="shortcut icon" type="image/x-icon"/>
+    <link rel="stylesheet" type="text/css" href="/static/css/web/common.css?v=${v}">
+    <link rel="stylesheet" type="text/css" href="/static/css/web/style.css?v=${v}">
+    <script type="text/javascript" src="/static/js/web/jquery-1.9.1.min.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/web/zixie.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/web/baidu.js?v=${v}"></script>
+    <script type="text/javascript" src="http://g.alicdn.com/sj/lib/jquery/dist/jquery.min.js?v=${v}"></script>
+    <script type="text/javascript" src="http://g.alicdn.com/sj/dpl/1.5.1/js/sui.min.js?v=${v}"></script>
+    <link rel="stylesheet" type="text/css" href="/static/css/web/sui.min.css?v=${v}">
+    <link rel="stylesheet" type="text/css" href="/static/css/web/sui-append.css?v=${v}">
+    <script type="text/javascript">
+        $(function(){
+            $(".subNav").click(function(){
+                $(this).toggleClass("currentDd").siblings(".subNav").removeClass("currentDd")
+                $(this).toggleClass("currentDt").siblings(".subNav").removeClass("currentDt")
+                $(this).next(".navContent").slideToggle(500).siblings(".navContent").slideUp(500);
+            });
+
+        });
+    </script>
+</head>
+<%layout("../../layout/body_layout.html"){%>
+<div class="zx_type">
+    <div class="zx_arrow"></div>
+    订单管理 >> 订单详情
+</div>
+<p class="zx_grzxUser"><span class="indTitleTao"></span>订单详情</p>
+    <div class="jiangeDiv"></div>
+    <fieldset id="ddZTai">
+    <legend>订单状态</legend>
+    <div class="ncp_ddztRight">
+        <%if(trade.status.val <= 20 ){%>
+        <!--待付款 zuixin-->
+        <img src="/static/images/add/ttu_2.png" alt="订单状态">
+        <%}else if(trade.status.val >= 30 && trade.status.val < 35 ){%>
+        <!--待拣货 zuixin-->
+        <img src="/static/images/add/ttu_3.png" alt="订单状态">
+        <%}else if(trade.status.val == 35 ){%>
+        <!--拣货中 zuixin-->
+        <img src="/static/images/add/ttu_4.png" alt="订单状态">
+        <%}else if(trade.status.val >= 50 && trade.status.val < 200 ){%>
+        <!--已发待收 zuixin-->
+        <img src="/static/images/add/ttu_7.png" alt="订单状态">
+        <%}else if(trade.status.val == 200 ){%>
+        <!--完成 zuixin-->
+        <img src="/static/images/add/ttu_8.png" alt="订单状态">
+        <%}%>
+    </div>
+    </fieldset>
+
+    <fieldset id="ddZTai03">
+    <legend>订单详情</legend>
+    <div class="ncp_grzxdingxinxi">
+        <p class="add_pspan add_marTop">
+            <span class="span001">总订单编号：</span>
+            <span>${trade.code}</span>
+        </p>
+        <div class="ty_gyClear"></div>
+        <p class="add_pspan">
+            <span class="span001">本单实际重量：</span>
+            <span>
+                <%if(nvl(trade.realityWeight,0)>0){%>
+                ${nums.g2k(trade.realityWeight)}KG
+                <%}%>
+            </span>
+        </p>
+        <p class="add_pspan add_nobotBor">
+            <span class="span001">供货商备注：</span>
+            <span>${trade.supplierComment}</span>
+        </p>
+        <table class="sui-table table-bordered" id="add_xiangq">
+            <thead>
+                <th>子订单编号</th>
+                <th>货品详情</th>
+                <th>规格属性</th>
+                <th>单价</th>
+                <th>数量</th>
+                <th>货品总价( 元 )</th>
+                <th>是否特殊商品</th>
+                <th>状态</th>
+            </thead>
+            <tbody>
+                <%for(item in orders){%>
+                <tr>
+                    <td>${item.code}</td>
+                    <td>
+                        <dl>
+                            <dt><img src="${img_url.getS(item.headImg!)}" width="60" /></dt>
+                            <dd>${item.goodsName}</dd>
+                        </dl>
+                    </td>
+                    <td>${item.specPropValue}</td>
+                    <td>${nums.yuan(item.price)}</td>
+                    <td>${item.quantity}</td>
+                    <td>${nums.yuan(item.money)}</td>
+                    <td>${item.isSpecial?'是':'否'}</td>
+                    <td>${item.status.name}</td>
+                </tr>
+                <%}%>
+            </tbody>
+        </table>
+    </div>
+    </fieldset>
+    <fieldset id="add_wuliuCon">
+        <legend>物流信息</legend>
+        <p class="add_pspan add_marTop">
+            <span class="span001">物流公司：</span>
+            <span>${sendOrder.expressName!}</span>
+        </p>
+        <p class="add_pspan add_marTop">
+            <span class="span001">物流单号：</span>
+            <span>${sendOrder.expressCode!}</span>
+        </p>
+        <p class="add_pspan add_marTop">
+            <span class="span001">快递费用：</span>
+            <span>${nums.yuan(trade.postFee)}</span>
+        </p>
+        <p class="add_pspan add_marTop add_nobotBor">
+            <span class="span001">物流跟踪：</span>
+        </p>
+        <div class="wuliuZTaiYs">
+            <div class="info-group wuliuInfo">
+                <div data-mohe-type="kuaidi_new" class="g-mohe " id="mohe-kuaidi_new">
+                    <div id="mohe-kuaidi_new_nucom">
+                        <div class="mohe-wrap mh-wrap">
+                            <div class="mh-cont mh-list-wrap mh-unfold">
+                                <div class="mh-list">
+                                    <ul>
+                                        <%if(!has(expressJson)){%>
+                                        <div class="kuaiDi_wuYs"><p>啊~~哦！暂无快递信息。</p></div>
+                                        <%}else if(expressJson.status == '2'){%>
+                                        <div class="kuaiDi_wuYs"><p>${expressJson.message!}</p></div>
+                                        <%}else {%>
+                                        <%for(express in expressJson.data!){%>
+                                        <%if(expressLP.last){%>
+                                        <li>
+                                            <img class="lasteZui" src="/static/images/web/wuLiu_ok.png" width="18" />
+                                            <p>${express.time!}</p>
+                                            <p>${express.context!}</p>
+                                            <span class="after"></span>
+                                        </li>
+                                        <%}else if(expressLP.first){%>
+                                        <li class="first">
+                                            <img class="firstZui" src="/static/images/web/wuLiu_yuan02.png" width="16" />
+                                            <p>${express.time!}</p>
+                                            <p>${express.context!}</p>
+                                            <span class="beforeLv"></span><span class="after"></span>
+                                        </li>
+                                        <%}else{%>
+                                        <li>
+                                            <img class="huiImg" src="/static/images/web/wuLiu_yuan02.png" width="16" />
+                                            <p>${express.time!}</p>
+                                            <p>${express.context!}</p>
+                                            <span class="before"></span><span class="after"></span>
+                                        </li>
+                                        <%}%>
+                                        <%}%>
+                                        <%}%>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <p><span class="ncp_closePage"><a href="/member/sellOrder/list.html" title="关闭页面">关闭页面</a></span></p>
+    </fieldset>
+<%}%>
+</html>

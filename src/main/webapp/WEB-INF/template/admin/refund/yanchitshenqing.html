@@ -1,0 +1,103 @@
+<%layout("../layout/header_layout.html"){%>
+<title>延迟退款退货申请页</title>
+<style>
+    #confirm_Con .add-on{width: 140px;margin-right: 5px;}
+    .sui-row:last-child{padding-left:0;}
+    #confirm_Con .add-on strong{color:#ff5712;padding:0 0 0 3px;}
+    #confirm_Con .sui-btn{margin: 0;}
+    .yichiInfo::after {  content: "延迟退款退货申请";}
+</style>
+<%}%>
+<%layout("../layout/body_layout.html"){%>
+<div class="query-zone" id="confirm_Con">
+    <form class="sui-form form-horizontal query-form" id="query-form">
+        <div class="info-group yichiInfo">
+            <div class="sui-row">
+                <div class="span4">
+                    <div class="input-prepend">
+                        <span class="add-on">子订单编号<strong>*</strong></span>
+                        <input type="text" class="input w420 h22" name="" value="" />
+                    </div>
+                </div>
+            </div>
+            <div class="sui-row">
+                <div class="span4">
+                    <div class="input-prepend">
+                        <span class="add-on">进货帐号</span>
+                        <input type="text" class="input w420 h22" name="" value="" />
+                    </div>
+                </div>
+            </div>
+            <div class="sui-row">
+                <div class="span4">
+                    <div class="input-prepend">
+                        <span class="add-on">进货商名称</span>
+                        <input type="text" class="input w420 h22" name="" value="" />
+                    </div>
+                </div>
+            </div>
+            <div class="sui-row">
+                <div class="span4">
+                    <div class="input-prepend">
+                        <span class="add-on">原因</span>
+                        <textarea name="yuanyin" rows="3" class="input-xlarge w420">交易完成申请退款退货</textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="qingchu-gao"></div>
+            <div class="sui-row">
+                <div class="span4">
+                    <div class="input-prepend">
+                        <span class="add-on">收款人姓名 ( <strong>进货商</strong> )</span>
+                        <input type="text" class="input w420 h22" name="" value="" />
+                    </div>
+                </div>
+            </div>
+            <div class="sui-row">
+                <div class="span4">
+                    <div class="input-prepend">
+                        <span class="add-on">收款人账号 ( <strong>进货商</strong> )</span>
+                        <input type="text" class="input w420 h22" name="" value="" />
+                    </div>
+                </div>
+            </div>
+            <div class="sui-row">
+                <div class="span4">
+                    <div class="input-prepend">
+                        <span class="add-on">退款金额<strong>*</strong></span>
+                        <input type="text" class="input w420 h22" name="" value="" />
+                    </div>
+                </div>
+            </div>
+            <div class="sui-row">
+                <div class="span4">
+                    <div class="input-prepend">
+                        <span class="add-on">款项权责方 ( 元 )</span>
+                        <div class="yiqi-quanze">
+                            <div class="yiqi-kuaidi">快递：</div>
+                            <input type="text" class="input w130 h22" name="" value="" />
+                            <div class="yiqi-jinhuos">进货商：</div>
+                            <input type="text" class="input w130 h22" name="" value="" />
+                            <div class="qingchu"></div>
+                            <div class="yiqi-kuaidi">快递：</div>
+                            <input type="text" class="input w130 h22" name="" value="" />
+                            <div class="yiqi-jinhuos">进货商：</div>
+                            <input type="text" class="input w130 h22" name="" value="" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="sui-row">
+                <div class="span4">
+                    <div class="input-prepend">
+                        <span class="add-on">&nbsp;</span>
+                        <div class="sui-btn-group">
+                            <a class="sui-btn btn-primary" data-title="提交" >提交</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<%}%>

@@ -1,0 +1,51 @@
+<%layout("/web/layout/header_layout2.html"){%><%}%>
+<%layout("/web/layout/body_layout2.html"){%>
+<style>
+    .sui-pagination ul{display: block;}
+    .sui-pagination div .page-num{height: 33px!important;}
+    .sui-pagination div .page-num + .page-confirm{height: 34px!important;}
+    .pagination-small div > span{line-height: 37px;}
+    .sui-pagination{padding:0;}
+    .sui-pagination div{float:left;}
+</style>
+<div id="zx_gonggao">
+    <div class="main">
+        <table class="sui-table table-bordered">
+            <thead>
+                <th>标题</th>
+                <th>发布时间</th>
+            </thead>
+            <tbody>
+                <%for(notice in notices.data){%>
+                    <tr>
+                        <td><a href="/notice/${notice.id!}.html" target="_blank">${notice.title!}</a></td>
+                        <td>${notice.created, "yyyy-MM-dd"}</td>
+                    </tr>
+                <%}elsefor{%>
+                    <tr>
+                        <td colspan="2">暂无公告</td>
+                    </tr>
+                <%}%>
+            </tbody>
+        </table>
+        <!--页码 start-->
+        <div class="zx_page zx_tabtop" >
+            <div class="zx_pageMain">
+                <#webPagePlus val='${notices.page}' size='small' params = '${params!}' showNum = 'show' />
+            </div>
+        </div>
+        <!--页码 end-->
+    </div>
+</div>
+<div class="zx_fuwuCon zx_bortop">
+    <div class="zx_fuwuMain">
+        <img src="/static/images/zuixin/zx_fuwu.png" />
+    </div>
+</div>
+</body>
+<script>
+$(function() {
+    Pagination.init();
+});
+</script>
+<%}%>

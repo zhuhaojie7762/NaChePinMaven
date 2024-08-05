@@ -1,0 +1,173 @@
+<%layout("../layout/header_layout.html"){%>
+<title>特殊订单处理页</title>
+<style>
+   #confirm_Con .add-on{width: 90px;}
+   .sui-row:last-child{padding-left:0;}
+   .sui-dropup.dropdown-bordered .dropdown-inner, .sui-dropdown.dropdown-bordered .dropdown-inner{width: 136px!important;}
+    #query-form .input{width: 128px;}
+</style>
+<script type="text/javascript">
+    $(function () {
+        Pagination.init();
+        $(".nav-tabs li").click(function () {
+            $(".nav-tabs li").removeClass("active");
+            $(this).addClass("active");
+            $(".tab").hide();
+            $("." + $(this).attr("tab")).show();
+            $("input[name=tabParam]").val($(this).attr("tab"));
+        });
+    });
+</script>
+<%}%>
+<%layout("../layout/body_layout.html"){%>
+<div class="query-zone" id="confirm_Con">
+    <form class="sui-form form-horizontal query-form" id="query-form">
+        <div class="sui-row">
+            <div class="span4">
+                <div class="input-prepend">
+                    <span class="add-on">订单编号</span>
+                    <input type="text" class="input h22" name="goodsItemNo" value="" />
+                </div>
+            </div>
+            <div class="span4">
+                <div class="input-prepend">
+                    <span class="add-on">收款人姓名</span>
+                    <input type="text" class="input h22" name="goodsName" value="" />
+                </div>
+            </div>
+            <div class="span4">
+                <div class="input-prepend">
+                    <span class="add-on">供货商账号</span>
+                    <input type="text" class="input h22" name="tradeCode" value="" />
+                </div>
+            </div>
+        </div>
+        <div class="sui-row">
+            <div class="span4">
+                <div class="input-prepend">
+                    <span class="add-on">全方责</span>
+                    <span class="sui-dropdown dropdown-bordered select h22">
+                        <span class="dropdown-inner">
+                            <a role="button" data-toggle="dropdown" href="#" class="dropdown-toggle">
+                                <input name="status" value="${params.status!}" type="hidden">
+                                <i class="caret"></i>
+                                <span>${decode(params.status,'10','待付款','20','交易关闭','30','待拣货','35','拣货中','50','待收',
+                            '70','退货申请','80','退货发回','90','退货完成','100','退货协商','105','退款申请','116','退款完成','200','完成','请选择')}</span>
+                            </a>
+                            <ul role="menu" aria-labelledby="drop12" class="sui-dropdown-menu">
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" >请选择</a></li>
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="10" title="未付款">待付款</a></li>
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="20" title="交易关闭">交易关闭</a></li>
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="30" title="待拣货">待拣货</a></li>
+                            </ul>
+                        </span>
+                    </span>
+                </div>
+            </div>
+            <div class="span4">
+                <div class="input-prepend">
+                    <span class="add-on">收款人账号</span>
+                    <input type="text" class="input h22" name="purchaseName" value="" />
+                </div>
+            </div>
+            <div class="span4">
+                <div class="input-prepend">
+                    <span class="add-on">供货商公司名称</span>
+                    <input type="text" class="input h22" name="supplierName" value="" />
+                </div>
+            </div>
+            <button class="sui-btn btn-primary" style="margin-left:20px;">查询</button>
+            <input type="button" class="sui-btn btn-primary btn-reset" value="重置"/>
+            <div class="sui-btn-group">
+            </div>
+        </div>
+    </form>
+</div>
+<div class="add_fenleiCon">
+    <span id="wancheng-btn" class="piliangshanBtn" title="交易完成退款退货申请">交易完成退款退货申请</span>
+</div>
+<ul class="sui-nav nav-tabs">
+    <li tab="total" class="${(tabParam!'total') == 'total' ? 'active'}"><a>交易统计</a></li>
+    <li tab="detail" class="${'detail' == (tabParam!) ? 'active'}"><a>交易明细</a></li>
+</ul>
+<div class="tab total sui-form form-horizontal" id="jiaoyitongji" style="display: ${(tabParam!'total') == 'total' ? 'block':'none'};">
+    <table class="sui-table table-bordered" id="zongzi_dingdan">
+        <thead>
+        <th>子订单编号</th>
+        <th>供货商客户</th>
+        <th>供货商公司名称</th>
+        <th>进货商名称</th>
+        <th>申请提交时间</th>
+        <th>退货原因</th>
+        <th>订单状态</th>
+        <th>退款金额</th>
+        <th>收款人姓名</th>
+        <th>收款人账号</th>
+        <th>权责方</th>
+        <th>权责方金额</th>
+        </thead>
+        <tbody>
+        <tr>
+            <td>001000</td>
+            <td>测试</td>
+            <td>天台纳车品</td>
+            <td>测试进货商</td>
+            <td>2017-02-04</td>
+            <td>退货原因</td>
+            <td>已付款</td>
+            <td>12.00</td>
+            <td>张三</td>
+            <td>zhangsan</td>
+            <td>测试</td>
+            <td>12.00</td>
+        </tr>
+
+        <!--表格无数据样式 start-->
+        <tr>
+            <td colspan="13" class="zanWuShuju"><p>没有数据</p></td>
+        </tr>
+        <!--表格无数据样式 end-->
+        </tbody>
+    </table>
+</div>
+<div class="tab detail sui-form form-horizontal" style="display: ${(tabParam!) == 'detail' ? 'block':'none'};">
+    <table class="sui-table table-bordered" id="zongzi_dingdan02">
+        <thead>
+        <th>子订单编号</th>
+        <th>供货商客户</th>
+        <th>供货商公司名称</th>
+        <th>进货商名称</th>
+        <th>申请提交时间</th>
+        <th>退货原因</th>
+        <th>订单状态</th>
+        <th>退款金额</th>
+        <th>收款人姓名</th>
+        <th>收款人账号</th>
+        <th>权责方</th>
+        <th>权责方金额</th>
+        </thead>
+        <tbody>
+        <tr>
+            <td>1</td>
+            <td>测试</td>
+            <td>天台纳车品</td>
+            <td>测试进货商</td>
+            <td>2017-02-04</td>
+            <td>退货原因</td>
+            <td>已付款</td>
+            <td>12.00</td>
+            <td>张三</td>
+            <td>zhangsan</td>
+            <td>测试</td>
+            <td>12.00</td>
+        </tr>
+
+        <!--表格无数据样式 start-->
+        <tr>
+            <td colspan="13" class="zanWuShuju"><p>没有数据</p></td>
+        </tr>
+        <!--表格无数据样式 end-->
+        </tbody>
+    </table>
+</div>
+<%}%>

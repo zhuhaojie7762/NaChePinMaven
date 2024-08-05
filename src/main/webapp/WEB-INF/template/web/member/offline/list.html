@@ -1,0 +1,419 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head>
+    <meta http-equiv="carlist_content-Type" carlist_content="text/html; charset=utf-8" />
+    <meta name="viewport" carlist_content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>下架商品</title>
+    <link href="/static/images/web/ncp_logo.ico" rel="icon" type="image/x-icon"/>
+    <link href="/static/images/web/ncp_logo.ico" rel="shortcut icon" type="image/x-icon"/>
+    <link rel="stylesheet" type="text/css" href="/static/css/web/common.css?v=${v}">
+    <link rel="stylesheet" type="text/css" href="/static/css/web/style.css?v=${v}">
+    <script type="text/javascript" src="/static/js/web/jquery-1.9.1.min.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/web/zixie.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/web/baidu.js?v=${v}"></script>
+    <script type="text/javascript" src="http://g.alicdn.com/sj/lib/jquery/dist/jquery.min.js?v=${v}"></script>
+    <script type="text/javascript" src="http://g.alicdn.com/sj/dpl/1.5.1/js/sui.min.js?v=${v}"></script>
+    <link rel="stylesheet" type="text/css" href="/static/css/web/sui.min.css?v=${v}">
+    <link rel="stylesheet" type="text/css" href="/static/css/web/sui-append.css?v=${v}">
+    <script type="text/javascript" src="/static/js/common.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/jquery.form.js?v=${v}"></script>
+    <script type="text/javascript">
+    
+    function showAllLi(obj) {
+    	$(obj).next().children().each(function(){
+    		$(this).show();
+    	});
+    }
+
+    function changeli(event, obj) {
+    	var realkey = String.fromCharCode(event.which); 
+    	if ((realkey >= 'a' && realkey <= 'z') || (realkey >= 'A' && realkey <= 'Z')) {
+    		$(obj).next().children().each(function(){
+    			var a = $(this).children().first();
+    			if ($(a).data('pinyin') == realkey.toUpperCase()) {
+    				$(this).show();
+    			} else {
+    				$(this).hide();
+    			}
+    		});
+    	}
+    }
+    
+        $(function(){
+            $(".subNav").click(function(){
+                $(this).toggleClass("currentDd").siblings(".subNav").removeClass("currentDd")
+                $(this).toggleClass("currentDt").siblings(".subNav").removeClass("currentDt")
+                $(this).next(".navContent").slideToggle(500).siblings(".navContent").slideUp(500);
+            });
+            Pagination.init();
+
+            $(".btn-onShelf").unbind("click").bind("click", function(){
+                if(!confirm("确认要上架商品吗？")){
+                    return;
+                }
+                var code = $(this).parent().siblings(".goodsCode").val();
+                Common.post("onShelf", {code:code}, function (json) {
+                    if (json.code == Common.SUCC) {
+                        Msg.success(json.message);
+                        Common.refresh();
+                    } else {
+                        Msg.danger(json.message);
+                    }
+                });
+            });
+
+            $(".btn-delete").unbind("click").bind("click", function(){
+                if(!confirm("确认要删除商品吗？")){
+                    return;
+                }
+                var code = $(this).parent().siblings(".goodsCode").val();
+                Common.post("delete", {code:code}, function (json) {
+                    if (json.code == Common.SUCC) {
+                        Msg.success(json.message);
+                        Common.refresh();
+                    } else {
+                        Msg.danger(json.message);
+                    }
+                });
+            });
+            
+            $("#brand li a").click(function(){
+        		var brand = $(this).attr("title");
+        		$("input[name='brand']").val(brand);
+        	});
+        	
+        	$("#secondclass li a").click(function(){
+        		var secondclassid = $(this).attr("value");
+        		var secondclassname = $(this).attr("title");
+        		$("input[name='secondclassname']").val(secondclassname);
+        		
+        		Common.ajax("/admin/goods/subclass", {id:secondclassid}, function(json) {
+        			
+        			var li = '<li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" >请选择</a></li>';
+        			
+            		if (json.code == Common.SUCC) {
+            			for (var i = 0; i < json.data.length; i++) {
+            				li += '<li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="' + json.data[i].id + '" title="' + json.data[i].name + '">' + json.data[i].name + '</a></li>'
+            			}
+            			
+            			$("#thirdclass").html(li);
+            			$("#thirdclassid").html('请选择');
+            			$("input[name='thirdclassid']").val('');
+            			$("input[name='thirdclassname']").val('');
+            			
+            			
+            			$("#thirdclass li a").click(function(){
+            				var thirdclassid = $(this).attr("value");
+            				var thirdclassname = $(this).attr("title");
+            				$("input[name='thirdclassname']").val(thirdclassname);
+            			});
+            			
+            		} else {
+            			Msg.danger("服务异常");
+            		}
+            	});
+        	});
+        	
+        	$("#thirdclass li a").click(function(){
+        		var thirdclassid = $(this).attr("value");
+        		var thirdclassname = $(this).attr("title");
+        		$("input[name='thirdclassname']").val(thirdclassname);
+        	});
+        	
+        	$("#firstclass li a").click(function(){
+        		var firstclassid = $(this).attr("value");
+        		var firstclassname = $(this).attr("title");
+        		$("input[name='firstclassname']").val(firstclassname);
+        		
+        		Common.ajax("/admin/goods/subclass", {id:firstclassid}, function(json) {
+        			
+        			var li = '<li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" >请选择</a></li>';
+        			
+            		if (json.code == Common.SUCC) {
+            			for (var i = 0; i < json.data.length; i++) {
+            				li += '<li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="' + json.data[i].id + '" title="' + json.data[i].name + '">' + json.data[i].name + '</a></li>'
+            			}
+            			
+            			$("#secondclass").html(li);
+            			
+            			$("#secondclassid").html('请选择');
+            			$("input[name='secondclassid']").val('');
+            			$("input[name='secondclassname']").val('');
+            			
+            			
+            			$("#thirdclassid").html('请选择');
+            			$("input[name='thirdclassid']").val('');
+            			$("input[name='thirdclassname']").val('');
+            			
+            			$("#secondclass li a").click(function(){
+            				var secondclassid = $(this).attr("value");
+            				var secondclassname = $(this).attr("title");
+            				$("input[name='secondclassname']").val(secondclassname);
+            				
+            				Common.ajax("/admin/goods/subclass", {id:secondclassid}, function(json) {
+            					
+            					var li = '<li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" >请选择</a></li>';
+            					
+            		    		if (json.code == Common.SUCC) {
+            		    			for (var i = 0; i < json.data.length; i++) {
+            		    				li += '<li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="' + json.data[i].id + '" title="' + json.data[i].name + '">' + json.data[i].name + '</a></li>'
+            		    			}
+            		    			
+            		    			$("#thirdclass").html(li);
+            		    			$("#thirdclassid").html('请选择');
+            		    			$("input[name='thirdclassid']").val('');
+            		    			$("input[name='thirdclassname']").val('');
+            		    			
+            		    			
+            		    			$("#thirdclass li a").click(function(){
+            		    				var thirdclassid = $(this).attr("value");
+            		    				var thirdclassname = $(this).attr("title");
+            		    				$("input[name='thirdclassname']").val(thirdclassname);
+            		    			});
+            		    			
+            		    		} else {
+            		    			Msg.danger("服务异常");
+            		    		}
+            		    	});
+            			});
+            			
+            		} else {
+            			Msg.danger("服务异常");
+            		}
+            	});
+        	});
+            
+            
+        });
+        function resetForm(){
+        	//$("input.ttlog_input").val('');
+        	//$("#query-form").trigger("reset");
+    		
+    		$("input[name='name']").val('');
+    		$("input[name='itemNo']").val('');
+    		
+    		
+    		$("#thirdclassid").html('请选择');
+    		$("input[name='thirdclassid']").val('');
+    		$("input[name='thirdclassname']").val('');
+    		$("#thirdclass").html('<li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" >请选择</a></li>');
+    		
+    		$("#secondclassid").html('请选择');
+    		$("input[name='secondclassid']").val('');
+    		$("input[name='secondclassname']").val('');
+    		$("#secondclass").html('<li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" >请选择</a></li>');
+    		
+    		$("#firstclassid").html('请选择');
+    		$("input[name='firstclassid']").val('');
+    		$("input[name='firstclassname']").val('');
+    		
+    		$("#brandname").html('请选择');
+    		$("input[name='brandid']").val('');
+    		$("input[name='brand']").val('');
+    		
+    		$("input[name='minsellcnt']").val('');
+    		$("input[name='maxsellcnt']").val('');
+    		
+    		$("input[name='minprice']").val('');
+    		$("input[name='maxprice']").val('');
+    		
+    		$("#submittypename").html('请选择');
+    		$("input[name='submittype']").val('');
+        };
+    </script>
+</head>
+<%layout("../../layout/body_layout.html"){%>
+<style>
+    .zx_grzxUser{margin: 28px 21px 0 20px;}
+</style>
+<div class="zx_type">
+    <div class="zx_arrow"></div>
+    商品管理 &nbsp;>>&nbsp; 下架商品
+</div>
+<p class="zx_grzxUser"><span class="indTitleTao"></span>下架商品</p>
+<fieldset id="sJiaShopF">
+    <legend>查询信息</legend>
+<form method="get">
+	<input type="hidden" name="perSize" value="${page.perSize!10}">
+    <input type="hidden" name="firstclassname" value="${parameter.firstclassname}">
+    <input type="hidden" name="secondclassname" value="${parameter.secondclassname}">
+    <input type="hidden" name="thirdclassname" value="${parameter.thirdclassname}">
+    <input type="hidden" name="brand" value="${parameter.brand}">
+    <p class="ttlog_search" id="xiaJiaShop">
+        <span>货品名称：</span>
+            <span>
+                <input type="text" class="ttlog_input" type="text" onblur="javascript:this.className='ttlog_input'" onfocus="javascript:this.className='ttlog_input02'" value="${parameter.name!}"
+                       name="name"/>
+            </span>
+        <span>货品货号：</span>
+            <span>
+                <input type="text" class="ttlog_input" type="text" onblur="javascript:this.className='ttlog_input'" onfocus="javascript:this.className='ttlog_input02'" value="${parameter.itemNo!}" name="itemNo"/>
+            </span>
+        <style>
+            .sui-dropup .caret::before, .sui-dropdown .caret::before{ content: "";}
+            .sui-dropup.dropdown-bordered .dropdown-inner > .sui-dropdown-menu, .sui-dropdown.dropdown-bordered .dropdown-inner > .sui-dropdown-menu{min-width: 142px;margin:3px 0 0 66px;border:1px solid #ededed;}
+            .dropdown-inner {background: rgba(0, 0, 0, 0) url('/static/images/web/xialabg.png') no-repeat scroll 118px center!important;border-radius: 0;}
+            .sui-dropup.dropdown-bordered .dropdown-inner a, .sui-dropdown.dropdown-bordered .dropdown-inner a{min-width: 122px;}
+            .add_marSix{margin-top:6px;}
+            .add_padTwo{padding-top:2px;padding-bottom:2px;}
+            .add_danjia{margin-left:18px;}
+            .add_danjia02{margin-left:16px;}
+            .add_danjia03{margin-left:7px;}
+            .add_jgtiao{padding-right:3px;color: rgba(85,85,85,.6);}
+            .add_sanjione{clear:both;float:left;}
+        </style>
+        <div class="float_l">
+            <span class="sui-dropdown dropdown-bordered select add_marSix">
+                <span class="zx_jiesuanzt">货品品牌：</span>
+                <span class="dropdown-inner add_padTwo">
+                    <input type="hidden" name="brandid" value="${parameter.brandid}" />
+                    <a role="button" data-toggle="dropdown" href="#" class="dropdown-toggle" onKeyPress="changeli(event, this);" onclick="showAllLi(this);">
+                        <i class="caret"></i>
+                        <span id="brandname" >${parameter.brand!'请选择' == '' ? '请选择' : parameter.brand!'请选择'}</span>
+                    </a>
+                    <ul id="brand" role="menu" aria-labelledby="drop12" class="sui-dropdown-menu">
+                    	<li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" >请选择</a></li>
+                        <%for(brand in brands!){%>
+        				<li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="${brand.id}" title="${brand.name}" data-pinyin="${brand.pinyin}">${brand.name}</a></li>
+        				<%}%>
+                    </ul>
+                </span>
+            </span>
+        </div>
+    	<span class="add_danjia">单价：</span>
+            <span>
+                <input type="text" class="ttlog_input" style="width: 38px" type="text" 
+                		onblur="javascript:this.className='ttlog_input'" 
+                		onfocus="javascript:this.className='ttlog_input02'" 
+                		value="${parameter.minprice}"
+                       	name="minprice"/>
+            </span>
+    	<span class="add_jgtiao">~</span>
+            <span>
+                <input type="text" class="ttlog_input" style="width: 38px" type="text"
+                       onblur="javascript:this.className='ttlog_input'"
+                       onfocus="javascript:this.className='ttlog_input02'" 
+                       value="${parameter.maxprice}" 
+                       name="maxprice"/>
+            </span>
+
+
+    <div class="add_sanjione">
+            <span class="sui-dropdown dropdown-bordered select add_marSix">
+                <span class="zx_jiesuanzt add_danjia03">一级分类：</span>
+                <span class="dropdown-inner add_padTwo">
+                    <input type="hidden" name="firstclassid" value="${parameter.firstclassid}" />
+                    <a role="button" data-toggle="dropdown" href="#" class="dropdown-toggle">
+                        <i class="caret"></i>
+                        <span id="firstclassid">${parameter.firstclassname!'请选择' == '' ? '请选择' : parameter.firstclassname!'请选择'}</span>
+                    </a>
+                    <ul id="firstclass" role="menu" aria-labelledby="drop12" class="sui-dropdown-menu">
+                    	<li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" >请选择</a></li>
+                    	<%for(class in firstclasslist!){%>
+		                <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="${class.id}" title="${class.name}">${class.name}</a></li>
+		                <%}%>
+                    </ul>
+                </span>
+            </span>
+    </div>
+    <div class="float_l">
+            <span class="sui-dropdown dropdown-bordered select add_marSix">
+                <span class="zx_jiesuanzt add_danjia">二级分类：</span>
+                <span class="dropdown-inner add_padTwo">
+                    <input type="hidden" name="secondclassid" value="${parameter.secondclassid}" />
+                    <a role="button" data-toggle="dropdown" href="#" class="dropdown-toggle">
+                        <i class="caret"></i>
+                        <span id="secondclassid">${parameter.secondclassname!'请选择' == '' ? '请选择' : parameter.secondclassname!'请选择'}</span>
+                    </a>
+                    <ul id="secondclass" role="menu" aria-labelledby="drop12" class="sui-dropdown-menu">
+                    	<li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" >请选择</a></li>
+                    	<%for(class in secondclasslist!){%>
+		                <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="${class.id}" title="${class.name}">${class.name}</a></li>
+		                <%}%>
+                    </ul>
+                </span>
+            </span>
+    </div>
+    <div class="float_l">
+            <span class="sui-dropdown dropdown-bordered select add_marSix">
+                <span class="zx_jiesuanzt add_danjia02">三级分类：</span>
+                <span class="dropdown-inner add_padTwo">
+                    <input type="hidden" name="thirdclassid" value="${parameter.thirdclassid}" />
+                    <a role="button" data-toggle="dropdown" href="#" class="dropdown-toggle">
+                        <i class="caret"></i>
+                        <span id="thirdclassid">${parameter.thirdclassname!'请选择' == '' ? '请选择' : parameter.thirdclassname!'请选择'}</span>
+                    </a>
+                    <ul id="thirdclass" role="menu" aria-labelledby="drop12" class="sui-dropdown-menu">
+                    	<li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" >请选择</a></li>
+                    	<%for(class in thirdclasslist!){%>
+		                <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="${class.id}" title="${class.name}">${class.name}</a></li>
+		                <%}%>
+                    </ul>
+                </span>
+            </span>
+    </div>
+
+    <span class="add_danjia03">总销量：</span>
+            <span>
+                <input type="text" class="ttlog_input" style="width: 38px" type="text"
+                       onblur="javascript:this.className='ttlog_input'"
+                       onfocus="javascript:this.className='ttlog_input02'" value="${parameter.minsellcnt}"
+                       name="minsellcnt"/>
+            </span>
+    <span class="add_jgtiao">~</span>
+            <span>
+                <input type="text" class="ttlog_input" style="width: 38px" type="text"
+                       onblur="javascript:this.className='ttlog_input'"
+                       onfocus="javascript:this.className='ttlog_input02'" value="${parameter.maxsellcnt}" 
+                       name="maxsellcnt"/>
+            </span>
+    <!--end-->
+    <div class="ty_gyClear"></div>
+    <span style="margin-left:63px;"><input type="submit" value="&nbsp;&nbsp;查询&nbsp;&nbsp;" title="查询" class="ttLog_chaXun"/> </span>
+    <span><input type="button" class="ttLog_chongzhi" onclick="resetForm()" value="&nbsp;&nbsp;重置&nbsp;&nbsp;"/></span>
+    </p>
+</form>
+</fieldset>
+        <p class="ttppzq_topAdd">
+        <table class="sui-table table-bordered" id="xiaJiaSPin">
+            <thead>
+            <tr>
+                <th width="52">商品编号</th>
+                <th>商品名称</th>
+                <th width="52">商品货号</th>
+                <th width="52">商品单价</th>
+                <th width="52">库存</th>
+                <!--<th>销量</th>-->
+                <th width="72">是否特殊商品</th>
+                <th width="38">关注数</th>
+                <th width="168">操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <%for(goods in pager.data!){%>
+            <tr>
+                <td>${goods.code}</td>
+                <td>${goods.name}</td>
+                <td>${goods.itemNo}</td>
+                <td>${goods.wholesalePrice/100, "#0.00"}</td>
+                <td>${goods.stock}</td>
+                <td>${goods.isSpecial?'是':'否'}</td>
+                <td>${goods.followCnt}</td>
+                <td width="162">
+                    <span class="ncguanzhu_chaK"><a href="javascript:void(0);" title="上架" class="btn-onShelf">上架</a></span>
+                    <span class="ncguanzhu_chaK02"><a href="/member/offline/${goods.code}.html" class="tiaoZheng_ys" title="编辑">编辑</a></span>
+                    <span class="ncguanzhu_chaK02"><a href="javascript:void(0);" title="删除" class="btn-delete">删除</a></span>
+                    <input type="hidden" class="goodsCode" value="${goods.code}" />
+                </td>
+            </tr>
+            <%}elsefor{%>
+            <tr>
+                <td colspan="8" class="zanWuShuju"><p>暂无数据</p></td>
+            </tr>
+            <%}%>
+            </tbody>
+        </table>
+        <#webPage val='${pager.page}' size='large' params = '${params!}' showNum = 'hide' />
+        </p>
+<div class="jiangeDiv"></div>
+<%}%>
+</html>

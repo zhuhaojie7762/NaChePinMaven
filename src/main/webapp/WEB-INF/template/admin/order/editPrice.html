@@ -1,0 +1,86 @@
+<form class="form-update" action="/admin/order/changePrice" method="post">
+    <table class="sui-table table-bordered" id="update_jiage">
+        <thead>
+            <th width="50">总订单号</th>
+            <th width="50">子订单号</th>
+            <th>货品名称</th>
+            <th width="50">单价</th>
+            <th width="40">数量</th>
+            <th width="90">货品价格(元)</th>
+            <th width="90">物流运费(元)</th>
+        </thead>
+        <tbody>
+            <%for(order in orders){%>
+            <tr>
+                <td>${trade.code}</td>
+                <td>${order.code}<input type="hidden" name="orderCode" value="${order.code}"></td>
+                <td>${order.goodsName}</td>
+                <td>${nums.yuan(order.oldPrice!0 > 0 ?order.oldPrice:order.price)}</td>
+                <td>${order.quantity}</td>
+                <td>
+                    <!--<input type="text" name="newPrice" data-cnt="${order.quantity}" value="${nums.yuan(order.price)}" class="updateJiaO"  placeholder="修改货品价格" onkeyup="value=value.replace(/[^\d.]/g,'')"  />-->
+                    <!--zuixin add start-->
+                    <input type="text"  name="newPrice" class="input h22 w150" data-cnt="${order.quantity}"  value="${nums.yuan(order.price)}" onkeyup="value=value.replace(/[^\d.-]/g,'');this.value=this.value.toUpperCase();" />
+                    <!--zuixin add end-->
+                </td>
+                <%if(orderLP.isFirst){%>
+                <td <%if(orderLP.size > 1){%>
+                        rowspan="${orderLP.size}" class="add_tdaddborder"
+                    <%}%>
+                >
+                    <input type="text" name="newPostFee" value="${trade.useType! == 'POST_FEE'? nums.yuan(trade.postFee - trade.couponFee): nums.yuan(trade.postFee)}" class="updateInput" placeholder="修改物流运费" onkeyup="value=value.replace(/[^\d.-]/g,'')" />
+                </td>
+                <%}%>
+            </tr>
+            <%}%>
+        </tbody>
+    </table>
+    <input type="hidden" name="tradeId" value="${trade.id}">
+    <div id="updateTextarea">
+        <p>
+            <textarea name="reason" placeholder="修改理由：请输入50字以内的说明"></textarea>
+        </p>
+        <p class="add_zongji">
+            <span>商品金额：</span>
+            <span><strong id="goodsMoney">0</strong></span>
+            <span>元，</span>
+            <span>运费：</span>
+            <span><strong id="postFee">0</strong></span>
+            <span>元，</span>
+            <span>订单总额：</span>
+            <span><strong id="totalMoney">0</strong></span>
+            <span>元</span>
+        </p>
+    </div>
+    <div class="addtextjuz">
+    <input type="submit" class="sui-btn btn-primary btn-submit" value="确定">
+    <input type="button" class="sui-btn btn-small btn-cancel" value="取消">
+    </div>
+</form>
+<script type="text/javascript">
+    $(function(){
+        moneyReset();
+        $("input[name=newPrice]").change(function(){
+            moneyReset();
+        });
+        $("input[name=newPostFee]").change(function(){
+            moneyReset();
+        });
+        $(".btn-cancel").click(function(){
+            $("#J_edit_price_modal").modal('hide');
+        });
+        Common.ajaxForm($("form.form-update"),null,null);
+    });
+    function moneyReset(){
+        var totalMoney = 0;
+        $('#update_jiage tbody tr').each(function(){
+            var newPrices = $(this).find("input[name=newPrice]").val();
+            var quantity = $(this).find("input[name=newPrice]").attr("data-cnt");
+            totalMoney = totalMoney + newPrices *  parseFloat(quantity);
+        });
+        $("#goodsMoney").text(totalMoney);
+        var postFee = $("input[name=newPostFee]").val();
+        $("#postFee").text(postFee);
+        $("#totalMoney").text(totalMoney + parseFloat(postFee));
+    }
+</script>

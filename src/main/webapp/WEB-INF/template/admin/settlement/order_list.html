@@ -1,0 +1,84 @@
+<%layout("../layout/header_layout.html"){%>
+<title>审核中的账单</title>
+<script type="text/javascript">
+    $(function(){
+        /**
+         * 重置
+         */
+        $("input.btn-reset").click(function () {
+            Common.reset("form.query-form");
+        });
+    });
+</script>
+<%}%>
+<%layout("../layout/body_layout.html"){%>
+<div class="query-zone" id="searchL">
+    <form class="sui-form form-horizontal query-form" id="query-form">
+        <div class="sui-row">
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        账单名称
+                    </span>
+                    <input type="text" class="input h22" name="code" value="${parameter.code!}"/>
+                </div>
+            </div>
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        账单生成日期
+                    </span>
+                    <input type="text" class="input-date h22" name="startTime" data-toggle="datepicker" value="${parameter.startTime!}">
+                    <span class="add-on2">-</span>
+                    <input type="text" class="input-date h22" name="endTime" data-toggle="datepicker" value="${parameter.endTime!}">
+                </div>
+            </div>
+        </div>
+        <div class="sui-row" style="margin:15px 0 0 2px;">
+            <button class="sui-btn btn-primary">查询</button>
+            <input type="button" class="sui-btn btn-primary btn-reset" value="重置"/>
+        </div>
+    </form>
+</div>
+<table class="sui-table table-bordered" id="yueJieTab">
+    <thead>
+    <tr>
+        <th>账单生成日期</th>
+        <th>账单名称</th>
+        <th>当前处理人</th>
+        <th>上一处理人</th>
+        <th>下一处理人</th>
+        <th>操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    <%for(item in data){%>
+    <tr>
+        <td>${dts.d2d(item.created)}</td>
+        <td>${item.code}</td>
+        <%if(item.status == 'wait_check_first'){%>
+        <td>运营主管</td>
+        <td>运营专员</td>
+        <td>财务主管</td>
+        <%}else if(item.status == 'wait_check_second'){%>
+        <td>财务主管</td>
+        <td>运营主管</td>
+        <td>总经理</td>
+        <%}else if(item.status == 'wait_check_thirdly'){%>
+        <td>总经理</td>
+        <td>财务主管</td>
+        <td></td>
+        <%}%>
+        <td>
+            <a href="/admin/settlement/order/detail?code=${item.code}" class="rightJj">查看</a>
+            <!--<a href="">处理</a>-->
+        </td>
+    </tr>
+    <%}elsefor{%>
+    <tr>
+        <td colspan="11" class="zanWuShuju"><p>没有数据</p></td>
+    </tr>
+    <%}%>
+    </tbody>
+</table>
+<%}%>

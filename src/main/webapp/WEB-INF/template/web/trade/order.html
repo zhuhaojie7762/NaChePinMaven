@@ -1,0 +1,356 @@
+<%layout("/web/layout/header_layout2.html"){%>
+    <script type="text/javascript" src="/static/js/web/confirmOrder.js?v=${v}"></script>
+    <style>
+        .sui-dropup.dropdown-bordered, .sui-dropdown.dropdown-bordered {display: block;}
+        #yggerling{min-height: 490px;}
+        #yggerling p b{color:red;font-size: 12px;margin-left:15px;font-weight: normal;}
+    </style>
+    <script type="text/javascript">
+        /*优惠券tab*/
+        function youhuijuanTabs(thisObj, Num) {
+            if (thisObj.className == "active")return;
+            var tabObj = thisObj.parentNode.id;
+            var tabList = document.getElementById(tabObj).getElementsByTagName("li");
+            for (i = 0; i < tabList.length; i++) {
+                if (i == Num) {
+                    thisObj.className = "active";
+                    /* $("#" + tabObj + "_Content" + i).animate({heigt: 'toggle'});*/
+                    $("#" + tabObj + "_Content" + i).show(300);
+                } else {
+                    tabList[i].className = "normal";
+                    $("#" + tabObj + "_Content" + i).hide();
+                }
+            }
+        }
+
+        $(function(){
+            <%if(parameter.errMsg == "NO_POST"){%>
+                Msg.warning("此地区该快递不送达，请选用其他快递!");
+            <%}else if(parameter.errMsg == "OVER_WEIGHT"){%>
+                Msg.warning("货物过重，此快递公司不接收，请选用其他快递!");
+            <%}%>
+        });
+    </script>
+<%}%>
+<%layout("/web/layout/body_layout2.html"){%>
+<style>
+    .sui-dropup.dropdown-bordered, .sui-dropdown.dropdown-bordered {display: block;}
+    #yggerling{min-height: 490px;}
+    #yggerling p b{color:red;font-size: 12px;margin-left:15px;font-weight: normal;}
+    .dropdown-inner { width: 160px; }
+    .sui-dropup.dropdown-bordered .dropdown-inner > .sui-dropdown-menu, .sui-dropdown.dropdown-bordered .dropdown-inner > .sui-dropdown-menu{width: 100px!important;}
+    .sui-dropdown.dropdown-bordered > .dropdown-inner a, .sui-dropup.dropdown-bordered > .dropdown-inner a, .sui-dropdown.dropdown-bordered.dropdown-xlarge > .dropdown-inner a, .sui-dropup.dropdown-bordered.dropdown-xlarge > .dropdown-inner a, .sui-dropdown.dropdown-bordered.dropdown-large > .dropdown-inner a, .sui-dropup.dropdown-bordered.dropdown-large > .dropdown-inner a, .sui-dropdown.dropdown-bordered.dropdown-small > .dropdown-inner a, .sui-dropup.dropdown-bordered.dropdown-small > .dropdown-inner a{display: block;width: 160px;}
+    .xiaDan_cityTop{margin-right: 0;}
+    .sui-dropup.dropdown-bordered, .sui-dropdown.dropdown-bordered{margin-right: 15px;}
+    .sui-dropup.dropdown-bordered .dropdown-inner, .sui-dropdown.dropdown-bordered .dropdown-inner{border:1px solid #ededed;}
+</style>
+<body style="background: #f5f5f5;">
+<div class="xiaDan_lcPic">
+    <img class="liuChengT" src="/static/images/add/ncpXD_liucpic.png"/>
+</div>
+<div class="ty_gyClear"></div>
+<form id="confirmOrderForm" action="/trade/order" method="post">
+<div class="xiaDan_lcPic diBuBot" id="yggerling">
+    <p class="xiaBianKuang xd_titel">确认收货地址</p>
+    <div class="ncp_adressFX">
+        <span class="ncp_adrFxSpan01">地址自动分析</span>
+        <span>
+            &nbsp;<textarea rows="2" id="ziDongFenXi" class="ncp_adrFxSpan02" ></textarea>
+        </span>
+        <div class="ty_gyClear"></div>
+        <p class="ziDong_fenXi">
+            <span class="ttLog_chongzhi" id="parseTaoBao" title="淘宝地址分析">淘宝地址分析</span>
+            <span id="fenxi01" title="地址分析格式1示例">&nbsp;&nbsp;示例</span>
+            <span class="ttLog_chongzhi" id="parseTaoBao2" title="淘宝地址分析">淘宝地址分析（发货）</span>
+            <span id="fenxi03" title="地址分析格式1示例">&nbsp;&nbsp;示例</span>
+            <span class="ttLog_chongzhi" id="parse1688" title="1688地址分析">1688地址分析</span>
+            <span id="fenxi02" title="地址分析格式2示例">&nbsp;&nbsp;示例</span>
+            <!--<span class="ttLog_chongzhi" title="京东地址分析">京东地址分析</span>-->
+        </p>
+        <div class="ty_gyClear"></div>
+        <p>
+            <span class="ncp_adrFxShr">收货人姓名：</span>
+            <span class="xiaDan_inpYs"><input type="text" id="name" maxlength="25" name="receiveName" placeholder="长度不超过25个字符" /></span>
+        </p>
+        <div class="ty_gyClear"></div>
+        <p>
+            <span class="ncp_adrFxShr">配送区域：</span>
+            <span class="xiaDan_inpYs">
+                <div class="controls">
+                    <span class="sui-dropdown dropdown-bordered select">
+                        <span class="dropdown-inner xiaDan_cityTop">
+                        <a id="select" role="button" data-toggle="dropdown" href="javascript:;" class="dropdown-toggle">
+                        <input value="0" data-weight="${totalWeight}" type="hidden" id="provinceId" name="province" data-rules="required">
+                        <i class="caret"></i><span id="province">请选择省份</span></a>
+                        <ul role="menu" aria-labelledby="drop4" class="sui-dropdown-menu" style="margin-top:16px;">
+                          <%var pinyin = "";%>
+                            <%for(p in provinces!){%>
+                            <%if(pinyin != p.pinyin){%>
+                            <li role="presentation" class="group-title" style="padding:0px 10px;text-align: left;">${p.pinyin}</li>
+                            <%pinyin = p.pinyin;%>
+                            <%}%>
+                            <li role="presentation">
+                                <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="${p.id}">${p.name}</a>
+                            </li>
+                            <%}%>
+                      </ul></span></span>
+                </div>
+                <div class="controls"><span class="sui-dropdown dropdown-bordered select"><span class="dropdown-inner xiaDan_cityTop"><a role="button" data-toggle="dropdown" href="#" class="dropdown-toggle">
+                    <input value="0" type="hidden" id="cityId" name="city" data-rules="required"><i class="caret"></i><span id="city">请选择市</span></a>
+                      <ul role="menu" aria-labelledby="drop4" class="sui-dropdown-menu cities" style="margin-top:16px;">
+
+                      </ul></span></span>
+                </div>
+
+                <div class="controls"><span class="sui-dropdown dropdown-bordered select"><span class="dropdown-inner xiaDan_cityTop"><a role="button" data-toggle="dropdown" href="#" class="dropdown-toggle">
+                    <input value="0" type="hidden" id="regionId" name="county" data-rules="required"><i class="cart"></i><span id="region">请选择区</span></a>
+                      <ul id="autoRegion" role="menu" aria-labelledby="drop4" class="sui-dropdown-menu counties" style="margin-top:16px;">
+
+                      </ul></span></span>
+                </div>
+            </span>
+        </p>
+        <div class="ty_gyClear"></div>
+        <p class="xiangXi_adress">
+            <span class="ncp_adrFxShr">详细地址：</span>
+            <span class="xiaDan_inpYs"><textarea rows="2" id="address" name="receiveAddress" class="ncp_adrFxSpan02" placeholder="建议您如实填写详细地址，例如街道名称、县、镇、村、楼层和房间号等信息"></textarea></span>
+        </p>
+        <div class="ty_gyClear"></div>
+        <p>
+            <span class="ncp_adrFxShr">手机号码：</span>
+            <span class="xiaDan_inpYs"><input type="text" id="mobileNumber" maxlength="11" name="receivePhone" placeholder="电话号码手机号码必填一项"/></span>
+        </p>
+        <div class="ty_gyClear"></div>
+        <p id="ncp_xiaDanTel">
+            <span class="ncp_adrFxShr">电话号码：</span>
+            <span class="xiaDan_inpYs quhao"><input type="text" id="phoneNumber0" maxlength="5" name="phoneNumber0" placeholder="区号"/></span>
+            <span class="xiaDan_inpYs telHao"><input type="text" id="phoneNumber1" maxlength="8" name="phoneNumber1" placeholder="电话号码"/></span>
+            <span class="xiaDan_inpYs fenjiHao"><input type="text" id="phoneNumber2" maxlength="8" name="phoneNumber2" placeholder="分机号"/></span>
+        </p>
+        <div class="ty_gyClear"></div>
+        <p>
+            <span class="ncp_adrFxShr">邮编：</span>
+            <span class="xiaDan_inpYs"><input type="text" id="postCode" maxlength="6" name="postCode" placeholder="如不清楚，请填写000000"/></span>
+        </p>
+    </div>
+</div>
+<div class="ty_gyClear"></div>
+<div class="xiaDan_lcPic diBuBot">
+    <p class="xiaBianKuang xd_titel">确认订单信息</p>
+            <table class="sui-table table-bordered" id="xiaDanPage_Tab">
+                <thead>
+                <th width="508"><span class="title_chej">
+                    </span><span style="margin-left:5px;">商品信息</span>
+                </th>
+                <th width="100">商品货号</th>
+                <th width="80">单价(元)</th>
+                <th width="200">数量</th>
+                <th width="80">重量(KG)</th>
+                <th width="100">是否特殊商品</th>
+                <th width="100">小计(元)</th>
+                </thead>
+                <tbody>
+                <%for(item in session.items!){%>
+                <tr>
+                    <td colspan="7" border="0">
+                        <ul>
+                            <p class="zongJi_tdTil">
+                                <span class="xiaDan_juLeft">品牌：</span>
+                                <span class="ghs_jhsF">${item.brand!}</span>
+                                <span>供货商：</span>
+                                <span class="ghs_jhsF">${item.supplierCompany!}</span>
+                            </p>
+                            <li>
+                                <span class="shop_XinXiWidth xiaDan_juLeft">
+                                    <span></span>
+                                    <a href="/goods/${item.goodsCode!}.html" target="_blank">
+                                        <span><img src="${img_url.getS(item.headImg)}" width="80" /></span>
+                                    </a>
+                                    <span>
+                                        <a href="/goods/${item.goodsCode!}.html" target="_blank">
+                                            <span class="shop_xgTitle">${item.goodsName!}</span>
+                                        </a>
+                                        <br /><br />
+                                        <a href="javascript:;">
+                                            <span class="shop_xgGuiGe">${strutil.replace(item.specPropValue,';','&nbsp;&nbsp;&nbsp;')}</span>
+                                        </a>
+                                        <br />
+                                    </span>
+                                </span>
+                                <a href="javascript:;">
+                                    <span class="shop_HuoHao">${item.goodsItemNo!}</span><!--商品货号-->
+                                </a>
+                                <a href="javascript:;"><!--单价-->
+                                    <span class="shop_DanJia">
+                                        <%if(item.offline){%>
+                                        <span style='color:red;'>商品已下架</span>
+                                        <%}else{%>
+                                        ${nums.yuan(item.price)}
+                                        <%}%>
+                                    </span>
+                                </a>
+                                <span class="shop_NumSpan">
+                                    ${item.stock >= item.quantity? item.quantity : "<span style='color:red;'>库存不足</span>"}
+                                </span>
+                                <a href="javascript:;">
+                                    <span class="shop_zhongLiang">${item.weight / 1000.00, "#0.0"}</span>
+                                </a>
+                                <a href="javascript:;">
+                                    <span class="youHuiFS">${item.isSpecial?'是':'否'}</span>
+                                </a>
+                                <a href="javascript:;">
+                                    <span class="xiaoJiYuan">
+                                        <%if(item.offline){%>
+                                        <span style='color:red;'>商品已下架</span>
+                                        <%}else{%>
+                                        ${nums.yuan(item.money)}
+                                        <%}%>
+                                    </span>
+                                </a>
+                                <div class="ty_gyClear"></div>
+                                <div class="ncp_panel">
+                                    <textarea rows="2" placeholder="备注"></textarea>
+                                </div>
+                            </li>
+
+                        </ul>
+                    </td>
+                </tr>
+                <%}%>
+                </tbody>
+            </table>
+        </div>
+</div>
+<div class="ty_gyClear"></div>
+<div class="xiaDan_lcPic">
+    <p class="xiaBianKuang xd_titel">配送方式</p>
+    <ul class="xiaDan_peiS peiSongTanChuang" id="peiSongTc">
+        <%for(item in expressList){%>
+        <li>
+            <span class="gongSi_wid02">
+                <span>
+                    <input class="express-company" data-name="${item.name}" data-id="${item.id}" data-fee="0" data-cut="${item.cutMoney!0}" data-discount="${item.discount!0}" name="express-company"  type="radio" value="" ${(item.id == defaultExpress.id)?'checked':''}  id="kuaidi${itemLP.index}" />
+                </span>
+                <label title="${item.name}">${item.name}</label>
+                <span class="peiSong_h">0.00</span>
+                <span>元</span>
+            </span>
+            <span class="pingTai_yunF">原运费：0.00元</span>
+            <span class="pingTai_ys">平台补贴：0.00元</span>
+        </li>
+        <%}%>
+    </ul>
+</div>
+<div class="ty_gyClear"></div>
+<div class="xiaDan_lcPic">
+    <p class="xiaBianKuang xd_titel">其它信息</p>
+    <div class="ty_gyClear"></div>
+    <div class="ncp_adressFX diBuBot02">
+    <p class="xiangXi_adress">
+        <span class="ncp_adrFxShr">留言：</span>
+        <span class="xiaDan_inpYs">
+            <textarea name="buyerMessage" rows="1" class="ncp_adrFxSpan02"></textarea></span>
+    </p>
+    <div class="ty_gyClear"></div>
+    </div>
+</div>
+    <div class="xiaDan_lcPic">
+        <input name="couponMoney" value="0" data-type="" type="hidden">
+        <input name="couponId" value="" type="hidden"/>
+        <p class="xiaBianKuang xd_titel">优惠信息</p>
+        <label class="add_yhsyong"><span class="add_fuxuankuang"><input type="checkbox" name="couponFlag" checked="checked" value="true" /></span>使用优惠：</label>
+        <div class="youhuiceng" id="youhuiceng"><label class="add_manyh" style="display: none" id="lab-coupon">满<strong id="lab-condition">0.00</strong>元，<label id="lab-type">抵运费</label><strong id="lab-money">0.00</strong>元</label></div>
+        <div class="addTabQie">
+            <div class="ncp_youhuiJMain" id="add_yhCon">
+                <div class="youhuiJuan_L" style="margin-left:22px;"></div>
+                <ul id="youHuiJuan">
+                    <li class="active" onclick="youhuijuanTabs(this,0);" title="我的优惠券">运费券</li>
+                    <li class="normal" onclick="youhuijuanTabs(this,1);"  title="已过期的优惠券">货品券</li>
+                </ul>
+                <div class="youhuiJuan_L"></div>
+                <!-- 我的优惠券(运费券) start -->
+                <ul id="youHuiJuan_Content0"  class="youHuiJuan_list">
+                    <%for(coupon in coupons!){%>
+                    <%if(coupon.couponTemplate.useType! == 'POST_FEE'){%>
+                    <li class="youHuiJuan_bg1 btn-coupon" title="马上使用" data-id="${coupon.id}" data-type="${coupon.couponTemplate.useType!}" data-money="${nums.yuan(coupon.couponTemplate.money!)}" data-condition="${nums.yuan(coupon.couponTemplate.condition!0)}">
+                        <span class="youHuiJuan_s01">
+                            <p class="youHuiJuan_jinEr">${coupon.couponTemplate.money!0 /100}</p>
+                            <p class="youHuiJuan_shiYoun">满${coupon.couponTemplate.condition!0 /100}元可用</p>
+                            <p class="youHuiJuan_shiYounQi">有效期：${dts.d2d(coupon.couponTemplate.startTime!)}&nbsp;至&nbsp;${dts.d2d(coupon.couponTemplate.endTime!)}</p>
+                        </span>
+                    </li>
+                    <%}%>
+                    <%}elsefor{%>
+                    <p class="addnoyouhuiP">当前没有可用优惠券</p>
+                    <%}%>
+                </ul>
+                <!-- 我的优惠券(运费券) end -->
+
+                <div class="ty_gyClear"></div>
+                <!-- 已过期的优惠券（货品券） start -->
+                <ul id="youHuiJuan_Content1" class="undis youHuiJuan_list" >
+                    <%for(coupon in coupons!){%>
+                    <%if(coupon.couponTemplate.useType! == 'PAYMENT'){%>
+                    <li class="youHuiJuan_bg2 btn-coupon" title="马上使用" data-id="${coupon.id}" data-type="${coupon.couponTemplate.useType!}" data-money="${nums.yuan(coupon.couponTemplate.money!)}" data-condition="${nums.yuan(coupon.couponTemplate.condition!0)}">
+                        <span class="youHuiJuan_s01">
+                            <p class="youHuiJuan_jinEr">${coupon.couponTemplate.money!0 /100}</p>
+                            <p class="youHuiJuan_shiYoun">满${coupon.couponTemplate.condition!0 /100}元可用</p>
+                            <p class="youHuiJuan_shiYounQi">有效期：${dts.d2d(coupon.couponTemplate.startTime!)}至${dts.d2d(coupon.couponTemplate.endTime!)}</p>
+                        </span>
+                    </li>
+                    <%}}elsefor{%>
+                    <p class="addnoyouhuiP">当前没有可用优惠券</p>
+                    <%}%>
+                </ul>
+            </span>
+        </span>
+        </p>
+        </div>
+        <div class="ty_gyClear"></div>
+    </div>
+</div>
+<div class="ty_gyClear"></div>
+<div class="zong_leiNum">
+    <span class="one_y">货品各类 </span>
+    <span class="two_y">${session.items.~size}</span>
+    <span class="three_y"> 种</span>
+    <span>货品数量 </span>
+    <span class="two_y">${productNum}</span>
+    <span class="three_y"> 个</span>
+    <span>货品总重 </span>
+    <span class="two_y">${totalWeight / 1000.0, '#0.0'}</span>
+    <span> KG</span>
+</div>
+<div class="zong_jiFeiYong">
+    <div>
+        <p>打包袋总计：<span><strong>${nums.yuan(packFee)}</strong>元</span></p>
+        <p>运费总计：<span><strong class="real-post-fee">0.00</strong>元</span></p>
+        <p>货品总金额：<strong>${nums.yuan(tradeTotalPrice)}</strong>元</p>
+        <p>
+            打包袋优惠金额：<strong id="packFee_discount">${nums.yuan(packFee)}</strong>元
+            &nbsp;&nbsp;&nbsp;&nbsp;商品优惠金额：<strong id="good_discount">0.00</strong>元
+            &nbsp;&nbsp;&nbsp;&nbsp;运费优惠金额：<strong id="postFee_discount">0.00</strong>元
+            &nbsp;&nbsp;&nbsp;&nbsp;平台优惠总计：<strong id="total_discount">${nums.yuan(packFee)}</strong>元
+        </p>
+        <div class="ty_gyClear"></div>
+        <p>
+            <span>元</span>
+            <span class="peiSong_h"><strong class="totalFee">${nums.yuan(tradeTotalPrice)}</strong></span>
+            <span>应付总金额 ( 含运费 ) ：</span>
+        </p>
+        <div class="ty_gyClear"></div>
+        <p><span id="orderMsg" class="add_address"></span></p>
+        <div class="ty_gyClear"></div>
+        <p class="ncp_tiJiaoFh">
+            <button class="tiJiao_BtnYs" title="提交订单">提交订单</button>
+            <a href="/shoppingCart.html" title="返回购物车修改"><span>返回购物车修改</span></a>
+        </p>
+    </div>
+</div>
+    <input type="hidden" name="postFee" value="0.00" />
+    <input type="hidden" name="totalPayment" value="<#yuan value='${tradeTotalPrice}' />" />
+    <input type="hidden" name="defaultExpress" value="${defaultExpress.id}" />
+    <input type="hidden" name="cutMoney" value="${defaultExpress.cutMoney!0}" />
+    <input type="hidden" name="discount" value="${defaultExpress.discount!0}"/>
+</form>
+<%}%>

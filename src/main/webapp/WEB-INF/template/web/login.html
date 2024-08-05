@@ -1,0 +1,49 @@
+<%layout("/web/layout/header_layout2.html"){%>
+<script type="text/javascript">
+    $(function(){
+        Common.ajaxForm($("form.tt_login"),"${actionKey!'/'}", null);
+        $(".ttlog_logbtn").click(function(){
+            $("form.tt_login").submit();
+        });
+
+    });
+    function showError(message){
+        $("#error").html(message);
+        $("#error").show();
+    }
+    function hideError(){
+        $("#error").html("");
+        $("#error").hide();
+    }
+</script>
+<%}%>
+<%layout("/web/layout/body_layout2.html"){%>
+<div class="ttlog_main">
+    <div class="ttlog_mainCon">
+        <div class="login_box"></div>
+        <form class="tt_login" action="${ctx}/loginByCode">
+            <p class="ttlog_title">用户登录</p>
+            <p class="ttlog_p">
+                <span class="ttlog_tit">用户名/手机号</span>
+                <span><input type="text" name="code" class="ttlog_inputT" maxlength="20" placeholder="用户名/手机号" onchange="hideError()" onfocus="javascript:this.className='redborder02'" onblur="javascript:this.className='ttlog_inputT'" /></span>
+            </p>
+            <p class="ttlog_p">
+                <span class="ttlog_tit">登录密码</span>
+                <span><input type="password" name="password" class="ttlog_inputP" maxlength="20" placeholder="请输入密码"  onchange="hideError()" onfocus="javascript:this.className='redborder03'" onblur="javascript:this.className='ttlog_inputP'" /></span>
+                <span class="ttlog_zhpwd"><a href="${ctx}/forgetPwd.html" title="找回密码">找回密码</a></span>
+            </p>
+            <p class="ttlog_p">
+                <span class="ttlog_fxk">
+                    <input type="checkbox" name="autoLogin" checked="checked">
+                </span>
+                <span class="ttlog_text">下次自动登录</span>
+            </p>
+            <input class="ttlog_logbtn float_l" title="登录" value="登录" type="submit" style="border: none">
+
+            <span class="ttlog_zhpwd"><a href="${ctx}/register.html" title="注册" >马上注册</a></span>
+            <div class="ty_gyClear"></div>
+            <div class="ttlog_error" id="error">请输入正确的手机号</div>
+        </form>
+    </div>
+</div>
+<%}%>

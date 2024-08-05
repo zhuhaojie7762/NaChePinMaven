@@ -1,0 +1,216 @@
+<%layout("../layout/header_layout.html"){%>
+<title>生成供货商结算账单(运营专员 )</title>
+
+<script type="text/javascript">
+    $(function () {
+
+        /**
+         * 选择/取消 全部
+         */
+        $("input[name=ckAll]").click(function () {
+            var checkFlag = $(this).prop("checked");
+            $("input[name=items]:checkbox").prop("checked", checkFlag);
+        });
+
+        /**
+         *  选择/取消 单个
+         */
+        $("input[name=items]:checkbox").click(function () {
+            if ($("input[name=items]:checkbox:checked").length == $("input[name=items]:checkbox").length) {
+                $("input[name=ckAll]:checkbox").prop("checked", 'true');
+            } else {
+                $("input[name=ckAll]:checkbox").removeAttr("checked");
+            }
+        });
+
+        /**
+         * 重置
+         */
+        $("input.btn-reset").click(function () {
+            Common.reset("form.query-form");
+        });
+
+        /**
+         * 提交
+         */
+        Common.ajaxForm($("form.form-create"), null, function(json){
+            if (json.code == Common.SUCC) {
+                Common.refresh();
+            }else{
+                Msg.danger(json.message);
+                $(".btn-tijiao").bind("click", function(){
+                    submitForm();
+                });
+            }
+        });
+
+        $(".btn-tijiao").unbind("click").bind("click", function(){
+            submitForm();
+        });
+
+        /**
+         * 导出供应商账单明细
+         */
+        $(".btn-exportDetail").unbind("click").bind("click", function() {
+            if($("input[name=items]:checkbox:checked").length == 0){
+                Msg.danger("选择需要导出订单");
+                return;
+            }
+            var ids = new Array();
+            var startTimes = new Array();
+            var endTimes = new Array();
+            $("input[name=items]:checkbox:checked").each(function (i, item) {
+                ids.push($(item).parents("tr").find("input[name=supplierId]").val());
+                startTimes.push($(item).parents("tr").find("input[name=startTime]").val());
+                endTimes.push($(item).parents("tr").find("input[name=endTime]").val());
+            });
+            var startTime = $("input[name=totalStartTime]").val();
+            var endTime = $("input[name=totalEndTime]").val();
+            Common.downLoadFile({url:"/admin/settlement/operate/exportDetail",
+                data:{totalStartTime:startTime, totalEndTime:endTime, ids:ids.join(","), startTimes:startTimes.join(","), endTimes:endTimes.join(",")}});
+        });
+
+        /**
+         * 导出供应商结算汇总
+         */
+        $(".btn-exportTotal").unbind("click").bind("click", function() {
+            if($("input[name=items]:checkbox:checked").length == 0){
+                Msg.danger("选择需要导出订单");
+                return;
+            }
+            var ids = new Array();
+            var startTimes = new Array();
+            var endTimes = new Array();
+            $("input[name=items]:checkbox:checked").each(function (i, item) {
+                ids.push($(item).parents("tr").find("input[name=supplierId]").val());
+                startTimes.push($(item).parents("tr").find("input[name=startTime]").val());
+                endTimes.push($(item).parents("tr").find("input[name=endTime]").val());
+            });
+            var startTime = $("input[name=totalStartTime]").val();
+            var endTime = $("input[name=totalEndTime]").val();
+            Common.downLoadFile({url:"/admin/settlement/operate/exportTotal",
+                data:{totalStartTime:startTime, totalEndTime:endTime, ids:ids.join(","), startTimes:startTimes.join(","), endTimes:endTimes.join(",")}});
+        });
+    });
+
+    function submitForm(){
+        if($("input[name=items]").length == 0){
+            Msg.danger("无需要结算的订单");
+            return;
+        }
+        $(".btn-tijiao").unbind("click");
+        $("form.form-create").submit();
+    }
+</script>
+<%}%>
+<%layout("../layout/body_layout.html"){%>
+<div class="query-zone" id="searchL">
+    <form class="sui-form form-horizontal query-form" id="query-form">
+        <div class="sui-row" id="jiesuanFangs">
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        供货商名称
+                    </span>
+                    <input type="text" class="input h22" name="supplierName" value="${parameter.supplierName!}"/>
+                </div>
+            </div>
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        应结算金额大于&nbsp;&nbsp;
+                    </span>
+                    <input type="text" class="input h22" name="settlementMoney" value="${parameter.settlementMoney!}" onkeyup="if(isNaN(value))execCommand('undo')" onafterpaste="if(isNaN(value))execCommand('undo')"/>
+                </div>
+            </div>
+            <div class="span4">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        结算方式
+                    </span>
+                </div>
+                <div class="fuxuankuangz">
+                    <label><input name="settlementMethod" type="radio" value="weekly" ${decode(parameter.settlementMethod!'weekly','weekly','checked','','checked','')} /> 周结 </label>
+                    <label><input name="settlementMethod" type="radio" value="monthly" ${parameter.settlementMethod! == 'monthly'?'checked'} /> 月结 </label>
+                    <!--<label><input name="settlementMethod" type="radio" value="daily" ${parameter.settlementMethod! == 'daily'?'checked'} /> 现结 </label>-->
+                </div>
+            </div>
+        </div>
+        <div class="sui-row" style="margin:15px 0 0 2px;">
+            <button class="sui-btn btn-primary">查询</button>
+            <input type="button" class="sui-btn btn-primary btn-reset" value="重置"/>
+            <input type="button" class="sui-btn btn-primary btn-exportDetail" value="导出供货商账单明细"/>&nbsp;
+            <input type="button" class="sui-btn btn-primary btn-exportTotal" value="导出结算汇总"/>
+        </div>
+    </form>
+</div>
+<form class="sui-form form-horizontal form-create" action="/admin/settlement/operate/create" method="post" id="form-data">
+    <input type="hidden" name="totalStartTime" value="${dts.d2d(startTime)}" />
+    <input type="hidden" name="totalEndTime" value="${dts.d2d(endTime)}" />
+    <table class="sui-table table-bordered" id="yueJieTab">
+        <thead>
+        <tr>
+            <th width="80"><input type="checkbox" value="" name="ckAll" id="ckAll">&nbsp;<label for="ckAll">全选/反选</label></th>
+            <th width="80">上次结算期间</th>
+            <th width="80">本次结算期间</th>
+            <th width="146">供货商名称</th>
+            <th width="60">销售金额</th>
+            <th width="60">退款金额</th>
+            <th width="80">应结算金额</th>
+            <th width="100">收款信息</th>
+            <th width="50">结算状态</th>
+            <th width="50">结算方式</th>
+            <th width="50">操作</th>
+            <th>备注</th>
+        </tr>
+        </thead>
+        <tbody>
+        <%
+        var sumSaleMoney = 0;
+        var sumBackMoney = 0;
+        %>
+        <%for(item in data){%>
+        <tr>
+            <td><input type="checkbox" name="items" value="${itemLP.index}" /></td>
+            <td>${dts.d2d(item.LastTime!)} ~ ${dts.d2d(item.startTime!)}<input type="hidden" name="startTime" value="${dts.d2d(item.startTime!)}"></td>
+            <td>${dts.d2d(item.startTime!)} ~ ${dts.d2d(item.endTime!)}<input type="hidden" name="endTime" value="${dts.d2d(item.endTime!)}"></td>
+            <td>
+                ${item.supplierCompany}
+                <input type="hidden" name="supplierId" value="${item.supplierId!}">
+                <input type="hidden" name="supplierName" value="${item.supplierName!}">
+                <input type="hidden" name="supplierCompany" value="${item.supplierCompany!}">
+            </td>
+            <td>${nums.yuan(item.saleMoney)}<input type="hidden" name="saleMoney" value="${item.saleMoney!}"></td>
+            <td>${nums.yuan(item.backMoney)}<input type="hidden" name="backMoney" value="${item.backMoney!}"></td>
+            <td>${nums.yuan(item.saleMoney - item.backMoney)}</td>
+            <td>
+                ${item.alipayName!}&nbsp;&nbsp;${item.alipayCode!}
+                <input type="hidden" name="alipayCode" value="${item.alipayCode!}">
+                <input type="hidden" name="alipayName" value="${item.alipayName!}">
+            </td>
+            <td>未结算</td>
+            <td>${item.settlementMethod.name}<input type="hidden" name="settlementMethod" value="${item.settlementMethod}"></td>
+            <td><a href="/admin/settlement/operate/detail?supplierId=${item.supplierId}" target="_blank">明细</a></td>
+            <td></td>
+        </tr>
+        <%
+        sumSaleMoney = sumSaleMoney + item.saleMoney;
+        sumBackMoney = sumBackMoney + item.backMoney;
+        %>
+        <%}%>
+        </tbody>
+        <tfoot id="yunyingftoot">
+            <tr>
+                <td colspan="12">
+                    <span>销售总金额：<strong>${nums.yuan(sumSaleMoney)}</strong>元</span>
+                    <span>退款总金额：<strong>${nums.yuan(sumBackMoney)}</strong>元</span>
+                    <span>应结算总金额：<strong>${nums.yuan(sumSaleMoney - sumBackMoney)}</strong>元</span>
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+    <div class="hdMore_btns hd_botomDiv">
+        <input type="button" class="sui-btn btn-primary btn-tijiao" value="提交" />
+    </div>
+</form>
+<%}%>

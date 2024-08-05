@@ -1,0 +1,277 @@
+<%layout("../layout/header_layout.html"){%>
+<title>发货</title>
+<script src="/static/js/web/hd_zixie.js?v=${v}"></script>
+<script type="text/javascript">
+    $(function(){
+        // 全选 or 全不选
+        $("#CheckedAll").click(function(){
+            var checked = $(this).prop("checked");
+            $("input[name=items]").prop("checked", checked);
+        });
+        // 批量发货
+        $(".btn-deliverGoods").click(function() {
+            var params = new Array();
+            if ($("input[name=items]:checkbox:checked").length > 0) {
+                var codes = new Array();
+                $("input[name=items]:checkbox:checked").each(function (i, item) {
+                    codes.push($(item).val());
+                });
+                params.push(codes.join(","));
+            } else {
+                Msg.danger("亲，请先选择要发货的订单！");
+                return;
+            }
+            if (!confirm("确认批量发货吗？")) {
+                return;
+            }
+            Common.post2({
+                url: "/admin/picklist/picking/deliverGoods",
+                param: { tradeCode : params.join("&"), pickCode : "${pickCode!}" },
+                success: function (result) {
+                    if (result.code == Common.SUCC) {
+                        Msg.success(result.message,function(){
+                            Common.go("/admin/picklist/picking");
+                        });
+                    }
+                }
+            });
+        });
+        // send goods
+        $(".sendGoods").click(function () {
+            if (!confirm("确认发货吗？")) {
+                return;
+            }
+            if ($(this).attr("data-pick") == "WAIT_RECEIVE") {
+                Msg.danger("亲，此订单已经发货过不能在次发货！");
+                return;
+            }
+            Common.post2({
+                url: "/admin/picklist/picking/deliverGoods",
+                param: { tradeCode : $(this).attr("data-code"), pickCode : "${pickCode!}" },
+                success: function (result) {
+                    if (result.code == Common.SUCC) {
+                        Msg.success(result.message);
+                    }
+                    setTimeout(function () {
+                        Common.refresh();
+                    }, 1000);
+                }
+            });
+        });
+        // 配货未完成
+        $(".allocating").click(function () {
+            if (!confirm("确认发配到未完成配货单吗？")) {
+                return;
+            }
+            Common.post2({
+                url: "/admin/picklist/picking/doAllocating",
+                param: { tradeCode : $(this).attr("data-code") },
+                success: function (result) {
+                    if (result.code == Common.SUCC) {
+                        Msg.success(result.message);
+                    }
+                    setTimeout(function () {
+                        Common.go("/admin/picklist/picking/sendOrder?pickCode=${pickCode!}");
+                    }, 1000);
+                }
+            });
+        });
+        // remark save
+        Common.ajaxForm($("form[name=remarkForm]"), null, null);
+        // express number
+        Common.ajaxForm($("form[name=expressForm]"), null, null);
+        // reality weight save
+        Common.ajaxForm($("form[name=weightForm]"), null, null);
+    });
+</script>
+<%}%>
+<%layout("../layout/body_layout.html"){%>
+<ul class="sui-breadcrumb">
+    <li><a href="/admin/picklist/picking">当日拣货中</a></li>
+    <li><a href="/admin/picklist/picking/pickOrder?pickCode=${pickCode!}">导出到EXCEL订单</a></li>
+    <li><a href="/admin/picklist/picking/printLoading?pickCode=${pickCode!}">打印拣货单</a></li>
+    <li class="active">发货</li>
+</ul>
+<div class="query-zone" id="confirm_Con">
+    <form class="sui-form form-horizontal query-form" id="query-form">
+        <input type="hidden" name="pickCode" value="${pickCode!}" />
+        <div class="sui-row">
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        订单号：
+                    </span>
+                    <input type="text" class="input h22" name="tradeCode" placeholder="例：TR00001" value="${setTradeCode!}" />
+                </div>
+            </div>
+            <!--
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        订单状态：
+                    </span>
+                    <span class="sui-dropdown dropdown-bordered select h22">
+                        <span class="dropdown-inner">
+                            <a role="button" data-toggle="dropdown" href="#" class="dropdown-toggle">
+                                <i class="caret"></i>
+                                <span>
+                                    已拣货
+                                </span>
+                            </a>
+                            <ul role="menu" aria-labelledby="drop12" class="sui-dropdown-menu">
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" >请选择</a></li>
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="">已拣货</a></li>
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="">未拣货</a></li>
+                            </ul>
+                        </span>
+                    </span>
+                </div>
+            </div>
+            -->
+            <div class="span2">
+                <button class="sui-btn btn-primary" title="查询">查询</button>
+                <input type="button" class="sui-btn btn-primary btn-reset" onclick="location.href='/admin/picklist/picking/sendOrder?pickCode=${pickCode!}'" value="重置" title="重置"/>
+            </div>
+        </div>
+    </form>
+</div>
+<div class="benCi_dingDan">
+    <p>本次拣货的订单（拣货单 ${pickCode!}）</p>
+</div>
+<!--新布局 start-->
+<table class="sui-table table-bordered" id="weiwancheng_Tab">
+    <thead>
+    <th><input type="checkbox" id="CheckedAll">&nbsp;&nbsp;&nbsp;&nbsp;商品详情</th>
+    <th width="50">数量</th>
+    <th width="50">重量</th>
+    <th width="56">单价</th>
+    <th width="50">状态</th>
+    <th width="60">优惠</th>
+    <th width="88">实付款</th>
+    <th width="80">操作</th>
+    </thead>
+    <tbody>
+    <%for(trade in trades){%>
+    <tr>
+        <td colspan="8">
+            <span class="tab_span01"><input type="checkbox" name="items" value="${trade.code!}"></span>
+            <span class="tab_span02">${trade.code!}</span>
+            <span class="tab_span03">${dts.d2s(trade.created)}</span>
+            <span class="tab_span03">${trade.sendOrder.expressName}</span>
+            <span class="phweiwancheng"><a href="javascript:;" class="allocating" data-code="${trade.code}">配货未完成</a></span>
+        </td>
+    </tr>
+        <%for(order in trade.orders){%>
+        <tr>
+            <td>
+                <div class="tab_span01"></div>
+                <div class="tab_span02">${order.code!}</div>
+                <div class="hd_ghsDiv">
+                    <p>${order.sellerCompany!}</p>
+                    <p>${order.brand!}</p>
+                </div>
+                <div class="wshop_goods"><img src="${img_url.getS(order.headImg!)}" /></div>
+                <div class="xiangQing">
+                    <span class="shop_xgTitle">${order.goodsName!}</span>
+                    <br />
+                    <span class="tongYong_gg">${order.specPropValue!}</span>
+                    <br />
+                    <span class="tongYong_bh">编号：${order.goodsCode!}&nbsp;&nbsp;货号：${order.goodsItemNo!}</span>
+                </div>
+            </td>
+            <td>${order.quantity!}</td>
+            <td>${nums.g2k(order.weight)}</td>
+            <td>${nums.yuan(order.price)}</td>
+            <td>${order.status.name!}</td>
+            <%if(orderLP.first){%>
+            <td rowspan="${orderLP.size}" class="wei_yhjuan">
+                <%if(!isEmpty(trade.coupon.couponTemplate.money!)){%>
+                ${trade.coupon.couponTemplate.useType.value!}${nums.yuan(trade.coupon.couponTemplate.money!)}元
+                <%}%>
+                <%if(trade.packSubsidy > 0){%>
+                打包优惠${nums.yuan(trade.packSubsidy)}元
+                <%}%>
+                <%if(trade.couponId == 0 && trade.packSubsidy == 0){%>
+                无
+                <%}%>
+            </td>
+            <td rowspan="${orderLP.size}">
+                <span style="font-size: 14px;display: block;">${nums.yuan(trade.payment)}元</span>
+                <span style="display: block;font-size: 12px;">( 含运费${nums.yuan(trade.postFee)}元 )</span>
+            </td>
+            <td rowspan="${orderLP.size}" class="hd_jddwei">
+                <form name="remarkForm" method="post" action="/admin/picklist/picking/remarkSave">
+                        <span class="beiZhu_wai" title="备注">
+                        <span class="sui-btn btn-small beiZhu_wai">备注</span>
+                            <!-- 备注框 start -->
+                            <p class="header_la">
+                                <input type="hidden" name="tradeCode" value="${trade.code!}" />
+                                <span><textarea name="remark" class="beiZhuQuYu" rows="6" placeholder="请填写备注内容（50字以内）。">${trade.remark!}</textarea></span>
+                                <button class="sui-btn btn-small dingbot">确定</button>
+                            </p>
+                            <!-- 备注框 end -->
+                        </span>
+                </form>
+                <a href="javascript:;" class="sui-btn btn-small sendGoods" data-code="${trade.code}" data-pick="${trade.status!}">发货</a>
+                <div class="tianxiedh" id="fhpageCon">
+                    <span class="sui-btn btn-small btn-takeOrder tianxiedhsj btn-bottomnum" >修改快递单号</span>
+                    <div class="hd_qddwei">
+                        <form name="expressForm" method="post" action="/admin/picklist/picking/expressSave?tradeCode=${trade.code!}">
+                            <span class="wuliu_hdSpan">物流公司：</span>
+                            <span class="sui-dropdown dropdown-bordered select h22">
+                                <span class="dropdown-inner">
+                                    <a id="select" role="button" href="javascript:void(0);" data-toggle="dropdown" class="dropdown-toggle">
+                                        <input type="hidden" name="expressId" data-rules="required" value="${trade.expressId!2}" />
+                                        <i class="caret"></i>
+                                        <span>${trade.expressName!'天天快递'}</span>
+                                    </a>
+                                    <ul role="menu" aria-labelledby="drop12" class="sui-dropdown-menu">
+                                        <li role="presentation"><a role="menuitem" tabindex="" href="javascript:void(0);" value="0" >请选择</a></li>
+                                        <%for(express in expressLists){%>
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="${express.id!}">${express.name!}</a></li>
+                                        <%}%>
+                                    </ul>
+                                </span>
+                            </span>
+                            <br /><br />
+                            <span class="wuliu_hdSpan">物流单号：</span>
+                            <span><input type="text" name="expressNum" value="${trade.expressCode!}" /></span>
+                            <br /><br /><br />
+                            <a class="sui-btn xiala_close">关闭</a>
+                            <button class="sui-btn xiala_save">保存</button>
+                        </form>
+                    </div>
+                </div>
+                <a href="/admin/picklist/peiOrder/detail?code=${trade.code}" class="sui-btn btn-small">查看详情</a>
+                <div id="shijizhongliang">
+                    <form name="weightForm" method="post" action="/admin/picklist/picking/weightSave?tradeCode=${trade.code!}">
+                        <span class="sui-btn btn-small btn-realWeight">实际重量</span>
+                        <!-- 实际重量 start -->
+                        <div class="shijizlCon">
+                            <span style="display: block;margin: 60px 0 0 17px;">实际重量(kg)：
+                                <input type="text" name="realityWeight" value="${nums.g2k(trade.realityWeight)}" onkeyup="if(isNaN(value))execCommand('undo')" onafterpaste="if(isNaN(value))execCommand('undo')" />
+                            </span>
+                            <a class="sui-btn btn-small sjzlQuxiaoBtn btn-realWeight-cancel">取消</a>
+                            <button class="sui-btn btn-small dingbot">确定</button>
+                        </div>
+                        <!-- 实际重量 end -->
+                        <div class="shijizhongliang"></div>
+                    </form>
+                </div>
+            </td>
+            <%}%>
+        </tr>
+        <%}%>
+    <%}elsefor{%>
+    <tr>
+        <td colspan="7" class="zanWuShuju"><p>没有数据</p></td>
+    </tr>
+    <%}%>
+    </tbody>
+</table>
+<div class="hdMore_btns hd_botomDiv">
+    <a href="/admin/picklist/picking/printLoading?pickCode=${pickCode!}" class="sui-btn btn-edit">上一步</a>
+    <input type="button" class="sui-btn btn-primary btn-deliverGoods" value="批量发货"/>&nbsp;&nbsp;
+</div>
+<!--新布局 end-->
+<%}%>

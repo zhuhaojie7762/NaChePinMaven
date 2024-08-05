@@ -1,0 +1,115 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="carlist_content-Type" carlist_content="text/html; charset=utf-8" />
+    <meta name="viewport" carlist_content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>账单</title>
+    <link href="/static/images/web/ncp_logo.ico" rel="icon" type="image/x-icon"/>
+    <link href="/static/images/web/ncp_logo.ico" rel="shortcut icon" type="image/x-icon"/>
+    <link href="/static/images/web/ncp_logo.ico" rel="icon" type="image/x-icon"/>
+    <link href="/static/images/web/ncp_logo.ico" rel="shortcut icon" type="image/x-icon"/>
+    <link rel="stylesheet" type="text/css" href="/static/css/web/common.css?v=${v}">
+    <link rel="stylesheet" type="text/css" href="/static/css/web/style.css?v=${v}">
+    <script type="text/javascript" src="/static/js/web/jquery-1.9.1.min.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/web/zixie.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/web/baidu.js?v=${v}"></script>
+    <script type="text/javascript" src="http://g.alicdn.com/sj/lib/jquery/dist/jquery.min.js?v=${v}"></script>
+    <script type="text/javascript" src="http://g.alicdn.com/sj/dpl/1.5.1/js/sui.min.js?v=${v}"></script>
+    <link rel="stylesheet" type="text/css" href="/static/css/web/sui.min.css?v=${v}">
+    <link rel="stylesheet" type="text/css" href="/static/css/web/sui-append.css?v=${v}">
+    <script type="text/javascript" src="/static/js/common.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/jquery.form.js?v=${v}"></script>
+</head>
+<%layout("../../layout/body_layout.html"){%>
+<div class="zx_type">
+    <div class="zx_arrow"></div>
+    账单
+</div>
+<p class="zx_grzxUser"><span class="indTitleTao"></span>账单</p>
+<fieldset id="ddmlF">
+<legend>查询信息</legend>
+<form action="" method="post">
+    <p id="chaxun" class="ttlog_search">
+        <span>对账单名称：</span>
+        <span>
+            <input type="text" class="ttlog_input" onblur="javascript:this.className='ttlog_input'" onfocus="javascript:this.className='ttlog_input02'" value="${params.code!}" name="code" />
+        </span>
+        <span>结算时间：</span>
+        <span id="demo2" class="date float_l">
+            <span class="add-on"></span>
+            <input type="text" style="width: 100px;" class="ttlog_input" onfocus="javascript:this.className='ttlog_input02'" onblur="javascript:this.className='ttlog_input'" value="${params.startTime!}" name="startTime" />
+        </span>
+        <script type="text/javascript">
+            $('#demo2.date').datepicker({});
+        </script>
+        <span id="demo" class="date float_l">
+            <span class="add-on">至&nbsp;&nbsp;</span>
+            <input type="text" style="width: 100px;"  class="ttlog_input" onfocus="javascript:this.className='ttlog_input02'" onblur="javascript:this.className='ttlog_input'" value="${params.endTime!}" name="endTime" />
+        </span>
+        <script type="text/javascript">
+            $('#demo.date').datepicker({});
+        </script>
+        <!--个人中心优化 start-->
+        <div id="zx_zhangds" >
+        <!--个人中心优化 end-->
+        <div class="ty_gyClear"></div>
+        <style>
+            .sui-dropup .caret::before, .sui-dropdown .caret::before{ content: "";}
+            .sui-dropup.dropdown-bordered .dropdown-inner > .sui-dropdown-menu, .sui-dropdown.dropdown-bordered .dropdown-inner > .sui-dropdown-menu{min-width: 142px;margin:3px 0 0 66px;border:1px solid #ededed;}
+            #zx_zhangds .dropdown-inner {background: rgba(0, 0, 0, 0) url('/static/images/web/xialabg.png') no-repeat scroll 120px center;}
+        </style>
+            <span class="sui-dropdown dropdown-bordered select">
+            <span class="zx_jiesuanzt">结算状态：</span>
+                <span class="dropdown-inner" style="padding-top:2px;padding-bottom:2px;">
+                    <a id="drop12" role="button" data-toggle="dropdown" href="#" class="dropdown-toggle">
+                        <input name="status" value="${params.status!}" type="hidden"><i class="caret"></i>
+                        <span>${decode(params.status,'0','未结算','1','已结算','请选择')}</span>
+                    </a>
+                    <ul id="menu12" role="menu" aria-labelledby="drop12" class="sui-dropdown-menu">
+                        <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="0" title="未结算">未结算</a></li>
+                        <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="1" title="已结算">已结算</a></li>
+                        <li role="presentation" class="divider"></li>
+                        <li role="presentation" class="active"><a role="menuitem" tabindex="-1" href="javascript:void(0);" title="请选择">请选择</a></li>
+                    </ul>
+                </span>
+            </span>
+    </div>
+    <!--<div style="position: absolute;top:60px;right:69px;">-->
+    <div class="ty_gyClear"></div>
+    <div id="zx_cxun">
+        <span><input type="submit" class="ttLog_chaXun" value="&nbsp;&nbsp;查询&nbsp;&nbsp;" /></span>
+        <span><input type="button" class="ttLog_chongzhi" onclick="javascript:Common.go('/member/bill/bill.html');" value="&nbsp;&nbsp;重置&nbsp;&nbsp;" /></span>
+    </div>
+    </p>
+</form>
+</fieldset>
+<div class="ty_gyClear jiangeJuLi"></div>
+<table class="sui-table table-bordered" id="dingDanMeLi" >
+    <thead>
+    <tr>
+        <th>结算时间</th>
+        <th>对账单名称</th>
+        <th>结算状态</th>
+    </tr>
+    </thead>
+    <tbody>
+    <%for(list in pageList.data){%>
+    <tr>
+        <td>${list.created!}</td>
+        <td><a href="/member/bill/detail?settlementCode=${list.code!}">${list.code!}</a></td>
+        <%if(list.status.val == 90 || list.status.val == 100){%>
+        <td>已结算</td>
+        <%}else{%>
+        <td>未结算</td>
+        <%}%>
+    </tr>
+    <%}elsefor{%>
+    <tr>
+        <td colspan="3" class="zanWuShuju"><p>暂无数据！</p></td>
+    </tr>
+    <%}%>
+    </tbody>
+</table>
+<%}%>
+</html>
+

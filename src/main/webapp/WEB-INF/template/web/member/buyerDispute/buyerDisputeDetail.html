@@ -1,0 +1,156 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="carlist_content-Type" carlist_content="text/html; charset=utf-8"/>
+    <meta name="viewport" carlist_content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+    <title>退款退货详情</title>
+    <link href="/static/images/web/ncp_logo.ico" rel="icon" type="image/x-icon"/>
+    <link href="/static/images/web/ncp_logo.ico" rel="shortcut icon" type="image/x-icon"/>
+    <link rel="stylesheet" type="text/css" href="/static/css/web/common.css?v=${v}">
+    <link rel="stylesheet" type="text/css" href="/static/css/web/style.css?v=${v}">
+    <link rel="stylesheet" type="text/css" href="/static/css/web/jindutiao.css?v=${v}">
+    <script type="text/javascript" src="/static/js/web/jquery-1.9.1.min.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/web/zixie.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/web/baidu.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/web/file.js?v=${v}"></script>
+    <script type="text/javascript" src="http://g.alicdn.com/sj/lib/jquery/dist/jquery.min.js?v=${v}"></script>
+    <script type="text/javascript" src="http://g.alicdn.com/sj/dpl/1.5.1/js/sui.min.js?v=${v}"></script>
+    <link rel="stylesheet" type="text/css" href="/static/css/web/sui.min.css?v=${v}">
+    <link rel="stylesheet" type="text/css" href="/static/css/web/sui-append.css?v=${v}">
+    <link rel="stylesheet" type="text/css" href="/static/css/web/webuploader.css?v=${v}">
+    <script type="text/javascript" src="/static/js/MsgBox.js?v=${v}"></script>
+    <link rel="stylesheet" type="text/css" href="/static/css/msg_box.css?v=${v}">
+    <script type="text/javascript" src="/static/js/web/webuploader.js?v=${v}"></script>
+</head>
+<%layout("../../layout/body_layout.html"){%>
+<div class="zx_type">
+    <div class="zx_arrow"></div>
+    退款退货详情
+</div>
+<p class="zx_grzxUser"><span class="indTitleTao"></span>退款退货详情</p>
+<table class="sui-table table-bordered" id="zongzi_dingdan">
+    <thead>
+    <th width="80">申请时间</th>
+    <th width="60">是否收货</th>
+    <th width="60">是否退货</th>
+    <th width="80">退款金额</th>
+    <th width="120">退款原因</th>
+    <th width="120">说明</th>
+    </thead>
+    <tbody>
+    <tr>
+        <td>${order.applyRefundTime!}</td>
+        <td>${order.isCargo == 1? "是" : "否"}</td>
+        <td>${order.status.val == 70? "是" : "--"}</td>
+        <td class="add_tdnoborder">${nums.yuan(order.refundFee)}</td>
+        <td class="add_tdnoborder">${reason.refundReason!}</td>
+        <td class="ncguanzhu_chaK02 add_tdnoborder">${reason.remarkReason!}</td>
+    </tr>
+    </tbody>
+</table>
+<fieldset id="addimgF">
+    <legend>图片</legend>
+    <div class="addtuiCon">
+        <div class="add_imgzus" id="imgPicker">
+            <%for(img in imgList){%>
+            <!--zdj add-->
+                <span class="ncguanzhu_chaK02">
+                    <img src="${img_url.getL(img)}" class="xiaoshouxing" onclick="bigImg(this)"  height="50" title="点击预览大图" />
+                </span>
+            <%}%>
+        </div>
+    </div>
+</fieldset>
+<!--图片预览弹出框 start-->
+<div id="bgDiv"></div>
+<div id="sqsImgBig">
+    <div class="casewinright">
+        <div class="sqsCdel">
+            <a onclick = "document.getElementById('sqsImgBig').style.display='none';document.getElementById('bgDiv').style.display='none';">
+                <img src="/static/images/web/close.png" width="35" height="35"/>
+            </a>
+        </div>
+        <div class="winright">
+            <img src="" width="120%"/>
+        </div>
+    </div>
+</div>
+<!--图片预览弹出框 end-->
+<fieldset id="addjiluF">
+    <legend>退货退款流程记录</legend>
+    <div class="add_tuijilu">
+        <p><span class="tuione">当前状态：</span>${order.status.name!}</p>
+        <%if(order.status.val == 70){%>
+            <p><span class="tuione">退回地址：</span>${trade.receiveAddress!}</p>
+        <%}%>
+    </div>
+    <div class="add_tuijilu">
+        <%for(log in refundLogs){%>
+            <%if(isNotEmpty(log.adminName)){%>
+                <p><span class="tuione">处理人：</span>${log.adminName!}<span class="tuiright">${log.createTime, "yyyy-MM-dd HH:mm:ss"}</span></p>
+                <p><span class="tuiTwo">${log.refundStatusCode.name!}
+                    <%if(isNotEmpty(log.reason)){%>
+                        ；原因：${log.reason!}
+                    <%}%>
+                </span></p>
+            <%}%>
+            <%if(isNotEmpty(log.clientName)){%>
+                <p><span class="tuione">进货商：</span>${log.clientName!}<span class="tuiright">${log.createTime, "yyyy-MM-dd HH:mm:ss"}</span></p>
+                <p><span class="tuiTwo">${log.refundStatusCode.name!}；
+                    <%if(isNotEmpty(log.goodsStatus)){%>
+                        货物状态为：${log.goodsStatus == 1? "已收到货" : "未收到货"}；
+                    <%}%>
+                    <%if(isNotEmpty(log.reason)){%>
+                        原因：${log.reason!}；
+                    <%}%>
+                    <%if(isNotEmpty(log.money)){%>
+                        金额：${nums.yuan(log.money)}元；
+                    <%}%>
+                    <%if(isNotEmpty(log.remark)){%>
+                        说明：${log.remark!}；
+                    <%}%>
+                    <%if(isNotEmpty(log.trackingName)){%>
+                        快递公司：${log.trackingName!}；
+                    <%}%>
+                    <%if(isNotEmpty(log.trackingNumber)){%>
+                        快递编号：${log.trackingNumber!}；
+                    <%}%>
+                    </span></p>
+            <%}%>
+        <%}%>
+    </div>
+</fieldset>
+<fieldset id="addhuopinF">
+    <legend>货品信息</legend>
+    <table class="sui-table table-bordered" id="tuihuokuan_dingdan">
+        <thead>
+            <th width="150">货品详情</th>
+            <th width="160">规格属性</th>
+            <th width="80">单价</th>
+            <th width="80">数量</th>
+            <th width="100">货品总价(元)</th>
+            <th width="90">运费(元)</th>
+        </thead>
+        <tbody>
+        <tr>
+            <td>
+                <div class="add_shopxqing add_shijiwidth">
+                    <a href="" target="_blank">
+                        <dl>
+                            <dt><img src="${img_url.getS(goods.headImgUrl1)}" width="70" /></dt>
+                            <dd class="title">${goods.brand!}&nbsp;&nbsp;${goods.name!}</dd>
+                        </dl>
+                    </a>
+                </div>
+            </td>
+            <td>${order.specPropValue!}</td>
+            <td>${nums.yuan(goods.wholesalePrice)}</td>
+            <td>${order.quantity!}</td>
+            <td class="add_tdnoborder">${nums.yuan(order.money)}</td>
+            <td class="add_tdnoborder">${nums.yuan(trade.postFee)}</td>
+        </tr>
+        </tbody>
+    </table>
+</fieldset>
+<%}%>
+</html>

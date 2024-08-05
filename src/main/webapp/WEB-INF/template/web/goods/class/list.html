@@ -1,0 +1,155 @@
+<%layout("/web/layout/header_layout2.html"){%>
+<script type="text/javascript" src="${ctx}/static/js/zuixin/lazyload.js"></script>
+<script type="text/javascript">
+    $(function(){
+        //翻页
+        Web_Pagination.init();
+        //删除条件
+        $(".btn-clear").live("click",function(){
+            var url = $(this).attr("data-url");
+            Common.go(url);
+        });
+        //排序
+        $("#btn-sort ul li").click(function(){
+            var url = $(this).attr("data-url");
+            Common.go(url);
+        });
+
+        //图片加载
+        var lazyload =$.noConflict();
+        lazyload(function(){
+            lazyload("#zx_shop li a img").lazyload({
+                placeholder : "${ctx}/static/images/zuixin/zx_jiazai.gif",
+                effect :"fadeIn"
+            });
+        });
+    });
+
+</script>
+
+<style>
+    .sui-pagination ul{display: block;}
+    .sui-pagination div .page-num{height: 33px!important;}
+    .sui-pagination div .page-num + .page-confirm{height: 34px!important;}
+    .pagination-small div > span{line-height: 37px;}
+    .sui-pagination{padding:0;}
+    .sui-pagination div{float:left;}
+    .zx_page{margin:15px auto 0 auto;}
+    .sui-pagination ul > li.dotted > a, .sui-pagination ul > li.dotted > span{background: #f5f5f5;}
+</style>
+<%}%>
+<%layout("/web/layout/body_layout2.html"){%>
+<!--查询条件 start-->
+<div class="ty_gyClear"></div>
+<div id="zx_area">
+    <div id="zx_tiaojian">
+        <div class="hasBeenSelected">
+            <span class="zx_hastop"><a href="/">首页</a></span>
+            <span class="zx_hastop"> > </span>
+            <span class="zx_hastop"><a href="javascript:void(0);">${goodsClass.name!}</a></span>
+            <span class="zx_hastop"> > </span>
+            <dl>
+                <dd class="">
+                    <div class=clearList>
+                        <%for(item in searchParams.attrs!){%>
+                        <div class="selectedInfor selectedShow btn-clear" data-url="${urls.searchUrl3(url, 'attr='+item.value.pid + '_0', searchParams, 'attr','thirdclassid')}">
+                            <span>${item.value.name}</span>
+                            <em></em>
+                        </div>
+                        <%}%>
+                        <%for(item in searchParams.params!){%>
+                        <%if(!isEmpty(item.value.name)){%>
+                        <div class="selectedInfor selectedShow btn-clear" data-url="${urls.searchUrl3(url, '', searchParams, 'brand','thirdclassid')}">
+                            <span>${item.value.name}</span>
+                            <em></em>
+                        </div>
+                        <%}%>
+                        <%}%>
+                    </div>
+                    <%if((searchParams.attrs.~size + searchParams.params.~size) > 1){%>
+                    <div class="selectedInfor selectedShow btn-clear" data-url="${url}">清除全部条件<em></em></div>
+                    <%}%>
+                </dd>
+            </dl>
+        </div>
+    </div>
+    <div class="selectNumberScreen">
+        <div id="selectList" class="screenBox screenBackground">
+            <%for(attribute in goodsClass.children!){%>
+            <dl class="listIndex" attr="terminal_brand_s">
+                <dt>${attribute.name}：</dt>
+                <dd>
+                    <%for(item in attribute.children!){%>
+                    <a href="${urls.searchUrl3(url, 'attr='+item.pid + '_' + item.id, searchParams, 'attr','thirdclassid')}" class="${strutil.contain(parameter.attr!'' ,item.pid + '_' + item.id)?'selected':''}">${item.name}</a>
+                    <%}%>
+                </dd>
+            </dl>
+            <%}%>
+            <%if(!isEmpty(brands!)){%>
+            <dl class="listIndex" attr="terminal_brand_s">
+                <dt>品牌：</dt>
+                <dd>
+                    <%for(item in brands!){%>
+                    <a href="${urls.searchUrl3(url, 'brand=eq_' + item.id, searchParams, 'brand','thirdclassid')}" class="${(parameter.brand!'' == 'eq_' + item.id)?'selected':''}">${item.name}</a>
+                    <%}%>
+                </dd>
+            </dl>
+            <%}%>
+        </div>
+    </div>
+</div>
+
+<div id="zx_shanshiA">
+    <div class="zx_shanshiMain">
+        <div class="zx_shanshiA">
+            <span>符合条件的商品共<em>${pager.page.totalNum!0}</em>件</span>
+        </div>
+        <div class="zx_shanshiR" id="btn-sort">
+            <ul>
+                <li class="${decode(searchParams.orders.time!'' ,'asc','up','desc','down','')}"
+                    data-url="${urls.searchUrl3(url, '', searchParams, 'sorts','thirdclassid')}&sorts=time_${searchParams.orders.time!'' == 'asc'?'desc':'asc'}">上架</li>
+                <li class="${decode(searchParams.orders.price!'' ,'asc','up','desc','down','')}"
+                    data-url="${urls.searchUrl3(url, '', searchParams, 'sorts','thirdclassid')}&sorts=price_${searchParams.orders.price!'' == 'asc'?'desc':'asc'}">价格</li>
+                <li class="${decode(searchParams.orders.saleNum!'' ,'asc','up','desc','down','')}"
+                    data-url="${urls.searchUrl3(url, '', searchParams, 'sorts','thirdclassid')}&sorts=saleNum_${searchParams.orders.saleNum!'' == 'asc'?'desc':'asc'}">销量</li>
+            </ul>
+        </div>
+    </div>
+</div>
+<!--商品列表 start-->
+<div id="zx_shop" >
+    <div class="zx_shop">
+        <ul class="zx_shopArea">
+            <%for(goods in pager.data){%>
+            <li>
+                <a href="${ctx}/goods/${goods.code}.html" target="_blank">
+                    <img src="${img_url.getS(goods.headImgUrl1)}" />
+                    <p><em>${goods.brand}</em>${goods.name}</p>
+                    <p><b>￥${nums.yuan(goods.wholesalePrice)}</b></p>
+                </a>
+            </li>
+            <%}elsefor{%>
+            <div class="zx_nogoodsM">
+                暂无货品
+            </div>
+            <%}%>
+        </ul>
+    </div>
+    <div class="ty_gyClear"></div>
+    <!--页码 start-->
+    <%if(pager.data.~size > 0){%>
+    <div style="width: 1190px;height: 60px;line-height: 60px;margin:0 auto;">
+        <div style="width: 582px;margin:0 auto;height: 60px;">
+            <#webPage2 url="${url}" val='${pager.page}' size='small' params = '${params!}' showNum = 'show' />
+        </div>
+        <!--页码 end-->
+    </div>
+    <%}%>
+</div>
+<!--商品列表 end-->
+<div class="zx_fuwuCon">
+    <div class="zx_fuwuMain">
+        <img src="/static/images/zuixin/zx_fuwu.png" />
+    </div>
+</div>
+<%}%>

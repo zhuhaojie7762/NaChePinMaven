@@ -1,0 +1,167 @@
+<%layout("../layout/header_layout.html"){%>
+<title>供货商结算</title>
+<%}%>
+<script>
+    $(function() {
+        $(".btn-query").click(function() {
+            if ($.trim($("input[name=startTime]").val()).length == 0 || $.trim($("input[name=endTime]").val()).length == 0) {
+                Msg.danger("请选择结算时间段！！！");
+                return;
+            }
+            $("#query-form").submit();
+        });
+
+        $("#doCheck").click(function() {
+            $("input[name=check]").prop("checked", $(this).prop("checked"));
+        });
+    });
+</script>
+<%layout("../layout/body_layout.html"){%>
+<script type="text/javascript" src="/static/js/web/hd_zixie.js?v=${v}"></script>
+<div class="query-zone" id="toDay_Con">
+    <form class="sui-form form-horizontal query-form" id="query-form">
+        <div class="sui-row">
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        结算时间
+                    </span>
+                    <input type="text" class="input-date h22" name="startTime" data-toggle="datepicker"
+                           data-date-timepicker='true' value="${parameter.startTime!}">
+                    <span class="add-on2">-</span>
+                    <input type="text" class="input-date h22" name="endTime" data-toggle="datepicker"
+                           data-date-timepicker='true' value="${parameter.endTime!}">
+                </div>
+            </div>
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        供货商公司名
+                    </span>
+                    <input type="text" class="input h22" name="supplierCompany" value="${parameter.supplierCompany!}"/>
+                </div>
+            </div>
+        </div>
+        <div class="sui-row">
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        支付宝帐号
+                    </span>
+                    <input type="text" class="input h22" name="alipayCode" value="${parameter.alipayCode!}"/>
+                </div>
+            </div>
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        支付宝姓名
+                    </span>
+                    <input type="text" class="input h22" name="alipayName" value="${parameter.alipayName!}"/>
+                </div>
+            </div>
+        </div>
+        <div class="sui-row" id="jiesuanFangs">
+            <div class="span4">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        结算方式
+                    </span>
+                </div>
+                <div class="fuxuankuangz">
+                    <label><input name="settlementMethod" type="radio" value="weekly" ${decode(parameter.settlementMethod!'weekly','weekly','checked','','checked','')} /> 周结 </label>
+                    <label><input name="settlementMethod" type="radio" value="monthly" ${parameter.settlementMethod! == 'monthly'?'checked'} /> 月结 </label>
+                    <label><input name="settlementMethod" type="radio" value="daily" ${parameter.settlementMethod! == 'daily'?'checked'} /> 现结 </label>
+                </div>
+            </div>
+        </div>
+        <div class="sui-row">
+            <input type="button" class="sui-btn btn-primary btn-query" value="查询" />
+            <input type="button" class="sui-btn btn-primary btn-reset" onclick="javascript:Common.go('/admin/settlement/check/goSettlementCheck')" value="重置"/>
+            <input type="button" class="sui-btn btn-primary btn-exportDetail" value="导出供货商账单明细"/>&nbsp;
+            <input type="button" class="sui-btn btn-primary btn-exportTotal" value="导出结算汇总"/>
+        </div>
+    </form>
+</div>
+<table class="sui-table table-bordered" id="yueJieTab">
+    <thead>
+    <tr>
+        <th width="90"><label><input type="checkbox" id="doCheck">&nbsp;全选/反选</label></th>
+        <th width="80">上次结算期间</th>
+        <th width="150">供货商公司名</th>
+        <th width="60">需结算金额</th>
+        <th width="60">退款金额</th>
+        <th width="80">应结算金额</th>
+        <th width="150">收款信息</th>
+        <th width="50">结算方式</th>
+        <th width="50">操作</th>
+        <th>备注</th>
+    </tr>
+    </thead>
+    <tbody>
+    <%for(list in lists){%>
+    <tr>
+        <td><input type="checkbox" name="check" value="${listLP.index}" /></td>
+        <td>
+            <%if(list.settlementMethod.name == "现结"){%>
+                --
+            <%}else{%>
+                ${dts.d2d(list.created!)}
+            <%}%>
+        </td>
+        <td>
+            ${list.supplierCompany!}
+            <input type="hidden" name="supplierId" value="${list.supplierId}" />
+        </td>
+        <td>${nums.yuan(list.saleMoney)}</td>
+        <td>${nums.yuan(list.backMoney)}</td>
+        <td>${nums.yuan(list.saleMoney - list.backMoney)}</td>
+        <td>${list.alipayName!}&nbsp;&nbsp;${list.alipayCode!}</td>
+        <td>${list.settlementMethod.name!}</td>
+        <td>
+            <a href="/admin/settlement/check/checkDetail?supplierId=${list.supplierId!}&startTime=${params.startTime!, 'yyyy-MM-dd HH:mm'}&endTime=${params.endTime!, 'yyyy-MM-dd HH:mm'}" target="_blank">明细</a>
+        </td>
+        <td></td>
+    </tr>
+    <%}elsefor{%>
+    <tr>
+        <td colspan="10" class="zanWuShuju"><p>没有数据</p></td>
+    </tr>
+    <%}%>
+    </tbody>
+</table>
+<script>
+    $(function () {
+        $(".btn-exportDetail").click(function () {
+            if ($("input[name=check]:checkbox:checked").length == 0) {
+                Msg.danger("请选择需要导出的订单");
+                return;
+            }
+            var sid = new Array();
+            $("input[name=check]:checkbox:checked").each(function (i, item) {
+               sid.push($(item).parents("tr").find("input[name=supplierId]").val());
+            });
+            var startTime = $("input[name=startTime]").val();
+            var endTime = $("input[name=endTime]").val();
+            Common.downLoadFile({url: "/admin/settlement/check/exportDetail",
+                data:{sid : sid.join(","), startTime : startTime, endTime : endTime}
+            });
+        });
+
+        $(".btn-exportTotal").click(function () {
+            if ($("input[name=check]:checkbox:checked").length == 0) {
+                Msg.danger("请选择需要导出的订单");
+                return;
+            }
+            var sid = new Array();
+            $("input[name=check]:checkbox:checked").each(function (i, item) {
+                sid.push($(item).parents("tr").find("input[name=supplierId]").val());
+            });
+            var startTime = $("input[name=startTime]").val();
+            var endTime = $("input[name=endTime]").val();
+            Common.downLoadFile({url: "/admin/settlement/check/exportTotal",
+                data:{sid : sid.join(","), startTime : startTime, endTime : endTime}
+            });
+        });
+    });
+</script>
+<%}%>

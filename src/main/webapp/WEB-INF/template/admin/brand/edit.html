@@ -1,0 +1,214 @@
+<%layout("../layout/header_layout.html"){%>
+<title>新增品牌</title>
+<script type="text/javascript">
+    $(function(){
+
+        //添加letter规则
+        var letter = function(value, element, param) {
+            var reg = /^[A-Za-z]+$/;
+            if (!reg.test(value)) {
+                return false;
+            } else {
+                return true;
+            }
+        };
+        $.validate.setRule("letter", letter, '请填写字母');
+
+        //表单校验
+        $("form.save-form").validate({
+            rules: {
+                name:{
+                    required:true
+                },
+                pinyin:{
+                    required:true,
+                    maxlength:1,
+                    letter: true
+                },
+/*                logo:{
+                    required: function ($input) {
+                        var value = $input.val();
+                        var id = $("input[name=id]").val();
+                        if (!id && !value) {
+                            return false;
+                        } else {
+                            return true;
+                        }
+                    }
+                },*/
+                comment:{
+                    required:true
+                }
+            }
+        });
+
+        Common.ajaxForm("form.save-form", "/admin/brand", null);
+
+        /**
+         * 删除品牌-分类关联
+         */
+        $(".btn-del").click(function () {
+            var classId = $(this).attr("data-id");
+            var brandId = $("input[name=id]").val();
+            if (confirm("确定删除该品牌与分类的关联吗")) {
+                Common.post("/admin/brand/delBrandClass", {brandId: brandId, classId: classId}, function (json) {
+                    if (json.code == Common.SUCC) {
+                        Msg.success(json.message, function () {
+                            Common.refresh();
+                        });
+                    } else {
+                        Msg.danger(json.message);
+                    }
+                });
+            }
+        });
+
+        /**
+         * 保存
+         */
+        $("input.btn-ok").click(function(){
+            $("form.save-form").submit();
+        });
+
+        /**
+         * 取消
+         */
+        $("input.btn-close").click(function(){
+           Common.go("/admin/brand");
+        });
+    });
+</script>
+<style>
+    .brand-info:after {
+        content: "品牌信息";
+    }
+    .class-info:after {
+        content: "品牌-分类关系";
+    }
+</style>
+<%}%>
+<%layout("../layout/body_layout.html"){%>
+<form class="sui-form form-horizontal save-form " novalidate="novalidate" method="POST" action="/admin/brand/save" enctype="multipart/form-data">
+    <input type="hidden" name="customerId" value="${parameter.customerId!}" >
+    <input type="hidden" name="id" value="${brand.id!}">
+    <div class="info-group brand-info">
+        <div class="control-group">
+            <div class="span3">
+                <div class="input-prepend">
+                    <span class="add-on"><b>*</b>品牌名称</span>
+                    <input type="text" class="input-fat h18 w200" placeholder="请输入品牌名称" name="name" value="${brand.name!}">
+                </div>
+            </div>
+            <div class="span3">
+                <div class="input-prepend">
+                    <span class="add-on"><b>*</b>品牌名称拼音首字母</span>
+                    <input type="text" class="input-fat h18 w200" placeholder="请输入品牌名称拼音首字母" name="pinyin" value="${brand.pinyin!}">
+                </div>
+            </div>
+        </div>
+        <div class="control-group">
+            <div class="span3">
+                <div class="input-prepend hdMore_btns">
+                    <span class="add-on">品牌图片上传</span>
+                    <input type="file" id="imgsc" name="logo" onchange="previewImage(this)" />
+                    <div class="pic_l">
+                        <span id="preview">
+                            <img id="imghead" width="220" src="${isEmpty(img_url.getM(brand.logo!))?'/static/images/web/ncp_upload.png':img_url.getM(brand.logo!)}"/>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="control-group">
+            <div class="span3">
+                <div class="input-prepend">
+                    <span class="add-on"><b>*</b>品牌介绍</span>
+                    <textarea class="input-xlarge w600"  placeholder="品牌详细介绍" name="comment" rows="3">${brand.comment!}</textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+    <%if(brand.id!0 >0){%>
+    <div class="info-group class-info">
+        <table class="sui-table table-bordered">
+            <thead>
+            <th>分类ID</th>
+            <th>分类名称</th>
+            <th>操作</th>
+            </thead>
+            <tbody>
+            <%for(item in class!){%>
+            <tr>
+                <td>${item.id}</td>
+                <td>${item.name}</td>
+                <td><a href="javascript:void(0);" class="sui-btn btn-small btn-del" title="删除" data-id="${item.id}">删除</a></td>
+            </tr>
+            <%}elsefor{%>
+            <tr>
+                <td colspan="5" class="zanWuShuju"><p>没有数据</p></td>
+            </tr>
+            <%}%>
+            </tbody>
+        </table>
+    </div>
+    <%}%>
+    <input type="button" class="sui-btn btn-primary btn-ok" value="保存"/>
+    <input type="button" class="sui-btn btn-primary btn-close" value="取消"/>
+</form>
+<%}%>
+<script type="text/javascript">
+    /*上传图片*/
+    function previewImage(file)
+    {
+        var MAXWIDTH  = 220;
+        var MAXHEIGHT = 200;
+        var div = document.getElementById('preview');
+        if (file.files && file.files[0])
+        {
+            div.innerHTML ='<img id=imghead>';
+            var img = document.getElementById('imghead');
+            img.onload = function(){
+                var rect = clacImgZoomParam(MAXWIDTH, MAXHEIGHT, img.offsetWidth, img.offsetHeight);
+                img.width  =  rect.width;
+                img.height =  rect.height;
+                img.style.marginTop = rect.top+'px';
+            }
+            var reader = new FileReader();
+            reader.onload = function(evt){img.src = evt.target.result;}
+            reader.readAsDataURL(file.files[0]);
+        }
+        else //兼容IE
+        {
+            var sFilter='filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=scale,src="';
+            file.select();
+            var src = document.selection.createRange().text;
+            div.innerHTML = '<img id=imghead>';
+            var img = document.getElementById('imghead');
+            img.filters.item('DXImageTransform.Microsoft.AlphaImageLoader').src = src;
+            var rect = clacImgZoomParam(MAXWIDTH, MAXHEIGHT, img.offsetWidth, img.offsetHeight);
+            status =('rect:'+rect.top+','+rect.left+','+rect.width+','+rect.height);
+            div.innerHTML = "<div id=divhead style='width:"+rect.width+"px;height:"+rect.height+"px;margin-top:"+rect.top+"px;"+sFilter+src+"\"'></div>";
+        }
+    }
+    function clacImgZoomParam( maxWidth, maxHeight, width, height ){
+        var param = {top:0, left:0, width:width, height:height};
+        if( width>maxWidth || height>maxHeight )
+        {
+            rateWidth = width / maxWidth;
+            rateHeight = height / maxHeight;
+
+            if( rateWidth > rateHeight )
+            {
+                param.width =  maxWidth;
+                param.height = Math.round(height / rateWidth);
+            }else
+            {
+                param.width = Math.round(width / rateHeight);
+                param.height = maxHeight;
+            }
+        }
+        param.left = Math.round((maxWidth - param.width) / 2);
+        param.top = Math.round((maxHeight - param.height) / 2);
+        return param;
+    }
+</script>

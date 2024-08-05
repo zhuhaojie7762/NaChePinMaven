@@ -1,0 +1,227 @@
+<%layout("/web/layout/header_layout.html"){%>
+<!--Web Uploader-->
+<script type="text/javascript" src="/static/js/web/webuploader.js?v=${v}"></script>
+<%}%>
+<%layout("../layout/body_layout.html"){%>
+<div class="zx_type">
+    <div class="zx_arrow"></div>
+    收款帐户设置
+</div>
+<p class="zx_grzxUser"><span class="indTitleTao"></span>收款帐户设置</p>
+<div class="ncnum_userMain" id="skzhSheZhi">
+    <form action="doAddPayee" id="doAdd" method="post">
+    <p class="ncnum_p1 ncnum_p2">
+        <span class="ncnum_span01">收款人帐号：</span>
+        <span><input type="text" name="payeeAccount" onblur="javascript:this.className=''" onfocus="javascript:this.className='xzhong'" maxlength="50" /></span>
+    </p>
+    <p class="ncnum_p1 ncnum_p2">
+        <span class="ncnum_span01">收款人真实姓名：</span>
+        <span><input type="text" name="payeeName" onblur="javascript:this.className=''" onfocus="javascript:this.className='xzhong'" maxlength="50" /></span>
+    </p>
+    <div class="shouquanupdat">
+        <input type="hidden" id="imagePolicy" value="${imagePolicy.policy!}" />
+        <input type="hidden" id="imageSignature" value="${imagePolicy.signature!}" />
+
+        <span class="shouquanBtn" id="imgPicker">上传授权书</span>
+        <div  id="shouquan">
+            <img id="shouquanImg" border="0" src="/static/images/web/image.png" width="168" height="168" />
+            <input id="imgResult" type="hidden" name="fileUrl" value=""/>
+        </div>
+    </div>
+    <p class="ncnum_p1 ncnum_p2">
+        <span class="ncnum_span01">&nbsp;</span>
+        <span><label><input type="checkbox" name="defaultAccount" value="1" /> 设置为默认收款帐户</label></span>
+    </p>
+    <p class="ncnum_p1 ncnum_p2">
+        <span class="ncnum_span01">&nbsp;</span>
+        <input type="submit" class="shouquanBtn" value="提交" />
+    </p>
+    </form>
+    <!--图片预览弹出框 start-->
+    <div id="bgDiv"></div>
+    <div id="sqsImgBig">
+        <div class="casewinright">
+            <div class="sqsCdel">
+                <a onclick = "document.getElementById('sqsImgBig').style.display='none';document.getElementById('bgDiv').style.display='none';">
+                    <img src="/static/images/web/close.png" width="35" height="35"/>
+                </a>
+            </div>
+            <div class="winright">
+                <img src="" width="120%"/>
+            </div>
+        </div>
+    </div>
+    <!--图片预览弹出框 end-->
+    <table class="sui-table table-bordered" id="guanZhList">
+        <thead>
+        <tr>
+            <th>收款人帐号</th>
+            <th>收款人真实姓名</th>
+            <th width="60">授权书</th>
+            <th width="60">状态</th>
+            <th>备注</th>
+            <th width="220">操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <%for(list in lists!){%>
+        <tr>
+            <td>
+                ${list.payeeAccount!}
+                <%if(list.defaultAccount != false){%>
+                    <br />（默认帐号）
+                <%}%>
+            </td>
+            <td>${list.payeeName}</td>
+            <td>
+                <span class="ncguanzhu_chaK02">
+                    <!--<input type="button" value="预览" id="yulan" />-->
+                    <img src="${img_url.getL(list.certificate)}" class="xiaoshouxing" onclick="bigImg(this)"  height="50" title="点击预览大图" />
+                </span>
+            </td>
+            <td>${list.status.name!}</td>
+            <td>${list.remark!}</td>
+            <td>
+                <span class="ncguanzhu_chaK02">
+                    <a title="修改" href="/member/goUpdatePayee?id=${list.id!}">修改</a>
+                </span>
+                <span class="ncguanzhu_chaK02">
+                    <a title="删除" href="javascript:;" class="doDelete" data-id="${list.id!}">删除</a>
+                </span>
+                <span class="ncguanzhu_chaK02">
+                    <%if(list.defaultAccount == false){%>
+                        <a title="默认帐号" href="javascript:;" class="doDefault" data-id="${list.id!}">设为默认帐号</a>
+                    <%}%>
+                </span>
+            </td>
+        </tr>
+        <%}%>
+        </tbody>
+    </table>
+</div>
+<%}%>
+<script>
+$(function() {
+    // 图片上传
+    var $ = jQuery,
+            $list = $('#shouquan'),
+            ratio = window.devicePixelRatio || 1,
+            thumbnailWidth = 168 * ratio,
+            thumbnailHeight = 168 * ratio,
+            uploader;
+
+    uploader = WebUploader.create({
+        auto: true,
+        disableGlobalDnd: true,
+        server: 'http://v0.api.upyun.com/nachepin-storage',
+        pick: '#imgPicker',
+        fileNumLimit: 1,
+        duplicate :true,
+        accept: {
+            title: 'Images',
+            extensions: 'gif,jpg,jpeg,bmp,png',
+            mimeTypes: 'image/*'
+        },
+        formData:{'policy':$("#imagePolicy").val(),
+            'signature':$("#imageSignature").val()
+        },
+        compress: false
+    });
+
+    // 当有文件添加进来的时候
+    uploader.on( 'fileQueued', function( file ) {
+        uploader.makeThumb( file, function( error, src ) {
+            if ( error ) {
+                $("#shouquanImg").remove();
+                $("#shouquan").append('<span>不能预览</span>');
+                return;
+            }
+            $("#shouquanImg").attr( 'src', src );
+        }, thumbnailWidth, thumbnailHeight );
+    });
+
+    // 文件上传过程中创建进度条实时显示。
+    uploader.on( 'uploadProgress', function( file, percentage ) {
+        var $li = $( '#'+file.id ),
+                $percent = $li.find('.progress span');
+        if ( !$percent.length ) {
+            $percent = $('<p class="progress"><span></span></p>')
+                    .appendTo( $li )
+                    .find('span');
+        }
+        $percent.css( 'width', percentage * 100 + '%' );
+    });
+
+    // 文件上传成功，给item添加成功class, 用样式标记上传成功。
+    uploader.on( 'uploadSuccess', function( file,response ) {
+        $("#imgResult").val(response.url);
+        uploader.reset();
+    });
+
+    // 文件上传失败，现实上传出错。
+    uploader.on( 'uploadError', function( file ) {
+        var $li = $( '#'+file.id ),
+                $error = $li.find('div.error');
+        if ( !$error.length ) {
+            $error = $('<div class="error"></div>').appendTo( $li );
+        }
+        $error.text('上传失败');
+    });
+
+    // 完成上传完了，成功或者失败，先删除进度条。
+    uploader.on( 'uploadComplete', function( file ) {
+        $( '#'+file.id ).find('.progress').remove();
+    });
+
+    // 信息提交
+    Common.ajaxForm($("form#doAdd"), null, function (result) {
+        var btn = $("form#doAdd").find("input[type=submit]");
+        if (result.code == Common.SUCC) {
+            Common.refresh();
+            Msg.success(result.message, top);
+        } else {
+            MsgBox.danger(btn, result.message, function(){}, 0);
+        }
+    });
+
+    // 删除
+    $(".doDelete").click(function () {
+        if (!confirm("确认删除此收款账号吗？")) {
+            return;
+        }
+        Common.post2({
+            url: "/member/doDeletePayee",
+            param: { id : $(this).attr("data-id") },
+            success: function (result) {
+                if (result.code == Common.SUCC) {
+                    Msg.success(result.message);
+                }
+                setTimeout(function () {
+                    Common.refresh();
+                }, 1000);
+            }
+        });
+    });
+
+    // 设为默认账号
+    $(".doDefault").click(function () {
+        if (!confirm("确认设置此收款账号为默认账号吗？")) {
+            return;
+        }
+        Common.post2({
+            url: "/member/doDefaultPayee",
+            param: { id : $(this).attr("data-id") },
+            success: function (result) {
+                if (result.code == Common.SUCC) {
+                    Msg.success(result.message);
+                }
+                setTimeout(function () {
+                    Common.refresh();
+                }, 1000);
+            }
+        });
+    });
+});
+</script>
+</html>
+

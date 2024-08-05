@@ -1,0 +1,288 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="carlist_content-Type" carlist_content="text/html; charset=utf-8"/>
+    <meta name="viewport" carlist_content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+    <title>退款申请</title>
+    <link href="/static/images/web/ncp_logo.ico" rel="icon" type="image/x-icon"/>
+    <link href="/static/images/web/ncp_logo.ico" rel="shortcut icon" type="image/x-icon"/>
+    <link rel="stylesheet" type="text/css" href="/static/css/web/common.css?v=${v}">
+    <link rel="stylesheet" type="text/css" href="/static/css/web/style.css?v=${v}">
+    <link rel="stylesheet" type="text/css" href="/static/css/web/jindutiao.css?v=${v}">
+    <link rel="stylesheet" type="text/css" href="/static/css/web/sui.min.css?v=${v}">
+    <link rel="stylesheet" type="text/css" href="/static/css/web/sui-append.css?v=${v}">
+    <link rel="stylesheet" type="text/css" href="/static/css/msg_box.css?v=${v}">
+    <!-- web Uploader css -->
+    <link rel="stylesheet" type="text/css" href="/static/css/web/webuploader.css?v=${v}">
+    <link rel="stylesheet" type="text/css" href="/static/css/web/demo.css?v=${v}">
+    <!-- /web Uploader css -->
+    <script type="text/javascript" src="/static/js/web/jquery-1.9.1.min.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/web/zixie.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/web/baidu.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/web/file.js?v=${v}"></script>
+    <script type="text/javascript" src="http://g.alicdn.com/sj/lib/jquery/dist/jquery.min.js?v=${v}"></script>
+    <script type="text/javascript" src="http://g.alicdn.com/sj/dpl/1.5.1/js/sui.min.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/MsgBox.js?v=${v}"></script>
+    <!--添加规格 start -->
+    <script type="text/javascript" src="/static/js/web/liandong.js?v=${v}"></script>
+    <!--添加规格 end -->
+    <!-- 一次性上传多个图片 start -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js?v=${v}"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js?v=${v}"></script>
+    <![endif]-->
+    <script type="text/javascript" src="/static/js/common.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/jquery.form.js?v=${v}"></script>
+</head>
+<%layout("../../layout/body_layout.html"){%>
+<style>
+    .sui-dropup .caret::before, .sui-dropdown .caret::before{ content: "";}
+    .sui-dropup.dropdown-bordered .dropdown-inner a, .sui-dropdown.dropdown-bordered .dropdown-inner a{min-width: 143px;color:#999;}
+    .dropdown-inner {
+        background: rgba(0, 0, 0, 0) url("/static/images/web/xialabg.png") no-repeat scroll 238px center;
+    }
+    .sui-dropup.dropdown-bordered .dropdown-inner > .sui-dropdown-menu, .sui-dropdown.dropdown-bordered .dropdown-inner > .sui-dropdown-menu {
+        margin: 0 0 0 65px;
+        min-width: 98%;
+    }
+    .sui-dropup.dropdown-bordered > .dropdown-inner > .sui-dropdown-menu, .sui-dropdown.dropdown-bordered > .dropdown-inner > .sui-dropdown-menu {
+        left: -62px;
+    }
+    .ttlog_search{padding-top:1px;}
+    .sui-dropup.dropdown-bordered .dropdown-inner, .sui-dropdown.dropdown-bordered .dropdown-inner {
+        border-radius: 0;
+        border:1px solid #ddd;
+    }
+    .sui-dropup.dropdown-bordered, .sui-dropdown.dropdown-bordered{line-height: 19px;}
+    .chaxunquyu{position: absolute;top:185px;left:253px;}
+    #chaxun .add_shouxing,#chaxun .daycha{cursor: pointer;color:#169bd5;}
+    #chaxun .daycha{margin:0 12px;}
+    #ddmlF{height: 190px;}
+    #add_mywuliu .ncjhs_p001 span input[type="text"],#add_mywuliu .ncjhs_p001 span input.ncjhs_inputxZ[type="text"] {
+        padding: 6px 15px;
+        width: 130px;
+        color:#444;
+    }
+    #add_mywuliu textarea{width: 500px;border:1px solid #f0f0f0;height: 50px;padding:10px;color:#666;font-size: 12px;}
+    /*zuixin add start*/
+    #add_mywuliu textarea{width: 800px;border:1px solid #f0f0f0;height: 50px;padding:10px;color:#666;font-size: 12px;color:#999;}
+    #add_mywuliu input#refundAmount{width: 230px;color:#999;}
+    #add_mywuliu span.add_zuicin{font-size:12px;margin-left:15px;}
+    .sui-dropup.dropdown-bordered .dropdown-inner > .sui-dropdown-menu, .sui-dropdown.dropdown-bordered .dropdown-inner > .sui-dropdown-menu{max-height: 160px;}
+    .sui-dropup.dropdown-bordered > .dropdown-inner > .sui-dropdown-menu, .sui-dropdown.dropdown-bordered > .dropdown-inner > .sui-dropdown-menu{left:-65px;}
+    .sui-dropup.dropdown-bordered .dropdown-inner > .sui-dropdown-menu, .sui-dropdown.dropdown-bordered .dropdown-inner > .sui-dropdown-menu{min-width: 100%;}
+    .zx_grzxUser{margin: 28px 16px 0 18px;}
+    .sui-form .help-inline{margin-top:5px;}
+    #add_xiangq02{width: 959px;margin: 15px 16px 10px;}
+    /*zuixin add end*/
+</style>
+<div class="zx_type">
+    <div class="zx_arrow"></div>
+    退款申请
+</div>
+<p class="zx_grzxUser"><span class="indTitleTao"></span>退款申请</p>
+<!-- 退款商品详情 -->
+<table class="sui-table table-bordered" id="add_xiangq02">
+    <thead>
+    <th>货品详情</th>
+    <th>规格属性</th>
+    <th>单价</th>
+    <th>数量</th>
+    <th>商品金额</th>
+    <th>邮费</th>
+    <th>状态</th>
+    </thead>
+    <tbody>
+    <tr>
+        <td>
+            <dl>
+                <dt><img src="${img_url.getS(goods.headImgUrl1)}" width="60" /></dt>
+                <dd>${goods.brand!}&nbsp;&nbsp;${goods.name!}</dd>
+            </dl>
+        </td>
+        <td>${order.specPropValue!}</td>
+        <td>${nums.yuan(goods.wholesalePrice)}</td>
+        <td>${order.quantity!}</td>
+        <td>${nums.yuan(order.money)}</td>
+        <td>${nums.yuan(trade.postFee)}</td>
+        <td>${order.status.name!}</td>
+    </tr>
+    </tbody>
+</table>
+<div class="ty_gyClear"></div>
+<!-- /退款商品详情 -->
+<fieldset id="add_mywuliu">
+    <!-- 退款申请提交 -->
+    <legend>退款申请信息</legend>
+    <form action="doRefund" id="doRefund" method="post">
+    <input type="hidden" name="orderCode" value="${order.code!}" />
+    <p class="add_pspan add_marTop">
+        <span class="span001">是否已收到货：</span>
+        <span>
+            <input type="radio" data-rules="required" id="isGoods01" name="isCargo" checked="checked" value="1" /><label for="isGoods01" class="ncp_labelY">是</label>
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            <input type="radio" data-rules="required" id="isGoods02" name="isCargo" value="0" /><label for="isGoods02" class="ncp_labelY">否</label>
+        </span>
+    </p>
+    <p class="add_pspan add_marTop">
+    <span class="span001">退款原因：</span>
+
+    <div class="add_gudingwz02" id="cause1">
+        <div class="ty_gyClear"></div>
+            <span class="sui-dropdown dropdown-bordered select">
+                <span class="dropdown-inner add_xiala">
+                    <a id="wuliu" role="button" data-toggle="dropdown" href="#" class="dropdown-toggle">
+                        <input type="hidden" name="refundCause" id="refundCause1" value="请选择退款原因" /><i class="caret"></i>
+                        <span>请选择退款原因</span>
+                    </a>
+                    <ul id="wuliuCon" role="menu" aria-labelledby="wuliu" class="sui-dropdown-menu">
+                        <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="退运费" title="退运费">退运费</a></li>
+                        <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="做工粗糙/有瑕疵" title="做工粗糙/有瑕疵">做工粗糙/有瑕疵</a></li>
+                        <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="质量问题" title="质量问题">质量问题</a></li>
+                        <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="大小/尺寸与商品描述不符" title="大小/尺寸与商品描述不符">大小/尺寸与商品描述不符</a></li>
+                        <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="颜色/图案/款式与商品描述不符" title="颜色/图案/款式与商品描述不符">颜色/图案/款式与商品描述不符</a></li>
+                        <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="材质与商品描述不符" title="材质与商品描述不符">材质与商品描述不符</a></li>
+                        <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="少件（含缺少配件）" title="少件（含缺少配件）">少件（含缺少配件）</a></li>
+                        <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="卖家发错货" title="卖家发错货">卖家发错货</a></li>
+                        <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="收到商品时有破损/污渍/变形" title="收到商品时有破损/污渍/变形">收到商品时有破损/污渍/变形</a></li>
+                        <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="未按约定时间发货" title="未按约定时间发货">未按约定时间发货</a></li>
+                        <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="发票问题" title="发票问题">发票问题</a></li>
+                        <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="其它原因" title="其它原因">其它原因</a></li>
+                    </ul>
+                </span>
+            </span>
+    </div>
+
+    <div class="add_gudingwz02" id="cause2" style="display: none;">
+        <div class="ty_gyClear"></div>
+        <span class="sui-dropdown dropdown-bordered select">
+            <span class="dropdown-inner add_xiala">
+                <a id="wuliu" role="button" data-toggle="dropdown" href="#" class="dropdown-toggle">
+                    <input type="hidden" name="refundCause" id="refundCause2" value="请选择退款原因" /><i class="caret"></i>
+                    <span>请选择退款原因</span>
+                </a>
+                <ul id="wuliuCon" role="menu" aria-labelledby="wuliu" class="sui-dropdown-menu">
+                    <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="不喜欢/不想要" title="不喜欢/不想要">不喜欢/不想要</a></li>
+                    <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="货物破损已拒签" title="货物破损已拒签">货物破损已拒签</a></li>
+                    <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="空包裹" title="空包裹">空包裹</a></li>
+                    <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="未按约定时间发货" title="未按约定时间发货">未按约定时间发货</a></li>
+                    <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="快递/物流一直未送到" title="快递/物流一直未送到">快递/物流一直未送到</a></li>
+                    <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="快递/物流无跟踪记录" title="快递/物流无跟踪记录">快递/物流无跟踪记录</a></li>
+                    <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="其它原因" title="其它原因">其它原因</a></li>
+                </ul>
+            </span>
+        </span>
+    </div>
+
+    </p>
+    <p class="add_pspan add_marTop ncjhs_p001">
+        <span class="span001">退款金额：</span>
+        <span>
+            <input type="text" name="refundAmount" id="refundAmount" maxlength="20" placeholder="最大退款金额" onkeyup="value=value.replace(/[^\d.]/g,'')" />
+        </span>
+        <span class="add_zuicin">退款金额明细 <font color="red">${detailPrice!}</font> 元（商品金额-优惠卷比例金额+运费= 退款金额）</span>
+    </p>
+    <p class="add_pspan add_marTop ncjhs_p001 add_inputheight">
+        <span class="span001">退款说明：</span>
+        <span>
+            <textarea name="refundExplain" id="refundExplain" oninput="value=value.slice(0,200)" placeholder="0~200字以内"></textarea>
+        </span>
+    </p>
+    <div class="ty_gyClear"></div>
+    <p class="add_pspan add_nobotBor">
+        <span class="span001">图片信息：</span>
+        <span><strong>( 最多上传5张 )</strong></span>
+    </p>
+    <p class="add_inputheight02">
+        <!-- web Uploader html -->
+        <div id="uploader" class="wu-example">
+            <div class="queueList">
+                <div id="dndArea" class="placeholder">
+                    <div id="filePicker"></div>
+                    <p>复制粘贴或将照片拖到这里，单次最多可选 5 张</p>
+                </div>
+            </div>
+            <div class="statusBar" style="display:none;">
+            <div class="progress">
+                <span class="text">0%</span>
+                <span class="percentage"></span>
+            </div>
+            <div class="info"></div>
+            <div class="btns">
+                <div id="filePicker2"></div>
+                <div class="uploadBtn">开始上传</div>
+            </div>
+        </div>
+        </div>
+        <input type="hidden" id="imagePolicy" value="${imagePolicy.policy!}" />
+        <input type="hidden" id="imageSignature" value="${imagePolicy.signature!}" />
+        <!-- /web Uploader html -->
+    </p>
+    <p class="add_twobtns">
+        <input type="button" class="ttLog_chaXun add_ncptijiao" value="提交" />
+        <input type="button" class="ttLog_chongzhi add_ncpquxiao" value="取消" />
+    </p>
+    </form>
+    <!-- /退款申请提交 -->
+</fieldset>
+<!-- web Uploader js -->
+<script type="text/javascript">
+    var BASE_URL = '/webuploader';
+</script>
+<script type="text/javascript" src="/static/js/web/webuploader.js?v=${v}"></script>
+<script type="text/javascript" src="/static/js/web/demo.js?v=${v}"></script>
+<!-- /web Uploader js -->
+<script>
+    $(function() {
+        $('#isGoods01').click(function() {
+            $('#cause2').hide();
+            $('#cause1').show();
+            $('#refundCause2').attr("disabled", "disabled");
+            $('#refundCause1').removeAttr("disabled");
+        });
+        $('#isGoods02').click(function() {
+            $('#cause1').hide();
+            $('#cause2').show();
+            $('#refundCause1').attr("disabled", "disabled");
+            $('#refundCause2').removeAttr("disabled");
+        });
+
+        $('.add_ncptijiao').click(function() {
+            if (dateFunc.coerceImg($('input[name=refundCause]').val())) {
+                if ($('.filelist').find('li').length == 0 ) {
+                    return;
+                }
+            }
+
+            if ($('.filelist').find('li').length > 0 ) {
+                if ($('input[name=headImgUrl]').length == 0) {
+                    Msg.danger("请先上传图片");
+                    return;
+                }
+            }
+
+            var request = $.ajax({
+                url: "doRefund",
+                data: $('#doRefund').serialize(),
+                dataType: "json"
+            });
+
+            request.done(function(result) {
+                if (result.code == Common.SUCC) {
+                    Msg.success(result.message);
+                    setTimeout(function() {
+                        Common.go("/member/buyOrder/list.html");
+                    }, 2000);
+                } else {
+                    Msg.danger(result.message);
+                }
+            });
+        });
+
+        $('.add_ncpquxiao').click(function() {
+            Common.go("/member/buyOrder/list.html");
+        });
+    });
+</script>
+<%}%>
+</html>

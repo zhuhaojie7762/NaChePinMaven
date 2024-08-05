@@ -1,0 +1,73 @@
+<%layout("/web/layout/header_layout2.html"){%>
+    <script type="text/javascript" src="http://g.alicdn.com/sj/lib/jquery/dist/jquery.min.js?v=${v}"></script>
+    <script type="text/javascript">
+        $(function(){
+            Pagination.init();
+        });
+    </script>
+    <style type="text/css">
+        .sui-table th {background:-moz-linear-gradient(top,#fcfcfc,#e6e6e7);background:-o-linear-gradient(top,#fcfcfc,#e6e6e7);background:-webkit-gradient(linear, 0 0, 0 bottom, from(#fcfcfc), to(#e6e6e7));box-shadow: 1px 0 0 #f6f6f7 inset;color: #707083;font-size: 1em;font-weight: normal;text-shadow: 1px 1px 0 #ffffff;vertical-align: middle;padding:8px 10px;}
+        .sui-table tr:hover,.sui-table:focus{background:-moz-linear-gradient(top,#fff,#fafafb);background:-o-linear-gradient(top,#fff,#fafafb);background:-webkit-gradient(linear, 0 0, 0 bottom, from(#fff), to(#fafafb));}
+        .sui-table{color:rgba(0,0,0,.8);}
+        #xiaoPiLiang a{float: right;}
+        .ttppzq_ps{padding-top:12px;}
+    </style>
+<%}%>
+<%layout("/web/layout/body_layout2.html"){%>
+<div class="ttlog_main">
+    <div class="ttppzq_con ty_rerelative">
+        <p class="ttppzq_title ttppzq_marTo"><span class="xiaodingZhiTao"></span>小批量定制流程：</p>
+        <p class="ttppzq_liucImg"></p>
+        <div class="ty_gyClear"></div>
+        <p class="ttppzq_top" id="xiaoPiLiang">
+            <span class="ttppzq_title"><span class="xiaodingZhiTao"></span>小批量定制信息</span>
+            <span class="ttppzq_ps">&nbsp;&nbsp;( *注：纳车品供销服务平台对于小批量定制信息的真实性不承担任何责任 )</span>
+            <%if(customer.type.val == 0){%>
+            <a href="/member/purchase.html?showMsg=true"><span class="ttwhlist_title">我的定制</span></a>
+            <a href="/member/purchase.html?showMsg=true" title="小批量定制申请"><span class="ttwhlist_title110">小批量定制申请</span></a>
+            <%}else{%>
+            <a href="/member/seek/list.html" title="我的定制"><span class="ttwhlist_title">我的定制</span></a>
+            <a href="/seek/seek.html" title="小批量定制申请"><span class="ttwhlist_title110">小批量定制申请</span></a>
+            <%}%>
+        </p>
+        <div class="ty_gyClear"></div>
+        <p class="ttppzq_top">
+        <table class="sui-table table-bordered" id="zx_dingzhi" >
+            <thead>
+            <tr>
+                <th width="52">编号</th>
+                <th width="80">进货商名</th>
+                <th width="80">联系电话</th>
+                <th width="80">QQ号</th>
+                <th width="80">旺旺号</th>
+                <th>定制产品名称</th>
+                <th width="60">数量</th>
+                <th width="120">材质</th>
+                <th width="60">报价</th>
+                <th width="72">要货时间</th>
+                <th width="70">操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <%for(seek in pager.data){%>
+            <tr>
+                <td>${seek.code}</td>
+                <td>${customer.type.val==2?seek.contacts:'仅供货商可见'}</td>
+                <td>${customer.type.val==2?seek.phone:'仅供货商可见'}</td>
+                <td>${customer.type.val==2?seek.qq:'仅供货商可见'}</td>
+                <td>${customer.type.val==2?seek.wangwang:'仅供货商可见'}</td>
+                <td>${seek.goodsName}</td>
+                <td>${seek.quantity}</td>
+                <td>${seek.material}</td>
+                <td>${seek.price}</td>
+                <td>${seek.needTime,"yyyy-MM-dd"}</td>
+                <td><a href="/seek/seekDetails/${seek.code}.html" title="查看详情" class="ttLog_chongzhi">查看</a></td>
+            </tr>
+            <%}%>
+            </tbody>
+        </table>
+        <#webPage val='${pager.page}' size='large' params = '${params!}' showNum = 'hide' />
+        </p>
+    </div>
+</div>
+<%}%>

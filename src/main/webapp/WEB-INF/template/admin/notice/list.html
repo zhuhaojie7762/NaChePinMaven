@@ -1,0 +1,76 @@
+<%layout("../layout/header_layout.html"){%>
+<script src="/static/js/web/zixie.js"></script>
+<title>公告管理</title>
+<script type="text/javascript">
+    $(function(){
+        /**
+         * 置顶处理
+         */
+       $(".btn-top").click(function(){
+           var id = $(this).attr("data-id");
+           Common.post("/admin/notice/moveTop", {id:id}, function(json){
+              if(json.code == Common.SUCC){
+                  Msg.success(json.message, function(){
+                      Common.go("/admin/notice");
+                  });
+              } else{
+                  Msg.danger(json.message);
+              }
+           });
+       });
+
+        /**
+         * 删除
+         */
+        $(".btn-del").click(function(){
+            if(!confirm("确认要删除吗？")){
+                return;
+            }
+            var id = $(this).attr("data-id");
+            Common.post("/admin/notice/del", {id:id}, function(json){
+                if(json.code == Common.SUCC){
+                    Msg.success(json.message, function(){
+                        Common.refresh();
+                    });
+                } else{
+                    Msg.danger(json.message);
+                }
+            });
+        });
+    });
+</script>
+<%}%>
+<%layout("../layout/body_layout.html"){%>
+<style>
+    .sui-dropup.dropdown-bordered .dropdown-inner, .sui-dropdown.dropdown-bordered .dropdown-inner {border-radius: 0;width: 142px;}
+</style>
+<div class="add_newzengcon">
+    <span class="add_newaddBtn" title="发布新文章" onclick="window.location.href='/admin/notice/add'">发布新文章</span>
+</div>
+<table class="sui-table table-bordered" id="pinpaimgs">
+    <thead>
+    <th>标题</th>
+    <th>发布时间</th>
+    <th>操作</th>
+    </thead>
+    <tbody>
+    <%for(item in pager.data){%>
+    <tr>
+        <td>${item.title}</td>
+        <td>${dts.d2s(item.created)}</td>
+        <td>
+            <span class="sui-btn btn-small btn-top" title="置顶" data-id="${item.id}">置顶</span>
+            <a class="sui-btn btn-small btn-edit" title="修改" href="/admin/notice/edit?id=${item.id}">修改</a>
+            <span class="sui-btn btn-small btn-del" title="删除" data-id="${item.id}">删除</span>
+            <a class="sui-btn btn-small" title="查看" href="/admin/notice/detail?id=${item.id}">查看</a>
+        </td>
+    </tr>
+    <%}elsefor{%>
+    <tr>
+        <td colspan="3" class="zanWuShuju"><p>没有数据</p></td>
+    </tr>
+    <%}%>
+    </tbody>
+</table>
+<#page val="${pager.page!}" size="large" params="${parameter.map!}"/>
+<%}%>

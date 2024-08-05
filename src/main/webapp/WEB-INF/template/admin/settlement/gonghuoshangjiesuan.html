@@ -1,0 +1,258 @@
+<%layout("../layout/header_layout.html"){%>
+<title>供货商结算</title>
+<%}%>
+<%layout("../layout/body_layout.html"){%>
+<script type="text/javascript" src="/static/js/web/jquery.js?v=${v}"></script>
+<script type="text/javascript" src="/static/js/web/hd_zixie.js?v=${v}"></script>
+<div class="query-zone" id="toDay_Con">
+    <form class="sui-form form-horizontal query-form" id="query-form">
+        <div class="sui-row">
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        供货商名称
+                    </span>
+                    <input type="text" class="input h22" name="orderCode" value="${parameter.orderCode!}"/>
+                </div>
+            </div>
+            <div class="span4">
+                <div class="input-prepend" style="padding-top: 3px;">
+                    <span class="add-on">
+                        结算状态
+                    </span>
+                    <span class="sui-dropdown dropdown-bordered select" style="margin-top: -4px;">
+                        <span class="dropdown-inner">
+                            <a role="button" href="javascript:void(0);" data-toggle="dropdown"
+                               class="dropdown-toggle h22">
+                                <input value="${parameter.fieldName!}" name="fieldName" type="hidden">
+                                <i class="caret"></i>
+                                <span>
+                                   已结算
+                                </span>
+                            </a>
+                            <ul role="menu" aria-labelledby="drop4" class="sui-dropdown-menu">
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="">请选择</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="">未结算</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="">已结算</a>
+                                </li>
+                            </ul>
+                        </span>
+                    </span>
+                </div>
+            </div>
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        结算时间
+                    </span>
+                    <input type="text" class="input-date h22" name="createdFrom" data-toggle="datepicker"
+                           data-date-timepicker='true' value="">
+                    <span class="add-on2">-</span>
+                    <input type="text" class="input-date h22" name="createdEnd" data-toggle="datepicker"
+                           data-date-timepicker='true' value="">
+                </div>
+            </div>
+        </div>
+        <div class="sui-row">
+            <div class="span4">
+                <div class="input-prepend" style="padding-top: 3px;">
+                    <span class="add-on">
+                        确认状态 &nbsp;&nbsp;
+                    </span>
+                    <span class="sui-dropdown dropdown-bordered select" style="margin-top: -4px;">
+                        <span class="dropdown-inner">
+                            <a role="button" href="javascript:void(0);" data-toggle="dropdown"
+                               class="dropdown-toggle h22">
+                                <input value="${parameter.fieldName!}" name="fieldName" type="hidden">
+                                <i class="caret"></i>
+                                <span>
+                                   已确认
+                                </span>
+                            </a>
+                            <ul role="menu" aria-labelledby="drop4" class="sui-dropdown-menu">
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="">请选择</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="">未确认</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="">已确认</a>
+                                </li>
+                            </ul>
+                        </span>
+                    </span>
+                </div>
+            </div>
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;支付宝帐号
+                    </span>
+                    <input type="text" class="input h22" name="goodsCode" value="${parameter.goodsCode!}"/>
+                </div>
+            </div>
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        支付宝名称
+                    </span>
+                    <input type="text" class="input h22" name="sellerPhone" value="${parameter.sellerPhone!}"/>
+                </div>
+            </div>
+        </div>
+        <div class="sui-row" id="jiesuanFangs">
+            <div class="span4">
+                <div class="input-prepend" style="float:left;">
+                    <span class="add-on">
+                        结算方式
+                    </span>
+                </div>
+                <div class="fuxuankuangz" style="float:left;">
+                    <label><input name="jiesuan" type="radio" value="" checked="checked" /> 周结 </label>
+                    <label><input name="jiesuan" type="radio" value="" /> 月结 </label>
+                    <label><input name="jiesuan" type="radio" value="" /> 现结 </label>
+                    <!--<label><input name="jiesuan" type="checkbox" value="" />其他 </label>-->
+                </div>
+            </div>
+        </div>
+        <div class="sui-row">
+            <button class="sui-btn btn-primary">查询</button>
+            <input type="button" class="sui-btn btn-primary btn-reset" value="重置"/>
+            <input type="button" class="sui-btn btn-primary" value="导出供货商账单明细"/>&nbsp;
+            <input type="button" class="sui-btn btn-primary" value="导出结算汇总"/>
+        </div>
+    </form>
+</div>
+<table class="sui-table table-bordered" id="yueJieTab">
+    <thead>
+    <tr>
+        <th width="70"><input type="checkbox" value="" id="zhuanshuAll">&nbsp;全选/反选</th>
+        <th width="80">上次结算期间</th>
+        <th width="150">供货商名称</th>
+        <th width="60">需结算金额</th>
+        <th width="60">退款金额</th>
+        <th width="80">应结算金额</th>
+        <th width="100">收款信息</th>
+        <th width="60">结算状态</th>
+        <th width="50">结算方式</th>
+        <th width="30">操作</th>
+        <th>备注</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td><input type="checkbox" /></td>
+        <td>2016-08-10</td>
+        <td>天台祥意汽车用品有限公司</td>
+        <td>2000.00</td>
+        <td>100.00</td>
+        <td>19900.00</td>
+        <td>名称+帐号</td>
+        <td>已结算</td>
+        <td>周结</td>
+        <td><a href="/admin/settlement/cur/jiesuanmingxi.html">明细</a></td>
+        <td>交易已完成</td>
+    </tr>
+    <tr>
+        <td><input type="checkbox" /></td>
+        <td>2016-08-10</td>
+        <td>天台祥意汽车用品有限公司</td>
+        <td>2000.00</td>
+        <td>100.00</td>
+        <td>19900.00</td>
+        <td>名称+帐号</td>
+        <td>已结算</td>
+        <td>周结</td>
+        <td><a href="/admin/settlement/cur/jiesuanmingxi.html">明细</a></td>
+        <td>交易已完成</td>
+    </tr>
+    <tr>
+        <td><input type="checkbox" /></td>
+        <td>2016-08-10</td>
+        <td>天台祥意汽车用品有限公司</td>
+        <td>2000.00</td>
+        <td>100.00</td>
+        <td>19900.00</td>
+        <td>名称+帐号</td>
+        <td>已结算</td>
+        <td>周结</td>
+        <td><a href="/admin/settlement/cur/jiesuanmingxi.html">明细</a></td>
+        <td>交易已完成</td>
+    </tr>    <tr>
+        <td><input type="checkbox" /></td>
+        <td>2016-08-10</td>
+        <td>天台祥意汽车用品有限公司</td>
+        <td>2000.00</td>
+        <td>100.00</td>
+        <td>19900.00</td>
+        <td>名称+帐号</td>
+        <td>已结算</td>
+        <td>周结</td>
+        <td><a href="/admin/settlement/cur/jiesuanmingxi.html">明细</a></td>
+        <td>交易已完成</td>
+    </tr>    <tr>
+        <td><input type="checkbox" /></td>
+        <td>2016-08-10</td>
+        <td>天台祥意汽车用品有限公司</td>
+        <td>2000.00</td>
+        <td>100.00</td>
+        <td>19900.00</td>
+        <td>名称+帐号</td>
+        <td>已结算</td>
+        <td>周结</td>
+        <td><a href="/admin/settlement/cur/jiesuanmingxi.html">明细</a></td>
+        <td>交易已完成</td>
+    </tr>    <tr>
+        <td><input type="checkbox" /></td>
+        <td>2016-08-10</td>
+        <td>天台祥意汽车用品有限公司</td>
+        <td>2000.00</td>
+        <td>100.00</td>
+        <td>19900.00</td>
+        <td>名称+帐号</td>
+        <td>已结算</td>
+        <td>周结</td>
+        <td><a href="/admin/settlement/cur/jiesuanmingxi.html">明细</a></td>
+        <td>交易已完成</td>
+    </tr>    <tr>
+        <td><input type="checkbox" /></td>
+        <td>2016-08-10</td>
+        <td>天台祥意汽车用品有限公司</td>
+        <td>2000.00</td>
+        <td>100.00</td>
+        <td>19900.00</td>
+        <td>名称+帐号</td>
+        <td>已结算</td>
+        <td>周结</td>
+        <td><a href="/admin/settlement/cur/jiesuanmingxi.html">明细</a></td>
+        <td>交易已完成</td>
+    </tr>    <tr>
+        <td><input type="checkbox" /></td>
+        <td>2016-08-10</td>
+        <td>天台祥意汽车用品有限公司</td>
+        <td>2000.00</td>
+        <td>100.00</td>
+        <td>19900.00</td>
+        <td>名称+帐号</td>
+        <td>已结算</td>
+        <td>周结</td>
+        <td><a href="/admin/settlement/cur/jiesuanmingxi.html">明细</a></td>
+        <td>交易已完成</td>
+    </tr>
+
+
+
+
+
+<!--    <tr>
+        <td colspan="11" class="zanWuShuju"><p>没有数据</p></td>
+    </tr>-->
+    </tbody>
+</table>
+<%}%>

@@ -1,0 +1,268 @@
+<%layout("../layout/header_layout.html"){%>
+<title>结算账单审核</title>
+<script type="text/javascript" src="/static/js/web/hd_zixie.js?v=${v}"></script>
+<script type="text/javascript">
+    $(function () {
+
+        /**
+         * 选择/取消 全部
+         */
+        $("input[name=ckAll]").click(function () {
+            var checkFlag = $(this).prop("checked");
+            $("input[name=items]:checkbox").prop("checked", checkFlag);
+        });
+
+        /**
+         *  选择/取消 单个
+         */
+        $("input[name=items]:checkbox").click(function () {
+            if ($("input[name=items]:checkbox:checked").length == $("input[name=items]:checkbox").length) {
+                $("input[name=ckAll]:checkbox").prop("checked", 'true');
+            } else {
+                $("input[name=ckAll]:checkbox").removeAttr("checked");
+            }
+        });
+
+        /**
+         * 重置
+         */
+        $("input.btn-reset").click(function () {
+            Common.reset("form.query-form");
+        });
+
+        /**
+         * 提交
+         */
+        Common.ajaxForm($("form.form-create"), null, null);
+        $(".btn-tijiao").unbind("click").bind("click", function() {
+            if($("input[name=items]").length == 0){
+                Msg.danger("无需要结算的订单");
+                return;
+            }
+            $("form.form-create").submit();
+        });
+
+        /**
+         * 导出供应商账单明细
+         */
+        $(".btn-exportDetail").unbind("click").bind("click", function() {
+            if($("input[name=items]:checkbox:checked").length == 0){
+                Msg.danger("选择需要导出订单");
+                return;
+            }
+            var ids = new Array();
+            var startTimes = new Array();
+            var endTimes = new Array();
+            $("input[name=items]:checkbox:checked").each(function (i, item) {
+                ids.push($(item).parents("tr").find("input[name=supplierId]").val());
+                startTimes.push($(item).parents("tr").find("input[name=startTime]").val());
+                endTimes.push($(item).parents("tr").find("input[name=endTime]").val());
+            });
+            var startTime = $("input[name=totalStartTime]").val();
+            var endTime = $("input[name=totalEndTime]").val();
+            Common.downLoadFile({url:"/admin/settlement/operate/exportDetail",
+                data:{totalStartTime:startTime, totalEndTime:endTime, ids:ids.join(","), startTimes:startTimes.join(","), endTimes:endTimes.join(",")}});
+        });
+
+        /**
+         * 导出供应商结算汇总
+         */
+        $(".btn-exportTotal").unbind("click").bind("click", function() {
+            if($("input[name=items]:checkbox:checked").length == 0){
+                Msg.danger("选择需要导出订单");
+                return;
+            }
+            var ids = new Array();
+            var startTimes = new Array();
+            var endTimes = new Array();
+            $("input[name=items]:checkbox:checked").each(function (i, item) {
+                ids.push($(item).parents("tr").find("input[name=supplierId]").val());
+                startTimes.push($(item).parents("tr").find("input[name=startTime]").val());
+                endTimes.push($(item).parents("tr").find("input[name=endTime]").val());
+            });
+            var startTime = $("input[name=totalStartTime]").val();
+            var endTime = $("input[name=totalEndTime]").val();
+            Common.downLoadFile({url:"/admin/settlement/operate/exportTotal",
+                data:{totalStartTime:startTime, totalEndTime:endTime, ids:ids.join(","), startTimes:startTimes.join(","), endTimes:endTimes.join(",")}});
+        });
+    });
+</script>
+<%}%>
+<%layout("../layout/body_layout.html"){%>
+<div class="query-zone" id="searchL">
+    <form class="sui-form form-horizontal query-form" id="query-form">
+        <div class="sui-row" id="jiesuanFangs">
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        供货商名称
+                    </span>
+                    <input type="text" class="input h22" name="supplierName" value="${parameter.supplierName!}"/>
+                </div>
+            </div>
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        应结算金额&nbsp;&nbsp;
+                    </span>
+                    <input type="text" class="input h22" name="settlementMoney" value="${parameter.settlementMoney!}" onkeyup="if(isNaN(value))execCommand('undo')" onafterpaste="if(isNaN(value))execCommand('undo')"/>
+                </div>
+            </div>
+            <div class="span4">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        结算方式
+                    </span>
+                </div>
+                <div class="fuxuankuangz">
+                    <label><input name="settlementMethod" type="radio" value="weekly" ${parameter.settlementMethod!'weekly' == 'weekly'?'checked'} /> 周结 </label>
+                    <label><input name="settlementMethod" type="radio" value="monthly" ${parameter.settlementMethod! == 'monthly'?'checked'} /> 月结 </label>
+                    <label><input name="settlementMethod" type="radio" value="daily" ${parameter.settlementMethod! == 'daily'?'checked'} /> 现结 </label>
+                </div>
+            </div>
+        </div>
+        <div class="sui-row" style="margin:15px 0 0 2px;">
+            <button class="sui-btn btn-primary">查询</button>
+            <input type="button" class="sui-btn btn-primary btn-reset" value="重置"/>
+            <input type="button" class="sui-btn btn-primary btn-exportDetail" value="导出供货商账单明细"/>&nbsp;
+            <input type="button" class="sui-btn btn-primary btn-exportTotal" value="导出结算汇总"/>
+        </div>
+    </form>
+</div>
+<form class="sui-form form-horizontal form-create" action="/admin/settlement/operate/create" method="post" id="form-data">
+    <input type="hidden" name="totalStartTime" value="${dts.d2d(startTime)}" />
+    <input type="hidden" name="totalEndTime" value="${dts.d2d(endTime)}" />
+    <table class="sui-table table-bordered" id="yueJieTab">
+        <thead>
+        <tr>
+            <th width="70"><input type="checkbox" value="" name="ckAll" id="ckAll">&nbsp;<label for="ckAll">全选/反选</label></th>
+            <th width="80">上次结算日期</th>
+            <th width="80">本次结算日期</th>
+            <th width="146">供货商名称</th>
+            <th width="60">销售金额</th>
+            <th width="60">退款金额</th>
+            <th width="80">应结算金额</th>
+            <th width="100">收款信息</th>
+            <th width="50">结算状态</th>
+            <th width="50">结算方式</th>
+            <th width="36">操作</th>
+            <th>备注</th>
+        </tr>
+        </thead>
+        <tbody>
+        <%
+        var sumSaleMoney = 0;
+        var sumBackMoney = 0;
+        %>
+        <%for(item in data){%>
+        <tr>
+            <td><input type="checkbox" name="items" value="${itemLP.index}" /></td>
+            <td>${dts.d2d(item.startTime!)}<input type="hidden" name="startTime" value="${dts.d2d(item.startTime!)}"></td>
+            <td>${dts.d2d(item.endTime!)}<input type="hidden" name="endTime" value="${dts.d2d(item.endTime!)}"></td>
+            <td>
+                ${item.supplierCompany}
+                <input type="hidden" name="supplierId" value="${item.supplierId!}">
+                <input type="hidden" name="supplierName" value="${item.supplierName!}">
+                <input type="hidden" name="supplierCompany" value="${item.supplierCompany!}">
+            </td>
+            <td>${nums.yuan(item.saleMoney)}<input type="hidden" name="saleMoney" value="${item.saleMoney!}"></td>
+            <td>${nums.yuan(item.backMoney)}<input type="hidden" name="backMoney" value="${item.backMoney!}"></td>
+            <td>${nums.yuan(item.saleMoney - item.backMoney)}</td>
+            <td>
+                ${item.alipayName!}&nbsp;&nbsp;${item.alipayCode!}
+                <input type="hidden" name="alipayCode" value="${item.alipayCode!}">
+                <input type="hidden" name="alipayName" value="${item.alipayName!}">
+            </td>
+            <td>未结算</td>
+            <td>${item.settlementMethod.name}<input type="hidden" name="settlementMethod" value="${item.settlementMethod}"></td>
+            <td><a href="/admin/settlement/operate/detail?supplierId=${item.supplierId}">明细</a></td>
+            <td></td>
+        </tr>
+        <%
+        sumSaleMoney = sumSaleMoney + item.saleMoney;
+        sumBackMoney = sumBackMoney + item.backMoney;
+        %>
+        <%}%>
+        </tbody>
+        <tfoot id="yunyingftoot">
+            <tr>
+                <td colspan="12">
+                    <span>销售总金额：<strong>${nums.yuan(sumSaleMoney)}</strong>元</span>
+                    <span>退款总金额：<strong>${nums.yuan(sumBackMoney)}</strong>元</span>
+                    <span>应结算总金额：<strong>${nums.yuan(sumSaleMoney - sumBackMoney)}</strong>元</span>
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+
+    <div class="tuihuiYuanyin">
+        <p><strong>审批流程及意见：</strong></p>
+        <%for(item in checkLog){%>
+        <%if(item.status == 'return_check_first'){%>
+        <p>账单于${dts.d2s(item.createdTime)}被运营主管退回，退回原因：${item.remark}</p>
+        <%}else if(item.status == 'wait_check_first'){%>
+        <p>账单于${dts.d2s(item.createdTime)}被运营专员，发起</p>
+        <%}else if(item.status == 'return_check_second'){%>
+        <p>账单于${dts.d2s(item.createdTime)}被财务主管退回，退回原因：${item.remark}</p>
+        <%}else if(item.status == 'wait_check_second'){%>
+        <p>账单于${dts.d2s(item.createdTime)}被运营主管，审核通过</p>
+        <%}else if(item.status == 'return_check_thirdly'){%>
+        <p>账单于${dts.d2s(item.createdTime)}被部门经理退回，退回原因：${item.remark}</p>
+        <%}else if(item.status == 'wait_check_thirdly'){%>
+        <p>账单于${dts.d2s(item.createdTime)}被财务主管，审核通过</p>
+        <%}else if(item.status == 'wait_pay'){%>
+        <p>账单于${dts.d2s(item.createdTime)}被部门经理，审核通过</p>
+        <%}else if(item.status == 'finish'){%>
+        <p>账单于${dts.d2s(item.createdTime)}被财务，付款</p>
+        <%}%>
+        <%}%>
+    </div>
+
+    <div class="hdMore_btns hd_botomDiv">
+        <a class="sui-btn btn-primary" id="tongguoBtoon"  href="javascript:;">通过</a>
+        <div id="tuihuiCon">
+            <span class="sui-btn btn-small tuihuism" href="">退回</span>
+            <div class="tuihuishouming">
+                <span><textarea name="remark" id="remark" class="beiZhuQuYu" rows="5" placeholder="请填写退回原因（50字以内）。"></textarea></span>
+                <input type="button" class="sui-btn btn-small quxiaoBtn" value="取消" />
+                <input type="button" class="sui-btn btn-small quedingBtn" value="确定" />
+            </div>
+            <div class="shijizhongliang"></div>
+        </div>
+    </div>
+</form>
+<script>
+    $(function (){
+        $("#tongguoBtoon").click(function (){
+            Common.post2({
+               url: "/admin/settlement/check/checkPass",
+               param: { code : "${code!}", checkId : "${checkId!}" },
+               success: function (result) {
+                   if (result.code == Common.SUCC) {
+                       Msg.success(result.message);
+                   }
+                   setTimeout(function () {
+                       Common.go("/admin/settlement/check/goAuditManage");
+                   }, 1000);
+               }
+            });
+        });
+
+        $(".quedingBtn").click(function () {
+            Common.post2({
+                url: "/admin/settlement/check/checkNotPass",
+                param: { code : "${code!}", checkId : "${checkId!}", remark : $.trim($("#remark").val()) },
+                success: function (result) {
+                    if (result.code == Common.SUCC) {
+                        Msg.success(result.message);
+                    }
+                    setTimeout(function () {
+                        Common.go("/admin/settlement/check/goAuditManage");
+                    }, 1000);
+                }
+            });
+        });
+    });
+
+</script>
+<%}%>
